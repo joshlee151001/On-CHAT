@@ -1,0 +1,187 @@
+rules_version = '2';
+
+// ============================================================
+// OnChat 보안 규칙
+// Firebase 콘솔 → Firestore Database → 규칙 탭에 전부 붙여넣고 [게시]
+//
+// 핵심: Gmail 인증을 마친 계정(uid)만 사용 가능.
+//       accounts/{uid} 에 저장된 내 전화번호(010...)로
+//       "내 데이터인지", "내가 들어가 있는 방인지"를 확인함
+// ============================================================
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---------- 공통 ----------
+    // Gmail 링크 인증까지 끝낸 사람
+    function verified() {
+      return request.auth != null && request.auth.token.email_verified == true;
+    }
+    function accountPath(uid) {
+      return /databases/$(database)/documents/accounts/$(uid);
+    }
+    // 프로필까지 만든 사람 (대부분의 기능은 이게 필요)
+    function signedIn() {
+      return verified() && exists(accountPath(request.auth.uid));
+    }
+    // 내 전화번호 (010...)
+    function me() {
+      return get(accountPath(request.auth.uid)).data.phone;
+    }
+    function roomPath(roomId) {
+      return /databases/$(database)/documents/rooms/$(roomId);
+    }
+    // 1:1 방 이름은 "번호_번호" → 내 번호가 들어 있으면 내 1:1 방
+    function isMyDmId(roomId) {
+      return roomId.split('_').hasAny([me()]);
+    }
+    // 작업 전 또는 작업 후에 이 방의 멤버인가
+    // (방 만들기 = 작업 후에 멤버 / 나가기 = 작업 전에 멤버)
+    function memberBefore(roomId) {
+      return exists(roomPath(roomId)) && me() in get(roomPath(roomId)).data.members;
+    }
+    function memberAfter(roomId) {
+      return existsAfter(roomPath(roomId)) && me() in getAfter(roomPath(roomId)).data.members;
+    }
+    // 내가 이 방에 들어온 시간 (예전에 만든 방엔 없을 수 있어서 기본값 0)
+    function myJoin(roomId) {
+      return get(roomPath(roomId)).data.get('joinedAt', {}).get(me(), 0);
+    }
+    // 사진은 앱이 만든 JPEG(data:image/jpeg;base64,...)만 → 이상한 주소/스크립트 차단
+    function okImage(data, field) {
+      return data.get(field, '') == ''
+        || (data[field] is string && data[field].matches('^data:image/jpeg;base64,[A-Za-z0-9+/=]+$'));
+    }
+
+    // ---------- 계정 ↔ 전화번호 연결 ----------
+    // 본인만 읽음. 만들 때 그 번호 프로필의 주인도 나로 같이 저장해야 함 (한 번호 = 한 계정)
+    match /accounts/{uid} {
+      allow get: if request.auth != null && request.auth.uid == uid;
+      allow list: if false;
+      allow create: if verified()
+        && request.auth.uid == uid
+        && request.resource.data.phone is string
+        && request.resource.data.phone.matches('^01[0-9]{8,9}$')
+        && getAfter(/databases/$(database)/documents/users/$(request.resource.data.phone)).data.uid == uid;
+      allow update, delete: if false;
+    }
+
+    // ---------- 사용자 프로필 ----------
+    // 읽기: 번호를 알고 있을 때 그 한 명만 (친구 검색, 프로필 보기, 가입 때 번호 중복 확인)
+    //       → 가입자 전체 목록을 한꺼번에 가져가는 건 막음 (list 금지)
+    // 쓰기: 본인 것만, 전화번호/주인은 못 바꿈
+    function profileOk(phone) {
+      return request.resource.data.phone == phone
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.nickname is string
+        && request.resource.data.nickname.size() > 0
+        && request.resource.data.nickname.size() <= 12
+        && okImage(request.resource.data, 'photo');
+    }
+    // 가입할 때: 이 번호를 내 계정에 연결하는 중 (accounts 문서를 같이 만듦)
+    function claimingPhone(phone) {
+      return getAfter(accountPath(request.auth.uid)).data.phone == phone;
+    }
+    match /users/{phone} {
+      allow get: if request.auth != null;
+      allow list: if false;
+      allow create: if verified() && profileOk(phone) && claimingPhone(phone);
+      allow update: if verified() && profileOk(phone) && (
+        resource.data.get('uid', null) == request.auth.uid
+        // 예전 버전에서 만든 주인 없는 프로필 → 처음 인증한 사람이 이어받음
+        || (resource.data.get('uid', null) == null && claimingPhone(phone))
+      );
+      allow delete: if false;
+
+      // 친구 목록, 차단 목록: 본인만 읽고 씀 (남이 내 친구/차단 목록을 못 봄)
+      match /friends/{friend} {
+        allow read, write: if signedIn() && phone == me();
+      }
+      match /blocked/{other} {
+        allow read, write: if signedIn() && phone == me();
+      }
+    }
+
+    // ---------- 채팅방 ----------
+    match /rooms/{roomId} {
+      // 한 방 읽기: 내가 멤버인 방 / 내 1:1 방(나갔다가 다시 들어올 때) / 아직 없는 방(새로 만들 때 확인용)
+      allow get: if signedIn() && (
+        resource == null
+        || me() in resource.data.members
+        || (resource.data.type == 'dm' && isMyDmId(roomId))
+      );
+      // 방 목록: "내가 멤버인 방" 조건으로 찾을 때만
+      allow list: if signedIn() && me() in resource.data.members;
+
+      // 만들기: 나를 포함해야 함. 1:1 방은 이름이 두 사람 번호여야 함
+      allow create: if signedIn()
+        && me() in request.resource.data.members
+        && request.resource.data.members.size() >= 2
+        && request.resource.data.members.size() <= 100
+        && (
+          request.resource.data.type == 'group'
+          || (request.resource.data.type == 'dm'
+              && isMyDmId(roomId)
+              && request.resource.data.members.toSet() == roomId.split('_').toSet())
+        );
+
+      // 수정: 멤버만 (메시지 보내기, 읽음, 초대, 이름 변경, 나가기)
+      //       + 내가 나갔던 1:1 방에 다시 들어가기
+      // 바꿀 수 있는 칸만 허용, 방 종류는 못 바꿈
+      // 멤버 목록은 "사람 추가(초대)" 또는 "나 자신만 빠지기"만 가능 → 남을 강퇴할 수 없음
+      // 1:1 방엔 방 번호의 두 사람 말고는 못 들어옴
+      allow update: if signedIn()
+        && request.resource.data.type == resource.data.type
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(
+             ['lastMessage', 'lastAt', 'lastSender', 'lastRead', 'unread', 'members', 'joinedAt', 'name'])
+        && (resource.data.type != 'dm'
+            || request.resource.data.members.toSet().difference(roomId.split('_').toSet()).size() == 0)
+        && (
+          (me() in resource.data.members && membersChangeOk())
+          || (resource.data.type == 'dm' && isMyDmId(roomId)
+              && request.resource.data.members.toSet() == resource.data.members.toSet().union([me()].toSet()))
+        );
+
+      allow delete: if false;
+
+      function membersChangeOk() {
+        let before = resource.data.members.toSet();
+        let after = request.resource.data.members.toSet();
+        return after.hasAll(before)
+          || (before.difference(after) == [me()].toSet() && after.difference(before).size() == 0);
+      }
+
+      // ---------- 메시지 ----------
+      match /messages/{messageId} {
+        // 읽기: 그 방 멤버만, 그리고 내가 들어온 뒤의 대화만
+        //       (초대받기 전 / 나갔다 다시 들어오기 전 대화는 못 봄)
+        allow read: if signedIn() && memberBefore(roomId)
+          && resource.data.clientAt >= myJoin(roomId);
+
+        // 보내기: 멤버만, 보낸 사람은 반드시 나
+        allow create: if signedIn()
+          && request.resource.data.sender == me()
+          && request.resource.data.clientAt is number
+          && okImage(request.resource.data, 'image')
+          && (memberBefore(roomId) || memberAfter(roomId));
+
+        // 수정:
+        //  - 내가 보낸 메시지 "모두에게서 삭제" (내용 지우기만 가능)
+        //  - 아무 메시지나 "나에게서 삭제" (hiddenFor에 내 번호 추가만 가능)
+        allow update: if signedIn() && memberBefore(roomId) && (
+          (resource.data.sender == me()
+            && request.resource.data.diff(resource.data).affectedKeys()
+                 .hasOnly(['deleted', 'text', 'image'])
+            && request.resource.data.deleted == true
+            && request.resource.data.get('text', '') == ''
+            && request.resource.data.get('image', '') == '')
+          ||
+          (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['hiddenFor'])
+            && request.resource.data.hiddenFor.toSet()
+                 .difference(resource.data.get('hiddenFor', []).toSet()) == [me()].toSet())
+        );
+
+        allow delete: if false;
+      }
+    }
+  }
+}
