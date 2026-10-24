@@ -1,5 +1,5 @@
 // OnChat 서비스 워커: 홈 화면 앱으로 열리게 하고, 알림을 누르면 그 채팅방을 열어 줌
-const CACHE = "onchat-v1";
+const CACHE = "onchat-v2"; // 아이콘 바꿈
 const SHELL = ["./", "./index.html", "./manifest.json", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", (e) => {
