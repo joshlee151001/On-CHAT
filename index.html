@@ -4,6 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>OnChat</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#FF9F43">
+  <link rel="icon" href="icon-192.png">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="OnChat">
   <style>
 /* ===== 색상 (라이트) ===== */
 :root {
@@ -67,6 +73,7 @@ button { font-family: inherit; }
   position: relative;
   max-width: 420px;
   height: 100vh;
+  height: 100dvh; /* 폰 브라우저 주소창/키보드 높이 반영 */
   margin: 0 auto;
   background: var(--bg);
   overflow: hidden;
@@ -531,7 +538,7 @@ button { font-family: inherit; }
   color: var(--text);
   border-radius: 18px;
   padding: 9px 14px;
-  font-size: 15px;
+  font-size: 16px; /* 16px보다 작으면 아이폰이 입력할 때 화면을 확대해 버림 */
   font-family: inherit;
   line-height: 1.4;
   max-height: 110px;
@@ -731,17 +738,165 @@ button { font-family: inherit; }
 }
 .field-label { font-size: 12px; color: var(--text-sub); margin: 4px 0 -4px 4px; }
 
-/* ===== 문자 인증 ===== */
-.step-info { text-align: center; font-size: 14px; color: var(--text-sub); line-height: 1.6; margin-bottom: 6px; }
-.step-info b { color: var(--text); }
-.code-input { text-align: center; font-size: 24px; letter-spacing: 10px; font-weight: 700; }
-.step-links { display: flex; justify-content: center; gap: 16px; }
-.step-links .link-btn, #nick-cancel { margin: 4px 0 0; }
-.link-btn:disabled { opacity: 0.6; text-decoration: none; cursor: default; }
-.login-msg { margin-top: 12px; line-height: 1.5; }
-.recaptcha-note { font-size: 11px; color: var(--text-sub); text-align: center; margin-top: 28px; line-height: 1.5; }
-.recaptcha-note a { color: var(--text-sub); }
-.grecaptcha-badge { visibility: hidden; } /* 아래 안내 문구로 대신 표시 */
+/* ===== 설정 추가 ===== */
+#tab-settings .setting-row { border-bottom: none; }
+#tab-settings .section-title { padding-top: 18px; }
+.setting-sub { display: block; font-size: 12px; color: var(--text-sub); margin-top: 3px; }
+.setting-value { font-size: 14px; color: var(--text-sub); }
+
+/* ===== 앱 안 알림 배너 ===== */
+.notice {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  z-index: 25;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 16px;
+  background: var(--sheet);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
+  cursor: pointer;
+  animation: drop 0.2s ease-out;
+}
+@keyframes drop { from { transform: translateY(-20px); opacity: 0; } }
+.notice .avatar, .notice .group-avatar { width: 40px; height: 40px; border-radius: 15px; font-size: 16px; }
+.notice .info { min-width: 0; flex: 1; }
+.notice .title { font-size: 14px; font-weight: 700; }
+.notice .body {
+  font-size: 13px;
+  color: var(--text-sub);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ===== 친구 아닌 사용자 / 차단 배너 ===== */
+.dm-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--primary-soft);
+  font-size: 13px;
+  border-bottom: 1px solid var(--border);
+}
+.dm-banner-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.dm-banner .btn.sm { padding: 7px 10px; font-size: 13px; border-radius: 9px; }
+.pick-row .btn.sm { padding: 8px 12px; font-size: 13px; }
+
+/* ===== 메시지: 링크 / 삭제됨 / 더 보기 ===== */
+.bubble a { color: inherit; text-decoration: underline; word-break: break-all; }
+.bubble.deleted { color: var(--text-sub); font-style: italic; }
+.msg.mine .bubble.deleted { background: var(--bubble-other); color: var(--text-sub); }
+.load-more { text-align: center; font-size: 12px; color: var(--text-sub); padding: 8px 0; }
+.bubble, .photo { -webkit-touch-callout: none; user-select: text; }
+.msg-menu-preview {
+  font-size: 13px;
+  color: var(--text-sub);
+  background: var(--input-bg);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.chat-input textarea:disabled { opacity: 0.6; }
+
+/* ===== 사진 여러 장 ===== */
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 3px;
+  width: 230px;
+  border-radius: 14px;
+  overflow: hidden;
+}
+.photo-grid.cols3 { grid-template-columns: repeat(3, 1fr); }
+.photo-grid .photo {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  max-width: none;
+  max-height: none;
+  border-radius: 0;
+}
+
+/* ===== 전송 실패 ===== */
+.msg.failed .bubble, .msg.failed .photo-grid, .msg.failed .photo { opacity: 0.6; }
+.fail-btn {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: none;
+  background: var(--danger);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  flex-shrink: 0;
+  align-self: center;
+}
+
+/* ===== 접속 중 / 입력 중 ===== */
+.avatar { position: relative; }
+.person.online .avatar::after {
+  content: "";
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: #2ECC71;
+  border: 2px solid var(--bg);
+}
+.chat-titles { flex: 1; min-width: 0; }
+.chat-sub { font-size: 12px; color: var(--text-sub); margin-top: 1px; }
+.chat-sub.on { color: #2ECC71; }
+.chat-sub:empty { display: none; }
+.typing-line { font-size: 12px; color: var(--text-sub); padding: 4px 16px; background: var(--chat-bg); }
+
+/* ===== 설치 안내 ===== */
+.install-guide p { font-size: 14px; line-height: 1.7; margin-bottom: 14px; }
+.install-guide .note { font-size: 12px; color: var(--text-sub); }
+.kbd { display: inline-block; padding: 0 6px; border: 1px solid var(--border); border-radius: 6px; background: var(--input-bg); }
+
+/* ===== Gmail 인증 ===== */
+.hint { font-size: 11px; color: var(--text-sub); font-weight: 400; }
+#auth-submit { margin-top: 12px; }
+#forgot-btn { margin: 6px auto 0; }
+.verify-box { text-align: center; display: flex; flex-direction: column; gap: 10px; }
+.verify-box .mail-icon { font-size: 44px; }
+.verify-to { font-size: 15px; line-height: 1.6; }
+.verify-to b { word-break: break-all; }
+.verify-how { font-size: 13px; color: var(--text-sub); line-height: 1.6; margin-bottom: 8px; }
+/* ===== 첫 화면 / 로그인 ===== */
+#login-screen { flex-direction: column; overflow-y: auto; }
+#login-screen:not(.hidden) { display: flex; }
+.welcome-actions { display: flex; flex-direction: column; gap: 10px; }
+.auth-head { display: flex; align-items: center; gap: 4px; margin: 0 0 6px -8px; }
+.auth-head h2 { font-size: 22px; }
+.auth-desc { font-size: 14px; color: var(--text-sub); line-height: 1.6; margin-bottom: 18px; }
+.auth-form { display: flex; flex-direction: column; gap: 8px; }
+.auth-form .field-label { margin: 8px 0 0 4px; }
+.row { display: flex; gap: 8px; }
+.row .input { flex: 1; min-width: 0; }
+.btn.sm { padding: 0 14px; font-size: 14px; white-space: nowrap; flex-shrink: 0; }
+.input:disabled { opacity: 0.6; }
+.code-input { letter-spacing: 6px; font-weight: 700; font-size: 18px; }
+.code-input::placeholder { letter-spacing: normal; font-weight: 400; font-size: 16px; }
+.code-help { font-size: 13px; color: var(--text-sub); margin: 2px 0 0 4px; min-height: 18px; }
+.verified { font-size: 13px; color: var(--primary); font-weight: 700; margin: 2px 0 0 4px; }
+.login-msg { margin-top: 14px; line-height: 1.5; }
+#finish-btn { margin-top: 10px; }
+.switch-mode { text-align: center; font-size: 13px; color: var(--text-sub); margin-top: 18px; }
+.switch-mode .link-btn { display: inline; margin: 0 0 0 4px; }
   </style>
 </head>
 <body>
@@ -750,43 +905,65 @@ button { font-family: inherit; }
     <!-- ========== 로그인 ========== -->
     <section id="login-screen" class="hidden">
       <div class="login-box">
-        <div class="logo">
-          <div class="logo-bubble">On</div>
-          <h1>OnChat</h1>
-          <p class="sub">번호 하나로 시작하는 대화</p>
-        </div>
-        <!-- 1단계: 전화번호 -->
-        <form id="step-phone" class="form hidden">
-          <input id="phone" class="input" type="tel" placeholder="전화번호 (010-0000-0000)" maxlength="13" autocomplete="tel" required>
-          <button type="submit" id="send-code-btn" class="btn">인증번호 받기</button>
-        </form>
 
-        <!-- 2단계: 인증번호 6자리 -->
-        <form id="step-code" class="form hidden">
-          <p class="step-info"><b id="code-phone"></b> 로 보낸<br>인증번호 6자리를 입력해 주세요.</p>
-          <input id="code" class="input code-input" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="000000">
-          <button type="submit" id="verify-btn" class="btn" disabled>확인</button>
-          <div class="step-links">
-            <button type="button" id="resend-btn" class="link-btn">인증번호 다시 받기</button>
-            <button type="button" id="change-phone-btn" class="link-btn">번호 다시 입력</button>
+        <!-- 첫 화면 -->
+        <div id="welcome" class="hidden">
+          <div class="logo">
+            <div class="logo-bubble">On</div>
+            <h1>OnChat</h1>
+            <p class="sub">친구랑 바로 이어지는 대화</p>
           </div>
-        </form>
+          <div class="welcome-actions">
+            <button id="go-signup" class="btn" type="button">새 프로필 만들기</button>
+            <button id="go-login" class="btn ghost" type="button">기존 프로필로 로그인</button>
+          </div>
+        </div>
 
-        <!-- 3단계: 처음 가입이면 닉네임 -->
-        <form id="step-nick" class="form hidden">
-          <p class="step-info">처음 오셨네요!<br>친구들에게 보일 닉네임을 정해 주세요.</p>
-          <input id="nickname" class="input" type="text" placeholder="닉네임" maxlength="12">
-          <button type="submit" id="nick-btn" class="btn">시작하기</button>
-          <button type="button" id="nick-cancel" class="link-btn">다른 번호로 로그인</button>
-        </form>
+        <!-- 가입 / 로그인 -->
+        <div id="auth-panel" class="hidden">
+          <div class="auth-head">
+            <button id="auth-back" class="icon-btn" type="button" aria-label="뒤로">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <h2 id="auth-title"></h2>
+          </div>
+          <p id="auth-desc" class="auth-desc"></p>
 
-        <p id="login-msg" class="login-msg"></p>
-        <p class="recaptcha-note">
-          이 사이트는 reCAPTCHA로 보호되며 Google
-          <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">개인정보처리방침</a>과
-          <a href="https://policies.google.com/terms" target="_blank" rel="noopener">서비스 약관</a>이 적용됩니다.
-        </p>
-        <div id="recaptcha-box"></div>
+          <form id="auth-form" class="auth-form" autocomplete="on" novalidate>
+            <div id="nick-field" class="auth-form">
+              <label class="field-label" for="nickname">닉네임</label>
+              <input id="nickname" class="input" type="text" maxlength="12" placeholder="친구들에게 보일 이름" autocomplete="nickname">
+            </div>
+            <div id="phone-field" class="auth-form">
+              <label class="field-label" for="phone">전화번호</label>
+              <input id="phone" class="input" type="tel" maxlength="13" placeholder="010-0000-0000" autocomplete="tel">
+            </div>
+            <div id="email-field" class="auth-form">
+              <label class="field-label" for="email">Gmail</label>
+              <input id="email" class="input" type="email" placeholder="example@gmail.com" autocomplete="email">
+            </div>
+            <div id="pw-field" class="auth-form">
+              <label class="field-label" for="password">비밀번호 <small class="hint">(6자 이상)</small></label>
+              <input id="password" class="input" type="password" minlength="6" placeholder="비밀번호" autocomplete="current-password">
+            </div>
+            <button id="auth-submit" class="btn" type="submit"></button>
+            <button id="forgot-btn" class="link-btn" type="button">비밀번호를 잊었어요</button>
+          </form>
+
+          <!-- Gmail 인증 기다리는 화면 -->
+          <div id="verify-box" class="verify-box hidden">
+            <div class="mail-icon">✉️</div>
+            <p class="verify-to"><b id="verify-email"></b><br>으로 인증 메일을 보냈어요.</p>
+            <p class="verify-how">Gmail에서 메일 속 <b>링크</b>를 누르면 자동으로 시작돼요.<br>메일이 안 보이면 <b>스팸함</b>도 확인해 주세요.</p>
+            <button id="check-verified-btn" class="btn" type="button">인증했어요</button>
+            <button id="resend-btn" class="btn ghost" type="button">메일 다시 보내기</button>
+          </div>
+
+          <p id="login-msg" class="login-msg"></p>
+          <p class="switch-mode">
+            <span id="switch-text"></span><button id="switch-btn" class="link-btn" type="button"></button>
+          </p>
+        </div>
       </div>
     </section>
 
@@ -824,9 +1001,28 @@ button { font-family: inherit; }
         <header class="topbar"><h2>설정</h2></header>
         <div id="settings-me"></div>
         <div class="divider"></div>
-        <button id="theme-row" class="setting-row" style="margin-top: 8px;">
+        <div class="section-title">알림</div>
+        <button id="notify-row" class="setting-row">
+          <span>새 메시지 알림<small id="notify-sub" class="setting-sub"></small></span>
+          <span id="notify-switch" class="switch"></span>
+        </button>
+        <button id="sound-row" class="setting-row">
+          알림 소리 <span id="sound-switch" class="switch"></span>
+        </button>
+        <div class="section-title">앱</div>
+        <button id="install-row" class="setting-row">
+          <span>홈 화면에 앱 추가<small class="setting-sub">주소창 없이 앱처럼 열려요</small></span>
+          <span class="setting-value">›</span>
+        </button>
+        <div class="section-title">화면</div>
+        <button id="theme-row" class="setting-row">
           다크모드 <span id="theme-switch" class="switch"></span>
         </button>
+        <div class="section-title">친구</div>
+        <button id="blocked-row" class="setting-row">
+          차단 친구 관리 <span id="blocked-count" class="setting-value"></span>
+        </button>
+        <div class="section-title">계정</div>
         <button id="logout-btn" class="setting-row danger">로그아웃</button>
       </div>
 
@@ -854,17 +1050,26 @@ button { font-family: inherit; }
         <button id="chat-back" class="icon-btn" aria-label="뒤로">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
         </button>
-        <h3 id="chat-title"></h3>
+        <div class="chat-titles"><h3 id="chat-title"></h3><div id="chat-sub" class="chat-sub"></div></div>
         <button id="chat-menu-btn" class="icon-btn" aria-label="채팅방 메뉴">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
         </button>
       </header>
+      <div id="dm-banner" class="dm-banner hidden">
+        <span id="dm-banner-text"></span>
+        <div class="dm-banner-actions">
+          <button id="dm-add" class="btn sm" type="button">친구 추가</button>
+          <button id="dm-block" class="btn sm ghost" type="button">차단</button>
+          <button id="dm-unblock" class="btn sm ghost" type="button">차단 해제</button>
+        </div>
+      </div>
       <div id="msg-list"></div>
+      <div id="typing-line" class="typing-line hidden"></div>
       <form id="chat-form" class="chat-input">
         <button id="attach-btn" class="attach-btn" type="button" aria-label="사진 보내기">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/></svg>
         </button>
-        <input id="photo-input" type="file" accept="image/*" hidden>
+        <input id="photo-input" type="file" accept="image/*" multiple hidden>
         <textarea id="chat-text" rows="1" placeholder="메시지 입력"></textarea>
         <button id="send-btn" class="send-btn" type="submit" disabled aria-label="전송">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
@@ -968,6 +1173,81 @@ button { font-family: inherit; }
       </div>
     </div>
 
+    <!-- ========== 메시지 길게 누르면 나오는 메뉴 ========== -->
+    <div id="msg-menu" class="overlay hidden">
+      <div class="sheet">
+        <div class="sheet-head">
+          <h3>메시지</h3>
+          <button class="icon-btn" data-close aria-label="닫기">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+          </button>
+        </div>
+        <p id="msg-menu-preview" class="msg-menu-preview"></p>
+        <div class="menu-list">
+          <button id="mm-copy">복사</button>
+          <button id="mm-save">사진 저장</button>
+          <button id="mm-unsend" class="danger">모두에게서 삭제</button>
+          <button id="mm-hide">나에게서 삭제</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== 전송 실패 메뉴 ========== -->
+    <div id="fail-menu" class="overlay hidden">
+      <div class="sheet">
+        <div class="sheet-head">
+          <h3>전송하지 못한 메시지</h3>
+          <button class="icon-btn" data-close aria-label="닫기">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+          </button>
+        </div>
+        <div class="menu-list">
+          <button id="fm-retry">재전송</button>
+          <button id="fm-delete" class="danger">삭제</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== 홈 화면에 추가 안내 ========== -->
+    <div id="install-modal" class="overlay hidden">
+      <div class="sheet">
+        <div class="sheet-head">
+          <h3>홈 화면에 앱 추가</h3>
+          <button class="icon-btn" data-close aria-label="닫기">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+          </button>
+        </div>
+        <div class="install-guide">
+          <p><b>아이폰 (사파리)</b><br>아래쪽 공유 버튼 <span class="kbd">⬆︎</span> → <b>홈 화면에 추가</b></p>
+          <p><b>안드로이드 (크롬)</b><br>오른쪽 위 메뉴 <span class="kbd">⋮</span> → <b>앱 설치</b> 또는 <b>홈 화면에 추가</b></p>
+          <p><b>컴퓨터 (크롬·엣지)</b><br>주소창 오른쪽 설치 아이콘 <span class="kbd">⊕</span> 누르기</p>
+          <p class="note">웹 주소(https)로 열었을 때만 돼요. 파일을 더블클릭해서 열면 안 돼요.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== 차단 친구 관리 ========== -->
+    <div id="blocked-modal" class="overlay hidden">
+      <div class="sheet tall">
+        <div class="sheet-head">
+          <h3>차단 친구 관리</h3>
+          <button class="icon-btn" data-close aria-label="닫기">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+          </button>
+        </div>
+        <div id="blocked-list" class="pick-list"></div>
+      </div>
+    </div>
+
+    <!-- ========== 앱 안 새 메시지 알림 ========== -->
+    <div id="notice" class="notice hidden" role="status">
+      <div id="notice-avatar"></div>
+      <div class="info">
+        <div id="notice-title" class="title"></div>
+        <div id="notice-body" class="body"></div>
+      </div>
+    </div>
+
     <!-- ========== 사진 크게 보기 ========== -->
     <div id="viewer" class="hidden">
       <img id="viewer-img" alt="사진">
@@ -984,8 +1264,11 @@ import {
   getAuth,
   signOut,
   onAuthStateChanged,
-  RecaptchaVerifier,
-  signInWithPhoneNumber,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  sendEmailVerification,
+  sendPasswordResetEmail,
+  deleteUser,
 } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
 import {
   getFirestore,
@@ -1003,9 +1286,21 @@ import {
   limitToLast,
   writeBatch,
   increment,
+  getDocs,
+  endBefore,
   arrayUnion,
   arrayRemove,
 } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
+import {
+  getDatabase,
+  ref as dbRef,
+  onValue,
+  set as dbSet,
+  remove as dbRemove,
+  push as dbPush,
+  onDisconnect,
+  serverTimestamp as rtdbNow,
+} from "https://www.gstatic.com/firebasejs/13.1.0/firebase-database.js";
 
 /* ================= Firebase 연결 ================= */
 const firebaseConfig = {
@@ -1022,6 +1317,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+const rtdb = getDatabase(app); // 접속 중 / 입력 중 표시용
 
 /* ================= 공통 도우미 ================= */
 const $ = (id) => document.getElementById(id);
@@ -1041,6 +1337,17 @@ let stopRoomListeners = []; // 방 나갈 때 실시간 감시 끄기용
 const userCache = new Map(); // 번호 → 프로필 읽기 작업 (같은 사람 반복해서 안 읽게)
 const userInfo = new Map();  // 번호 → 이미 읽어온 프로필 (화면 그릴 때 바로 꺼내 씀)
 
+// 차단 / 알림 / 이전 대화 상태
+let blocked = new Map();    // 지금 차단 중인 번호 → 차단한 시간
+let blockRanges = new Map(); // 번호 → 차단했던 기간들 [{from, to}]
+let allRooms = [];          // 차단한 1:1 방까지 포함한 전체 목록
+let roomsLoaded = false;    // 처음 목록 불러올 땐 알림 안 띄움
+const seenUnread = new Map(); // 방 → 마지막으로 본 안 읽음 수 (늘어나면 새 메시지)
+const PAGE = 50;            // 한 번에 불러오는 메시지 수
+let session = 0;           // 로그인할 때마다 +1 (로그아웃 뒤 늦게 도착한 응답 무시용)
+let hasMore = false;
+let loadingOlder = false;
+
 function cacheUser(user) {
   userInfo.set(user.phone, user);
   userCache.set(user.phone, Promise.resolve(user));
@@ -1050,11 +1357,17 @@ function getUser(phone) {
   if (!userCache.has(phone)) {
     userCache.set(
       phone,
-      getDoc(doc(db, "users", phone)).then((s) => {
-        const user = s.exists() ? s.data() : { phone, nickname: "알 수 없음", photo: "" };
-        userInfo.set(phone, user);
-        return user;
-      })
+      getDoc(doc(db, "users", phone))
+        .then((s) => {
+          const user = s.exists() ? s.data() : { phone, nickname: "알 수 없음", photo: "" };
+          userInfo.set(phone, user);
+          return user;
+        })
+        .catch(() => {
+          // 인터넷이 잠깐 끊겼을 때 등: 다음에 다시 읽어보게 기억 지우고 임시 이름으로
+          userCache.delete(phone);
+          return userInfo.get(phone) || { phone, nickname: formatPhone(phone), photo: "" };
+        })
     );
   }
   return userCache.get(phone);
@@ -1092,9 +1405,16 @@ function el(tag, className, text) {
   return node;
 }
 
+// 우리 앱이 만든 사진(data:image/... base64)만 허용 → 이상한 주소/스크립트 차단
+const SAFE_IMAGE = /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/;
+function safeImage(src) {
+  return typeof src === "string" && SAFE_IMAGE.test(src) ? src : "";
+}
+
 function paintAvatar(node, user) {
-  if (user.photo) {
-    node.style.backgroundImage = `url("${user.photo}")`;
+  const photo = safeImage(user.photo);
+  if (photo) {
+    node.style.backgroundImage = `url("${photo}")`;
     node.textContent = "";
   } else {
     node.style.backgroundImage = "";
@@ -1221,254 +1541,465 @@ document.querySelectorAll(".overlay").forEach((overlay) => {
   });
 });
 
-/* ================= 로그인 (문자 인증) ================= */
-auth.languageCode = "ko"; // 인증 문자를 한국어로
+/* ================= 로그인 (Gmail 인증) ================= */
+// 가입: 닉네임 + 전화번호 + Gmail + 비밀번호 → Gmail로 온 링크를 누르면 끝
+// 로그인: 전화번호 + Gmail + 비밀번호 (전화번호가 그 Gmail에 등록된 번호여야 함)
+// 계정(uid) ↔ 전화번호 연결은 accounts/{uid} 에 저장
+auth.languageCode = "ko"; // 인증 메일을 한국어로
 
-let confirmation = null;   // 인증번호 확인용 (signInWithPhoneNumber 결과)
-let recaptcha = null;      // 로봇 방지
-let pendingPhone = "";     // 인증 중인 번호 (010...)
+let authMode = "signup";  // "signup" | "login" | "verify" | "finish"
+let inFlow = false;       // 가입/로그인 버튼 처리 중 (이때는 화면 이동을 버튼 쪽에서 처리)
+let loginPhone = "";      // 로그인할 때 입력한 번호 (계정 번호와 맞는지 확인용)
+let verifyTimer = null;
 let resendTimer = null;
-
-// 010-1234-5678 ↔ +821012345678
-function toIntl(phone) {
-  return "+82" + phone.slice(1);
-}
-function toLocal(intl) {
-  return intl.startsWith("+82") ? "0" + intl.slice(3) : onlyDigits(intl);
-}
 
 function showLoginMsg(text) {
   $("login-msg").textContent = text;
 }
 
-function showStep(step) {
-  for (const s of ["phone", "code", "nick"]) {
-    $(`step-${s}`).classList.toggle("hidden", s !== step);
-  }
-  $("login-screen").classList.remove("hidden");
-  $("main-screen").classList.add("hidden");
-  showLoginMsg("");
-  if (step === "phone") setTimeout(() => $("phone").focus(), 50);
-  if (step === "code") setTimeout(() => $("code").focus(), 50);
-  if (step === "nick") setTimeout(() => $("nickname").focus(), 50);
-}
-
-// Firebase 에러 코드를 한국어 안내로
 function authErrorMessage(err) {
   const map = {
-    "auth/invalid-phone-number": "전화번호 형식이 올바르지 않아요.",
-    "auth/missing-phone-number": "전화번호를 입력해 주세요.",
+    "auth/email-already-in-use": "이미 가입된 Gmail이에요. '기존 프로필로 로그인'으로 들어가 주세요.",
+    "auth/invalid-email": "Gmail 주소를 다시 확인해 주세요.",
+    "auth/missing-email": "Gmail 주소를 입력해 주세요.",
+    "auth/weak-password": "비밀번호는 6자 이상으로 해 주세요.",
+    "auth/missing-password": "비밀번호를 입력해 주세요.",
+    "auth/invalid-credential": "Gmail 또는 비밀번호가 맞지 않아요.",
+    "auth/invalid-login-credentials": "Gmail 또는 비밀번호가 맞지 않아요.",
+    "auth/wrong-password": "Gmail 또는 비밀번호가 맞지 않아요.",
+    "auth/user-not-found": "Gmail 또는 비밀번호가 맞지 않아요.",
+    "auth/user-disabled": "사용이 정지된 계정이에요.",
     "auth/too-many-requests": "요청이 너무 많아요. 잠시 후 다시 시도해 주세요.",
-    "auth/quota-exceeded": "오늘 보낼 수 있는 인증 문자를 다 썼어요. 내일 다시 시도해 주세요.",
-    "auth/invalid-verification-code": "인증번호가 맞지 않아요.",
-    "auth/code-expired": "인증번호가 만료됐어요. 다시 받아 주세요.",
-    "auth/captcha-check-failed": "로봇 확인에 실패했어요. 새로고침 후 다시 시도해 주세요.",
-    "auth/unauthorized-domain": "이 주소는 Firebase에 등록되지 않았어요. (Authentication → 설정 → 승인된 도메인)",
-    "auth/operation-not-allowed": "Firebase에서 '전화' 로그인이 꺼져 있어요. (Authentication → 로그인 방법)",
-    "auth/billing-not-enabled": "실제 문자 발송은 Firebase 요금제 설정이 필요해요. 테스트 번호로 시도해 주세요.",
     "auth/network-request-failed": "인터넷 연결을 확인해 주세요.",
+    "auth/operation-not-allowed": "Firebase에서 '이메일/비밀번호' 로그인이 꺼져 있어요. (Authentication → 로그인 방법)",
+    "auth/operation-not-supported-in-this-environment": "파일로 열면 로그인이 안 돼요. GitHub Pages 주소로 열어 주세요.",
+    "auth/unauthorized-domain": "이 주소는 Firebase에 등록되지 않았어요. (Authentication → 설정 → 승인된 도메인)",
+    "permission-denied": "권한이 없어요. Firebase 보안 규칙을 최신으로 게시했는지 확인해 주세요.",
   };
   return map[err && err.code] || `문제가 생겼어요. (${(err && (err.code || err.message)) || "알 수 없음"})`;
 }
 
-function getRecaptcha() {
-  if (!recaptcha) {
-    recaptcha = new RecaptchaVerifier(auth, "recaptcha-box", { size: "invisible" });
-  }
-  return recaptcha;
+/* ---------- 화면 전환 ---------- */
+function showWelcome() {
+  stopVerifyWatch();
+  $("auth-form").reset();
+  $("welcome").classList.remove("hidden");
+  $("auth-panel").classList.add("hidden");
+  $("login-screen").classList.remove("hidden");
+  $("main-screen").classList.add("hidden");
+  showLoginMsg("");
 }
 
-function resetRecaptcha() {
-  try { recaptcha && recaptcha.clear(); } catch (e) { /* 이미 지워짐 */ }
-  recaptcha = null;
-  $("recaptcha-box").replaceChildren();
+const AUTH_TEXT = {
+  signup: {
+    title: "새 프로필 만들기",
+    desc: "가입하면 입력한 Gmail로 인증 링크가 가요. 링크를 누르면 바로 시작할 수 있어요.",
+    submit: "가입하고 인증 메일 받기",
+    switchText: "이미 프로필이 있나요?",
+    switchBtn: "기존 프로필로 로그인",
+  },
+  login: {
+    title: "기존 프로필로 로그인",
+    desc: "가입할 때 쓴 전화번호, Gmail, 비밀번호를 입력해 주세요. 다른 기기에서도 그대로 이어서 쓸 수 있어요.",
+    submit: "로그인",
+    switchText: "처음이신가요?",
+    switchBtn: "새 프로필 만들기",
+  },
+  verify: {
+    title: "Gmail 인증",
+    desc: "",
+    submit: "",
+    switchText: "",
+    switchBtn: "다른 계정으로 로그인",
+  },
+  finish: {
+    title: "프로필 만들기",
+    desc: "Gmail 인증은 끝났어요. 닉네임과 전화번호를 정하면 시작할 수 있어요.",
+    submit: "시작하기",
+    switchText: "",
+    switchBtn: "다른 계정으로 로그인",
+  },
+};
+
+function showAuth(mode) {
+  authMode = mode;
+  const t = AUTH_TEXT[mode];
+  $("welcome").classList.add("hidden");
+  $("auth-panel").classList.remove("hidden");
+  $("login-screen").classList.remove("hidden");
+  $("main-screen").classList.add("hidden");
+  showLoginMsg("");
+
+  $("auth-title").textContent = t.title;
+  $("auth-desc").textContent = t.desc;
+  $("auth-desc").classList.toggle("hidden", !t.desc);
+  $("auth-submit").textContent = t.submit;
+  $("switch-text").textContent = t.switchText;
+  $("switch-btn").textContent = t.switchBtn;
+
+  const isVerify = mode === "verify";
+  $("auth-form").classList.toggle("hidden", isVerify);
+  $("verify-box").classList.toggle("hidden", !isVerify);
+  $("nick-field").classList.toggle("hidden", mode === "login");
+  $("email-field").classList.toggle("hidden", mode === "finish");
+  $("pw-field").classList.toggle("hidden", mode === "finish");
+  $("forgot-btn").classList.toggle("hidden", mode !== "login");
+  $("password").autocomplete = mode === "signup" ? "new-password" : "current-password";
+
+  if (!isVerify) stopVerifyWatch();
+  setTimeout(() => {
+    if (mode === "signup" || mode === "finish") $("nickname").focus();
+    else if (mode === "login") $("phone").focus();
+  }, 50);
 }
 
-// 문자 인증은 진짜 웹 주소(https, localhost)에서만 동작
-const isFileMode = location.protocol === "file:";
-
-async function sendCode(phone) {
-  if (isFileMode) {
-    showLoginMsg("문자 인증은 웹 주소에서만 돼요. GitHub Pages에 올린 다음 그 주소로 열어 주세요.");
-    return false;
+$("go-signup").addEventListener("click", () => {
+  $("auth-form").reset();
+  showAuth("signup");
+});
+$("go-login").addEventListener("click", () => {
+  $("auth-form").reset();
+  showAuth("login");
+});
+$("auth-back").addEventListener("click", async () => {
+  if (auth.currentUser) await signOut(auth); // 인증 대기/프로필 만들기에서 뒤로 → 로그아웃
+  showWelcome();
+});
+$("switch-btn").addEventListener("click", async () => {
+  if (authMode === "verify" || authMode === "finish") {
+    await signOut(auth); // → 첫 화면
+    return;
   }
+  showAuth(authMode === "login" ? "signup" : "login");
+});
+
+/* ---------- 가입하다 만 정보 기억 (인증 링크 누르고 돌아왔을 때 이어서) ---------- */
+function savePending(email, data) {
+  try { localStorage.setItem("onchat-pending:" + email, JSON.stringify(data)); } catch (e) { /* 못 저장해도 프로필 만들기 화면에서 다시 물어봄 */ }
+}
+function readPending(email) {
+  try { return JSON.parse(localStorage.getItem("onchat-pending:" + email) || "null"); } catch (e) { return null; }
+}
+function clearPending(email) {
+  try { localStorage.removeItem("onchat-pending:" + email); } catch (e) { /* 괜찮음 */ }
+}
+
+/* ---------- 가입 / 로그인 / 프로필 만들기 버튼 ---------- */
+$("auth-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  if (inFlow) return;
+  showLoginMsg("");
+  const nickname = $("nickname").value.trim();
+  const phone = onlyDigits($("phone").value);
+  const email = $("email").value.trim().toLowerCase();
+  const password = $("password").value;
+
+  if ((authMode === "signup" || authMode === "finish") && !nickname) return fail("닉네임을 입력해 주세요.", "nickname");
+  if (!isValidPhone(phone)) return fail("전화번호를 다시 확인해 주세요.", "phone");
+  if (authMode !== "finish") {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return fail("Gmail 주소를 다시 확인해 주세요.", "email");
+    if (password.length < 6) return fail("비밀번호는 6자 이상으로 해 주세요.", "password");
+  }
+
+  const btn = $("auth-submit");
+  const label = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = "잠시만요...";
+  inFlow = true;
   try {
-    confirmation = await signInWithPhoneNumber(auth, toIntl(phone), getRecaptcha());
-    pendingPhone = phone;
-    return true;
+    if (authMode === "signup") await doSignup(nickname, phone, email, password);
+    else if (authMode === "login") await doLogin(phone, email, password);
+    else if (authMode === "finish") await createProfile(auth.currentUser, phone, nickname);
   } catch (err) {
-    console.error(err);
-    resetRecaptcha(); // 실패하면 로봇 방지를 새로 만들어야 다시 보낼 수 있음
+    console.warn(err);
     showLoginMsg(authErrorMessage(err));
-    return false;
+  } finally {
+    inFlow = false;
+    btn.disabled = false;
+    btn.textContent = label;
   }
+});
+
+function fail(text, focusId) {
+  showLoginMsg(text);
+  if (focusId) $(focusId).focus();
 }
 
-// 다시 받기 버튼: 60초 동안 잠금
-function startResendTimer() {
+async function doSignup(nickname, phone, email, password) {
+  const { user } = await createUserWithEmailAndPassword(auth, email, password);
+  // 이미 다른 사람이 쓰는 번호면 방금 만든 계정은 지우고 안내
+  const taken = await phoneOwner(phone);
+  if (taken && taken !== user.uid) {
+    await deleteUser(user).catch(() => signOut(auth));
+    showAuth("signup");
+    $("nickname").value = nickname;
+    $("email").value = email;
+    fail("이미 다른 사람이 가입한 전화번호예요.", "phone");
+    return;
+  }
+  savePending(email, { nickname, phone });
+  await sendVerifyMail(user);
+  showVerify(user);
+}
+
+async function doLogin(phone, email, password) {
+  const { user } = await signInWithEmailAndPassword(auth, email, password);
+  loginPhone = phone;
+  if (!user.emailVerified) {
+    // 가입하고 아직 링크를 안 누른 경우 → 인증 화면으로 (메일 다시 보낼 수 있음)
+    showVerify(user);
+    return;
+  }
+  await afterVerified(user);
+}
+
+// 이 번호를 이미 쓰는 계정 (없으면 null, 예전 버전에서 만든 주인 없는 프로필도 null)
+async function phoneOwner(phone) {
+  const snap = await getDoc(doc(db, "users", phone));
+  return snap.exists() ? snap.data().uid || null : null;
+}
+
+/* ---------- Gmail 인증 기다리기 ---------- */
+function verifyUrl() {
+  // 링크를 누른 뒤 "계속" 버튼으로 돌아올 주소 (웹 주소일 때만)
+  return location.protocol.startsWith("http") ? { url: location.origin + location.pathname } : undefined;
+}
+
+async function sendVerifyMail(user) {
+  try {
+    await sendEmailVerification(user, verifyUrl());
+  } catch (err) {
+    if (err && /continue-uri|unauthorized/.test(err.code || "")) {
+      await sendEmailVerification(user); // 돌아올 주소가 등록 안 됐으면 주소 없이
+    } else {
+      throw err;
+    }
+  }
+  startResendCooldown();
+}
+
+function showVerify(user) {
+  showAuth("verify");
+  $("verify-email").textContent = user.email;
+  startVerifyWatch();
+}
+
+// 3초마다 "링크 눌렀나?" 확인 + 다른 탭(Gmail)에서 돌아오면 바로 확인
+function startVerifyWatch() {
+  stopVerifyWatch();
+  verifyTimer = setInterval(checkVerified, 3000);
+}
+function stopVerifyWatch() {
+  clearInterval(verifyTimer);
+  verifyTimer = null;
+}
+window.addEventListener("focus", () => {
+  if (authMode === "verify" && verifyTimer) checkVerified();
+});
+
+let checking = false;
+async function checkVerified(fromButton = false) {
+  const user = auth.currentUser;
+  if (!user || checking) return;
+  checking = true;
+  try {
+    await user.reload();
+    if (!user.emailVerified) {
+      if (fromButton) showLoginMsg("아직 인증이 안 됐어요. Gmail에서 링크를 눌러 주세요.");
+      return;
+    }
+    stopVerifyWatch();
+    await user.getIdToken(true); // 인증된 상태를 보안 규칙에도 바로 반영
+    inFlow = true;
+    await afterVerified(user);
+  } catch (err) {
+    console.warn(err);
+    if (fromButton) showLoginMsg(authErrorMessage(err));
+  } finally {
+    inFlow = false;
+    checking = false;
+  }
+}
+$("check-verified-btn").addEventListener("click", () => checkVerified(true));
+
+function startResendCooldown() {
   clearInterval(resendTimer);
   let left = 60;
   const btn = $("resend-btn");
   btn.disabled = true;
-  btn.textContent = `다시 받기 (${left}초)`;
+  btn.textContent = `메일 다시 보내기 (${left})`;
   resendTimer = setInterval(() => {
     left -= 1;
     if (left <= 0) {
       clearInterval(resendTimer);
       btn.disabled = false;
-      btn.textContent = "인증번호 다시 받기";
+      btn.textContent = "메일 다시 보내기";
     } else {
-      btn.textContent = `다시 받기 (${left}초)`;
+      btn.textContent = `메일 다시 보내기 (${left})`;
     }
   }, 1000);
 }
 
-// 1단계: 번호 → 인증번호 받기
-$("step-phone").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  showLoginMsg("");
-  const phone = onlyDigits($("phone").value);
-  if (!isValidPhone(phone)) {
-    showLoginMsg("전화번호를 다시 확인해 주세요.");
-    return;
-  }
-
-  const btn = $("send-code-btn");
-  btn.disabled = true;
-  btn.textContent = "보내는 중...";
-  const ok = await sendCode(phone);
-  btn.disabled = false;
-  btn.textContent = "인증번호 받기";
-  if (!ok) return;
-
-  $("code-phone").textContent = formatPhone(phone);
-  $("code").value = "";
-  $("verify-btn").disabled = true;
-  showStep("code");
-  startResendTimer();
-});
-
-// 2단계: 6자리 입력 → 확인 (6자리 다 치면 자동 확인)
-$("code").addEventListener("input", (e) => {
-  e.target.value = onlyDigits(e.target.value).slice(0, 6);
-  $("verify-btn").disabled = e.target.value.length !== 6;
-  if (e.target.value.length === 6) $("step-code").requestSubmit();
-});
-
-let verifying = false;
-$("step-code").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const code = $("code").value;
-  if (code.length !== 6 || !confirmation || verifying) return;
-
-  verifying = true;
-  $("verify-btn").disabled = true;
-  $("verify-btn").textContent = "확인 중...";
-  showLoginMsg("");
-  try {
-    await confirmation.confirm(code);
-    // 성공하면 onAuthStateChanged가 알아서 다음 화면으로 보냄
-    clearInterval(resendTimer);
-  } catch (err) {
-    console.error(err);
-    showLoginMsg(authErrorMessage(err));
-    $("code").select();
-  } finally {
-    verifying = false;
-    $("verify-btn").textContent = "확인";
-    $("verify-btn").disabled = $("code").value.length !== 6;
-  }
-});
-
 $("resend-btn").addEventListener("click", async () => {
-  showLoginMsg("");
-  resetRecaptcha();
-  const ok = await sendCode(pendingPhone);
-  if (ok) {
-    toast("인증번호를 다시 보냈어요");
-    startResendTimer();
-  }
-});
-
-$("change-phone-btn").addEventListener("click", () => {
-  clearInterval(resendTimer);
-  confirmation = null;
-  showStep("phone");
-});
-
-// 3단계: 처음 가입 → 닉네임
-$("step-nick").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const nickname = $("nickname").value.trim();
-  const fbUser = auth.currentUser;
-  if (!nickname) {
-    showLoginMsg("닉네임을 입력해 주세요.");
-    return;
-  }
-  if (!fbUser) {
-    showStep("phone");
-    return;
-  }
-
-  const phone = toLocal(fbUser.phoneNumber);
-  $("nick-btn").disabled = true;
+  const user = auth.currentUser;
+  if (!user) return showWelcome();
   try {
-    await setDoc(doc(db, "users", phone), {
+    await sendVerifyMail(user);
+    toast("인증 메일을 다시 보냈어요");
+  } catch (err) {
+    console.warn(err);
+    showLoginMsg(authErrorMessage(err));
+  }
+});
+
+/* ---------- 비밀번호 찾기 ---------- */
+$("forgot-btn").addEventListener("click", async () => {
+  const email = $("email").value.trim().toLowerCase();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return fail("비밀번호를 받을 Gmail 주소를 먼저 입력해 주세요.", "email");
+  try {
+    await sendPasswordResetEmail(auth, email, verifyUrl());
+  } catch (err) {
+    if (!(err && err.code === "auth/user-not-found")) {
+      console.warn(err);
+      return showLoginMsg(authErrorMessage(err));
+    }
+  }
+  // 가입 여부를 알려주지 않으려고, 결과와 상관없이 같은 안내
+  showLoginMsg(`${email}(으)로 비밀번호 재설정 메일을 보냈어요. (가입된 주소일 때만 와요)`);
+});
+
+/* ---------- 인증 끝난 뒤: 프로필로 들어가기 ---------- */
+async function afterVerified(user) {
+  const acc = await getDoc(doc(db, "accounts", user.uid));
+  if (acc.exists()) {
+    const phone = acc.data().phone;
+    if (loginPhone && loginPhone !== phone) {
+      loginPhone = "";
+      await signOut(auth);
+      showAuth("login");
+      showLoginMsg("이 Gmail에 등록된 전화번호와 달라요.");
+      return;
+    }
+    loginPhone = "";
+    clearPending(user.email);
+    enterMain(phone);
+    return;
+  }
+
+  // 아직 프로필이 없는 계정
+  const pending = readPending(user.email);
+  const phone = loginPhone || (pending && pending.phone) || "";
+  loginPhone = "";
+  if (phone) {
+    const snap = await getDoc(doc(db, "users", phone));
+    const data = snap.exists() ? snap.data() : null;
+    if (data && data.uid && data.uid !== user.uid) {
+      showFinish(pending, "이미 다른 사람이 가입한 전화번호예요. 다른 번호를 입력해 주세요.");
+      return;
+    }
+    // 예전 버전에서 만든 이 번호 프로필 → 닉네임/사진 그대로 이어받기
+    if (data && !data.uid) {
+      await createProfile(user, phone, data.nickname);
+      return;
+    }
+    if (pending && pending.nickname) {
+      await createProfile(user, phone, pending.nickname);
+      return;
+    }
+  }
+  showFinish(pending, "");
+}
+
+function showFinish(pending, msg) {
+  showAuth("finish");
+  if (pending) {
+    $("nickname").value = pending.nickname || "";
+    $("phone").value = formatPhone(pending.phone || "");
+  }
+  if (msg) showLoginMsg(msg);
+}
+
+// 계정 ↔ 번호 연결 + 프로필 만들기 (한 번에 저장)
+async function createProfile(user, phone, nickname) {
+  if (!user) return showWelcome();
+  const ref = doc(db, "users", phone);
+  const snap = await getDoc(ref);
+  const data = snap.exists() ? snap.data() : null;
+  if (data && data.uid && data.uid !== user.uid) {
+    showFinish({ nickname, phone }, "이미 다른 사람이 가입한 전화번호예요.");
+    return;
+  }
+
+  const batch = writeBatch(db);
+  batch.set(doc(db, "accounts", user.uid), { phone, email: user.email, createdAt: serverTimestamp() });
+  if (data) {
+    // 예전 프로필 이어받기: 사진/상태메시지는 그대로, 주인(uid)만 등록
+    batch.set(ref, { phone, uid: user.uid, nickname: data.nickname || nickname }, { merge: true });
+  } else {
+    batch.set(ref, {
       phone,
+      uid: user.uid,
       nickname,
       photo: "",
       statusMessage: "",
       createdAt: serverTimestamp(),
     });
-    enterMain(phone);
-  } catch (err) {
-    console.error(err);
-    showLoginMsg("가입에 실패했어요. (" + (err.code || err.message) + ")");
-  } finally {
-    $("nick-btn").disabled = false;
   }
-});
-
-$("nick-cancel").addEventListener("click", () => signOut(auth));
+  await batch.commit();
+  clearPending(user.email);
+  enterMain(phone);
+}
 
 /* ================= 로그인 상태가 바뀔 때마다 (앱 시작 포함) ================= */
-// 문자 인증 성공 / 새로고침 / 로그아웃 → 전부 여기서 화면을 정함
+// 새로고침 / 로그아웃 → 여기서 화면을 정함
 localStorage.removeItem("onchat-phone"); // 예전 버전(번호만 입력) 흔적 정리
 
-onAuthStateChanged(auth, async (fbUser) => {
-  // 로그인 안 됨, 또는 예전 버전의 익명 로그인 → 번호 입력부터
-  if (!fbUser || !fbUser.phoneNumber) {
-    if (fbUser) await signOut(auth);
-    if (myPhone) cleanupSession();
-    $("step-phone").reset();
-    showStep("phone");
-    if (isFileMode) {
-      showLoginMsg("지금은 파일로 열어서 문자 인증이 안 돼요. GitHub Pages 주소로 열어 주세요.");
+onAuthStateChanged(auth, async (user) => {
+  // 늦게 도착한 예전 소식은 무시 (지금 로그인 상태와 다르면)
+  const nowUser = auth.currentUser;
+  if ((user && (!nowUser || nowUser.uid !== user.uid)) || (!user && nowUser)) return;
+
+  if (!user) {
+    if (myPhone) {
+      cleanupSession();
+      showWelcome();
+      return;
     }
+    // 가입/로그인 화면에서 실패해서 로그아웃된 거면 안내 문구를 보여주던 화면 그대로
+    const onForm =
+      !$("login-screen").classList.contains("hidden") &&
+      !$("auth-panel").classList.contains("hidden") &&
+      (authMode === "login" || authMode === "signup");
+    if (!onForm) showWelcome();
     return;
   }
-
-  const phone = toLocal(fbUser.phoneNumber);
-  if (myPhone === phone) return; // 이미 들어와 있음
+  // 예전 버전(문자 인증/익명 로그인) 계정 → 로그아웃하고 다시 로그인
+  if (!user.email) {
+    await signOut(auth);
+    return;
+  }
+  if (inFlow || myPhone) return; // 가입/로그인 버튼 쪽에서 처리 중이거나 이미 들어와 있음
 
   try {
-    const snap = await getDoc(doc(db, "users", phone));
-    if (snap.exists()) {
-      enterMain(phone);
-    } else {
-      $("nickname").value = "";
-      showStep("nick");
+    if (!user.emailVerified) {
+      showVerify(user);
+      return;
     }
+    inFlow = true;
+    await afterVerified(user);
   } catch (err) {
-    console.error(err);
-    showStep("phone");
+    console.warn(err);
+    showWelcome();
     showLoginMsg("정보를 불러오지 못했어요. (" + (err.code || err.message) + ")");
+  } finally {
+    inFlow = false;
   }
 });
 
 /* ================= 메인 화면 들어가기 ================= */
 function enterMain(phone) {
   myPhone = phone;
+  const mySession = ++session;
   $("login-screen").classList.add("hidden");
   $("main-screen").classList.remove("hidden");
   showTab("friends");
@@ -1488,15 +2019,21 @@ function enterMain(phone) {
       const phones = snap.docs.map((d) => d.id);
       friendSet = new Set(phones);
 
-      // 친구 각각의 최신 프로필 읽어오기
+      // 친구 각각의 최신 프로필 읽어오기 (하나 실패해도 나머지는 보이게)
       const profiles = await Promise.all(
         phones.map(async (p) => {
-          const s = await getDoc(doc(db, "users", p));
-          return s.exists() ? s.data() : null;
+          try {
+            const s = await getDoc(doc(db, "users", p));
+            return s.exists() ? s.data() : null;
+          } catch (e) {
+            return userInfo.get(p) || null;
+          }
         })
       );
+      if (mySession !== session) return;
 
       profiles.filter(Boolean).forEach(cacheUser);
+      phones.forEach(watchPresence);
 
       friends = profiles
         .filter(Boolean)
@@ -1507,6 +2044,8 @@ function enterMain(phone) {
   );
 
   // 3) 내가 들어가 있는 채팅방 목록 실시간 감시
+  roomsLoaded = false;
+  seenUnread.clear();
   const stopRooms = onSnapshot(
     query(collection(db, "rooms"), where("members", "array-contains", phone)),
     async (snap) => {
@@ -1515,22 +2054,295 @@ function enterMain(phone) {
       // 방에 있는 상대들 프로필 미리 읽어두기
       const others = new Set(list.flatMap((r) => r.members).filter((p) => p !== myPhone));
       await Promise.all([...others].map(getUser));
+      if (mySession !== session) return;
 
       // 대화가 하나라도 있는 방만, 최근 대화 순으로
-      rooms = list
+      allRooms = list
         .filter((r) => r.lastAt)
         .sort((a, b) => b.lastAt - a.lastAt);
-      renderRooms();
+      applyRoomFilter();
+      checkNewMessages();
     },
     (err) => console.error(err)
   );
 
-  stopListeners = [stopMe, stopFriends, stopRooms];
+  // 4) 차단 목록 실시간 감시
+  const stopBlocked = onSnapshot(
+    collection(db, "users", phone, "blocked"),
+    async (snap) => {
+      // 지금 차단 중인 사람 + 예전에 차단했던 기간 (그 사이 온 1:1 메시지는 계속 숨김)
+      const docs = snap.docs.map((d) => ({ phone: d.id, ...d.data() }));
+      blocked = new Map(docs.filter((d) => d.active !== false).map((d) => [d.phone, d.blockedAt || 0]));
+      blockRanges = new Map(
+        docs.map((d) => [
+          d.phone,
+          (d.ranges || []).concat(d.active !== false ? [{ from: d.blockedAt || 0, to: Infinity }] : []),
+        ])
+      );
+      await Promise.all(docs.map((d) => getUser(d.phone)));
+      if (mySession !== session) return;
+      $("blocked-count").textContent = blocked.size ? `${blocked.size}명` : "";
+      applyRoomFilter();
+      renderBlockedList();
+      if (currentRoom && currentRoom.loaded) {
+        renderDmBanner();
+        renderMessages(false);
+      }
+    },
+    (err) => console.error(err)
+  );
+
+  stopListeners = [stopMe, stopFriends, stopRooms, stopBlocked];
+  startPresence();
+
+  // 알림을 눌러서 열린 경우 그 방으로
+  if (pendingOpenRoom) {
+    const id = pendingOpenRoom;
+    pendingOpenRoom = null;
+    history.replaceState(null, "", location.pathname);
+    openRoom(id);
+  }
 }
+
+// 차단한 사람과의 1:1 방은 목록에서 숨김
+function applyRoomFilter() {
+  rooms = allRooms.filter((r) => !(r.type === "dm" && blocked.has(dmPartner(r))));
+  renderRooms();
+}
+
+/* ================= 알림 ================= */
+const prefs = {
+  get notify() { return readPref("onchat-notify", "on") === "on"; },
+  get sound() { return readPref("onchat-sound", "on") === "on"; },
+};
+function readPref(key, fallback) {
+  try { return localStorage.getItem(key) || fallback; } catch (e) { return fallback; }
+}
+function writePref(key, on) {
+  try { localStorage.setItem(key, on ? "on" : "off"); } catch (e) { /* 저장 못 해도 이번엔 동작 */ }
+}
+
+function notifySupported() {
+  return "Notification" in window;
+}
+
+function renderNotifySettings() {
+  $("notify-switch").classList.toggle("on", prefs.notify);
+  $("sound-switch").classList.toggle("on", prefs.sound);
+  let sub = "";
+  if (prefs.notify) {
+    if (!notifySupported()) sub = "이 브라우저는 알림 창을 지원하지 않아요 (앱 안 알림만)";
+    else if (Notification.permission === "denied") sub = "브라우저에서 알림이 차단돼 있어요 (주소창 왼쪽 자물쇠에서 허용)";
+    else if (Notification.permission === "default") sub = "눌러서 브라우저 알림 허용하기";
+    else sub = "다른 창을 보고 있어도 알려드려요";
+  }
+  $("notify-sub").textContent = sub;
+}
+
+$("notify-row").addEventListener("click", async () => {
+  // 켜져 있는데 브라우저 허락이 아직이면 → 허락 요청만
+  if (prefs.notify && notifySupported() && Notification.permission === "default") {
+    await Notification.requestPermission();
+    renderNotifySettings();
+    return;
+  }
+  const next = !prefs.notify;
+  writePref("onchat-notify", next);
+  if (next && notifySupported() && Notification.permission === "default") {
+    await Notification.requestPermission();
+  }
+  renderNotifySettings();
+});
+$("sound-row").addEventListener("click", () => {
+  writePref("onchat-sound", !prefs.sound);
+  renderNotifySettings();
+  if (prefs.sound) playDing();
+});
+renderNotifySettings();
+
+// 알림 소리 "띵-동" (파일 없이 브라우저에서 직접 만듦)
+let audioCtx = null;
+function unlockAudio() {
+  // 브라우저는 사용자가 한 번 누르기 전엔 소리를 막아서, 첫 터치 때 준비해 둠
+  if (!audioCtx) {
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if (Ctx) audioCtx = new Ctx();
+  }
+  if (audioCtx && audioCtx.state === "suspended") audioCtx.resume();
+}
+document.addEventListener("pointerdown", unlockAudio);
+document.addEventListener("keydown", unlockAudio);
+
+function playDing() {
+  if (!audioCtx) return;
+  const now = audioCtx.currentTime;
+  [[880, 0], [1320, 0.12]].forEach(([freq, start]) => {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = "sine";
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0.0001, now + start);
+    gain.gain.exponentialRampToValueAtTime(0.25, now + start + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + start + 0.35);
+    osc.connect(gain).connect(audioCtx.destination);
+    osc.start(now + start);
+    osc.stop(now + start + 0.4);
+  });
+}
+
+// 방 목록이 바뀔 때마다: 내 안 읽음 수가 늘어난 방 = 새 메시지 도착
+function checkNewMessages() {
+  const firstTime = !roomsLoaded;
+  roomsLoaded = true;
+  for (const room of allRooms) {
+    const unread = myUnread(room);
+    const before = seenUnread.has(room.id) ? seenUnread.get(room.id) : (firstTime ? unread : 0);
+    seenUnread.set(room.id, unread);
+    if (firstTime || unread <= before) continue;
+    if (room.type === "dm" && blocked.has(dmPartner(room))) continue;
+    if (!room.lastSender || room.lastSender === myPhone) continue;
+    const watching = currentRoom && currentRoom.id === room.id && document.visibilityState === "visible";
+    if (watching) continue;
+    notifyMessage(room);
+  }
+}
+
+async function notifyMessage(room) {
+  if (!prefs.notify) return;
+  const sender = nameOf(room.lastSender);
+  const title = isGroup(room) ? roomTitle(room) : sender;
+  const body = isGroup(room) ? `${sender}: ${room.lastMessage}` : room.lastMessage;
+
+  if (prefs.sound) playDing();
+
+  if (document.visibilityState === "visible") {
+    showNotice(room, title, body);
+    return;
+  }
+  // 다른 탭/창을 보고 있으면 → 브라우저 알림 창
+  if (notifySupported() && Notification.permission === "granted") {
+    // 홈 화면 앱/폰에선 서비스 워커로 띄워야 함 (누르면 그 방이 열림)
+    try {
+      const reg = canUseSW ? await navigator.serviceWorker.getRegistration() : null;
+      if (reg) {
+        await reg.showNotification(title, { body, tag: room.id, icon: "icon-192.png", data: { roomId: room.id } });
+        return;
+      }
+    } catch (e) {
+      // 아래 방식으로
+    }
+    try {
+      const n = new Notification(title, {
+        body,
+        tag: room.id, // 같은 방 알림은 하나로 합침
+        icon: safeImage(userOf(room.lastSender).photo) || "icon-192.png",
+      });
+      n.onclick = () => {
+        window.focus();
+        openRoom(room.id);
+        n.close();
+      };
+    } catch (e) {
+      // 일부 폰 브라우저는 이 방식의 알림을 지원 안 함 → 소리/배지로만
+    }
+  }
+}
+
+let noticeTimer = null;
+function showNotice(room, title, body) {
+  const box = $("notice");
+  $("notice-avatar").replaceChildren(makeRoomAvatar(room));
+  $("notice-title").textContent = title;
+  $("notice-body").textContent = body;
+  box.dataset.room = room.id;
+  box.classList.remove("hidden");
+  clearTimeout(noticeTimer);
+  noticeTimer = setTimeout(() => box.classList.add("hidden"), 3500);
+}
+$("notice").addEventListener("click", () => {
+  const id = $("notice").dataset.room;
+  $("notice").classList.add("hidden");
+  if (id) {
+    closeAllModals();
+    openRoom(id);
+  }
+});
+
+// 탭 제목에 안 읽은 수: "(3) OnChat"
+function updateTitle(total) {
+  document.title = total > 0 ? `(${total > 99 ? "99+" : total}) OnChat` : "OnChat";
+}
+
+/* ================= 차단 ================= */
+async function blockUser(user) {
+  if (!confirm(`${user.nickname}님을 차단할까요?\n차단하면 친구 목록에서 빠지고, 1:1 메시지를 받지 않아요.`)) return false;
+  const batch = writeBatch(db);
+  batch.set(doc(db, "users", myPhone, "blocked", user.phone), { active: true, blockedAt: Date.now() }, { merge: true });
+  batch.delete(doc(db, "users", myPhone, "friends", user.phone));
+  try {
+    await batch.commit();
+    toast(`${user.nickname}님을 차단했어요`);
+    return true;
+  } catch (err) {
+    console.error(err);
+    toast("차단하지 못했어요");
+    return false;
+  }
+}
+
+async function unblockUser(user) {
+  const now = Date.now();
+  const from = blocked.get(user.phone) || 0;
+  try {
+    // 지우지 않고 "차단했던 기간"으로 남겨서, 그동안 온 메시지가 다시 나타나지 않게
+    await updateDoc(doc(db, "users", myPhone, "blocked", user.phone), {
+      active: false,
+      ranges: arrayUnion({ from, to: now }),
+    });
+    // 차단 중에 쌓인 안 읽음 숫자는 0으로
+    const dmId = [myPhone, user.phone].sort().join("_");
+    const dmRoom = allRooms.find((r) => r.id === dmId);
+    if (dmRoom && dmRoom.members.includes(myPhone) && myUnread(dmRoom) > 0) {
+      await updateDoc(doc(db, "rooms", dmId), {
+        [`unread.${myPhone}`]: 0,
+        [`lastRead.${myPhone}`]: Math.max(now, dmRoom.lastAt || 0),
+      });
+    }
+    toast(`${user.nickname}님 차단을 해제했어요`);
+    return true;
+  } catch (err) {
+    console.error(err);
+    toast("차단을 해제하지 못했어요");
+    return false;
+  }
+}
+
+function renderBlockedList() {
+  const list = $("blocked-list");
+  if (blocked.size === 0) {
+    list.replaceChildren(el("p", "empty", "차단한 친구가 없어요."));
+    return;
+  }
+  const people = [...blocked.keys()].map(userOf).sort((a, b) => a.nickname.localeCompare(b.nickname, "ko"));
+  list.replaceChildren(
+    ...people.map((u) => {
+      const row = el("div", "pick-row");
+      const btn = el("button", "btn sm ghost", "차단 해제");
+      btn.addEventListener("click", () => unblockUser(u));
+      row.append(makeAvatar(u), el("div", "name", u.nickname), btn);
+      return row;
+    })
+  );
+}
+$("blocked-row").addEventListener("click", () => {
+  renderBlockedList();
+  openModal("blocked-modal");
+});
 
 /* ================= 친구 목록 그리기 ================= */
 function makePersonRow(user, { isMe = false } = {}) {
   const row = el("div", isMe ? "person me" : "person");
+  if (!isMe && isOnline(user.phone)) row.classList.add("online");
   const info = el("div", "info");
   info.appendChild(el("div", "name", user.nickname));
 
@@ -1550,6 +2362,7 @@ function renderMe() {
 }
 
 function renderFriends() {
+  if (currentRoom && currentRoom.loaded) renderDmBanner();
   $("friend-title").textContent = `친구 ${friends.length}`;
   const list = $("friend-list");
 
@@ -1604,7 +2417,16 @@ $("search-form").addEventListener("submit", async (e) => {
     info.append(el("div", "name", user.nickname), el("div", "sub", formatPhone(user.phone)));
 
     const btn = el("button", "btn");
-    if (friendSet.has(phone)) {
+    if (blocked.has(phone)) {
+      // 경우 5: 내가 차단한 사람
+      btn.textContent = "차단 해제";
+      btn.className = "btn ghost";
+      btn.addEventListener("click", async () => {
+        btn.disabled = true;
+        if (await unblockUser(user)) closeModal("add-friend-modal");
+        btn.disabled = false;
+      });
+    } else if (friendSet.has(phone)) {
       // 경우 3: 이미 친구
       btn.textContent = "이미 친구예요";
       btn.disabled = true;
@@ -1655,6 +2477,12 @@ function openProfile(user, isMe) {
       openEditProfile();
     });
     actions.append(edit);
+  } else if (blocked.has(user.phone)) {
+    const unblock = el("button", "btn ghost", "차단 해제");
+    unblock.addEventListener("click", async () => {
+      if (await unblockUser(user)) closeModal("profile-modal");
+    });
+    actions.append(unblock);
   } else {
     const chat = el("button", "btn", "1:1 채팅");
     chat.addEventListener("click", () => {
@@ -1663,7 +2491,14 @@ function openProfile(user, isMe) {
     });
     actions.append(chat);
 
-    if (friendSet.has(user.phone)) {
+    const block = el("button", "btn danger", "차단");
+    block.addEventListener("click", async () => {
+      if (await blockUser(user)) closeModal("profile-modal");
+    });
+
+    if (!friendSet.has(user.phone)) {
+      actions.append(block);
+    } else {
       const remove = el("button", "btn danger", "친구 삭제");
       remove.addEventListener("click", async () => {
         if (!confirm(`${user.nickname}님을 친구에서 삭제할까요?`)) return;
@@ -1676,7 +2511,7 @@ function openProfile(user, isMe) {
           toast("삭제에 실패했어요");
         }
       });
-      actions.append(remove);
+      actions.append(remove, block);
     }
   }
 
@@ -1823,6 +2658,7 @@ function renderRooms() {
   const badge = $("chat-tab-badge");
   badge.textContent = total > 99 ? "99+" : total;
   badge.classList.toggle("hidden", total === 0);
+  updateTitle(total);
 
   if (rooms.length === 0) {
     const empty = el("p", "empty");
@@ -2064,7 +2900,7 @@ async function renameCurrentRoom() {
     : `${nameOf(myPhone)}님이 채팅방 이름을 지웠습니다.`;
 
   const batch = writeBatch(db);
-  batch.update(doc(db, "rooms", room.id), { name: trimmed, lastMessage: text, lastAt: now });
+  batch.update(doc(db, "rooms", room.id), { name: trimmed, lastMessage: text, lastAt: now, lastSender: myPhone });
   addSystemMessage(batch, room.id, text, now);
   try {
     await batch.commit();
@@ -2086,8 +2922,10 @@ async function leaveCurrentRoom() {
     members: arrayRemove(myPhone),
     lastMessage: text,
     lastAt: now,
+    lastSender: myPhone,
   });
   addSystemMessage(batch, room.id, text, now);
+  leavingRoomId = room.id;
   try {
     await batch.commit();
     closeModal("room-menu");
@@ -2135,60 +2973,247 @@ $("menu-rename").addEventListener("click", renameCurrentRoom);
 $("menu-leave").addEventListener("click", leaveCurrentRoom);
 
 /* ================= 채팅방 열기 / 닫기 ================= */
+let stopMsgListener = null;
+let roomFirstLoad = true;
+let olderMessages = [];   // 위로 올려서 불러온 예전 대화 (한 번만 읽음)
+let liveMessages = [];    // 최근 대화 (실시간)
+let leavingRoomId = null; // 내가 방금 나간 방 (안내 문구 두 번 안 뜨게)
+
+function myJoinOf(room) {
+  return (room && room.joinedAt && room.joinedAt[myPhone]) || 0;
+}
+
 function openRoom(id) {
   closeRoom();
+  const mySession = session;
   roomMessages = [];
+  olderMessages = [];
+  liveMessages = [];
+  hasMore = false;
+  loadingOlder = false;
+  roomFirstLoad = true;
   currentRoom = { id, members: [myPhone], lastRead: {}, unread: {}, joinedAt: {}, loaded: false };
   $("chat-title").textContent = "";
   $("msg-list").replaceChildren();
+  $("dm-banner").classList.add("hidden");
   $("chat-screen").classList.remove("hidden");
-  let firstLoad = true;
+  let msgsStarted = false;
 
   // 방 정보 (읽음 상태·인원·이름이 바뀌면 다시 그림)
-  const stopRoom = onSnapshot(doc(db, "rooms", id), async (snap) => {
-    if (!snap.exists() || !currentRoom || currentRoom.id !== id) return;
-    const data = snap.data();
-    await Promise.all(data.members.filter((p) => p !== myPhone).map(getUser));
-    if (!currentRoom || currentRoom.id !== id) return;
-    currentRoom = { id, ...data, loaded: true };
-    fillTitle($("chat-title"), currentRoom);
-    renderMessages(firstLoad);
-    if (roomMessages.length) firstLoad = false;
-    markRead();
-  });
-
-  // 메시지 (최근 200개)
-  const stopMsgs = onSnapshot(
-    query(collection(db, "rooms", id, "messages"), orderBy("clientAt"), limitToLast(200)),
+  const stopRoom = onSnapshot(
+    doc(db, "rooms", id),
     async (snap) => {
-      if (!currentRoom || currentRoom.id !== id) return;
-      roomMessages = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-      // 처음 보는 보낸 사람(나간 사람 등) 프로필도 읽어둠
-      await Promise.all([...new Set(roomMessages.map((m) => m.sender))].map(getUser));
-      if (!currentRoom || currentRoom.id !== id || !currentRoom.loaded) return;
-      renderMessages(firstLoad);
-      firstLoad = false;
+      if (!currentRoom || currentRoom.id !== id || mySession !== session) return;
+      if (!snap.exists()) {
+        closeRoom();
+        toast("채팅방을 찾을 수 없어요");
+        return;
+      }
+      const data = snap.data();
+
+      // 이미 나간 방 (예전 알림 등으로 들어온 경우)
+      if (!data.members.includes(myPhone)) {
+        if (leavingRoomId === id) return;
+        closeRoom();
+        if (data.type === "dm") {
+          const partner = id.split("_").find((p) => p !== myPhone);
+          if (partner) openDm(await getUser(partner)); // 1:1은 다시 들어감
+        } else {
+          toast("이미 나간 채팅방이에요");
+        }
+        return;
+      }
+
+      await Promise.all(data.members.filter((p) => p !== myPhone).map(getUser));
+      if (!currentRoom || currentRoom.id !== id || mySession !== session) return;
+      currentRoom = { id, ...data, loaded: true };
+      fillTitle($("chat-title"), currentRoom);
+      if (!isGroup(currentRoom)) watchPresence(dmPartner(currentRoom));
+      renderChatSub();
+      renderDmBanner();
+
+      // 내가 들어온 시간을 알아야 그 뒤 대화만 받아올 수 있어서, 방 정보를 받은 뒤에 시작
+      if (!msgsStarted) {
+        msgsStarted = true;
+        listenMessages(id, myJoinOf(currentRoom));
+        return;
+      }
+      renderMessages(false);
       markRead();
     },
-    (err) => console.error(err)
+    (err) => {
+      console.warn(err);
+      if (currentRoom && currentRoom.id === id) {
+        closeRoom();
+        toast("채팅방을 열 수 없어요");
+      }
+    }
   );
 
-  stopRoomListeners = [stopRoom, stopMsgs];
+  listenTyping(id);
+  stopRoomListeners = [stopRoom, () => stopMsgListener && stopMsgListener(), () => typingStop && typingStop()];
   setTimeout(() => $("chat-text").focus(), 50);
 }
 
+// 내가 들어온 뒤의 대화만 (들어오기 전 대화는 서버에서부터 안 받음)
+function messagesQuery(id, myJoin, ...rest) {
+  return query(collection(db, "rooms", id, "messages"), where("clientAt", ">=", myJoin), orderBy("clientAt"), ...rest);
+}
+
+function toMessages(snap) {
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+}
+
+function combineMessages() {
+  const liveIds = new Set(liveMessages.map((m) => m.id));
+  roomMessages = olderMessages.filter((m) => !liveIds.has(m.id)).concat(liveMessages);
+}
+
+// 최근 50개는 실시간으로
+function listenMessages(id, myJoin) {
+  if (stopMsgListener) stopMsgListener();
+  const mySession = session;
+  let firstSnap = true;
+  stopMsgListener = onSnapshot(
+    messagesQuery(id, myJoin, limitToLast(PAGE)),
+    async (snap) => {
+      if (!currentRoom || currentRoom.id !== id || mySession !== session) return;
+      const next = toMessages(snap);
+
+      // 새 메시지가 많이 와서 실시간 범위(50개) 밖으로 밀려난 건 예전 대화 쪽으로 옮겨 둠
+      const nextIds = new Set(next.map((m) => m.id));
+      const firstLive = next.length ? next[0].clientAt : Infinity;
+      const pushedOut = liveMessages.filter((m) => !nextIds.has(m.id) && m.clientAt < firstLive);
+      if (pushedOut.length) {
+        const olderIds = new Set(olderMessages.map((m) => m.id));
+        olderMessages = olderMessages.concat(pushedOut.filter((m) => !olderIds.has(m.id))).sort((a, b) => a.clientAt - b.clientAt);
+      }
+      liveMessages = next;
+      if (firstSnap) hasMore = next.length >= PAGE;
+      firstSnap = false;
+      combineMessages();
+
+      // 처음 보는 보낸 사람(나간 사람 등) 프로필도 읽어둠
+      await Promise.all([...new Set(roomMessages.map((m) => m.sender))].map(getUser));
+      if (!currentRoom || currentRoom.id !== id || mySession !== session) return;
+
+      renderMessages(roomFirstLoad);
+      roomFirstLoad = false;
+      markRead();
+    },
+    (err) => console.warn(err)
+  );
+}
+
+// 예전 대화는 50개씩 한 번만 읽어옴 (이미 받은 사진을 다시 받지 않게)
+async function loadOlder() {
+  if (!hasMore || loadingOlder || !currentRoom || !currentRoom.loaded) return;
+  const room = currentRoom;
+  const oldest = roomMessages[0];
+  if (!oldest) {
+    hasMore = false;
+    return;
+  }
+  const box = $("msg-list");
+  const keep = { height: box.scrollHeight, top: box.scrollTop };
+  loadingOlder = true;
+  renderLoadMore();
+  try {
+    const snap = await getDocs(messagesQuery(room.id, myJoinOf(room), endBefore(oldest.clientAt), limitToLast(PAGE)));
+    if (!currentRoom || currentRoom.id !== room.id) return;
+    const got = toMessages(snap);
+    hasMore = got.length >= PAGE;
+    olderMessages = got.concat(olderMessages);
+    combineMessages();
+    await Promise.all([...new Set(got.map((m) => m.sender))].map(getUser));
+    if (!currentRoom || currentRoom.id !== room.id) return;
+    loadingOlder = false;
+    keepScroll = keep;
+    renderMessages(false, true);
+  } catch (err) {
+    console.warn(err);
+    loadingOlder = false;
+    renderLoadMore();
+  }
+}
+
+// 예전 대화는 실시간이 아니라서, 내가 지운 건 화면에 바로 반영
+function patchLocalMessage(id, patch) {
+  olderMessages = olderMessages.map((m) => (m.id === id ? { ...m, ...patch } : m));
+  combineMessages();
+  renderMessages(false);
+}
+
+// 맨 위까지 올리면 예전 대화 50개 더
+$("msg-list").addEventListener("scroll", () => {
+  if ($("msg-list").scrollTop <= 60) loadOlder();
+});
+
 function closeRoom() {
+  if (currentRoom) clearTyping(currentRoom.id);
   stopRoomListeners.forEach((stop) => stop());
+  typingStop = null;
+  typingState = {};
+  $("typing-line").classList.add("hidden");
+  $("chat-sub").textContent = "";
   stopRoomListeners = [];
+  stopMsgListener = null;
   currentRoom = null;
   roomMessages = [];
   $("chat-screen").classList.add("hidden");
   $("chat-form").reset();
   $("chat-text").style.height = "";
   $("send-btn").disabled = true;
+  setInputBlocked(false);
 }
 
 $("chat-back").addEventListener("click", closeRoom);
+
+/* ================= 친구 아닌 사용자 / 차단 배너 (1:1 방) ================= */
+function renderDmBanner() {
+  const banner = $("dm-banner");
+  if (!currentRoom || isGroup(currentRoom)) {
+    banner.classList.add("hidden");
+    setInputBlocked(false);
+    return;
+  }
+  const partner = dmPartner(currentRoom);
+  const isBlocked = blocked.has(partner);
+  const isFriend = friendSet.has(partner);
+
+  if (isBlocked) {
+    $("dm-banner-text").textContent = "차단한 사용자예요.";
+  } else if (!isFriend) {
+    $("dm-banner-text").textContent = "친구가 아닌 사용자예요. 모르는 사람이면 차단할 수 있어요.";
+  }
+  $("dm-add").classList.toggle("hidden", isBlocked);
+  $("dm-block").classList.toggle("hidden", isBlocked);
+  $("dm-unblock").classList.toggle("hidden", !isBlocked);
+  banner.classList.toggle("hidden", isFriend && !isBlocked);
+  setInputBlocked(isBlocked);
+}
+
+function setInputBlocked(on) {
+  $("chat-text").disabled = on;
+  $("attach-btn").disabled = on;
+  $("chat-text").placeholder = on ? "차단을 해제하면 메시지를 보낼 수 있어요" : "메시지 입력";
+  if (on) $("send-btn").disabled = true;
+}
+
+$("dm-add").addEventListener("click", async () => {
+  const partner = dmPartner(currentRoom);
+  try {
+    await setDoc(doc(db, "users", myPhone, "friends", partner), { addedAt: serverTimestamp() });
+    friendSet.add(partner);
+    renderDmBanner();
+    toast(`${nameOf(partner)}님을 친구로 추가했어요`);
+  } catch (err) {
+    console.error(err);
+    toast("추가에 실패했어요");
+  }
+});
+$("dm-block").addEventListener("click", () => blockUser(userOf(dmPartner(currentRoom))));
+$("dm-unblock").addEventListener("click", () => unblockUser(userOf(dmPartner(currentRoom))));
 
 /* ================= 읽음 처리 ================= */
 // 방을 보고 있을 때 "여기까지 읽었음" 기록 + 내 안 읽음 수 0
@@ -2197,11 +3222,13 @@ function markRead() {
   if (!currentRoom.members.includes(myPhone)) return;
   const last = roomMessages[roomMessages.length - 1];
   const myLastRead = (currentRoom.lastRead && currentRoom.lastRead[myPhone]) || 0;
+  // 상대 폰 시계가 내 폰보다 빠를 수 있어서, 마지막 메시지 시간보다 작게 쓰지 않음
+  const readUpTo = Math.max(Date.now(), last ? last.clientAt : 0);
   const needed = myUnread(currentRoom) > 0 || (last && last.clientAt > myLastRead);
   if (!needed) return;
 
   updateDoc(doc(db, "rooms", currentRoom.id), {
-    [`lastRead.${myPhone}`]: Date.now(),
+    [`lastRead.${myPhone}`]: readUpTo,
     [`unread.${myPhone}`]: 0,
   }).catch((err) => console.error(err));
 }
@@ -2210,6 +3237,8 @@ function markRead() {
 document.addEventListener("visibilitychange", markRead);
 
 /* ================= 메시지 그리기 ================= */
+let keepScroll = null; // 예전 대화 불러올 때 보던 위치 유지용
+
 function minuteKey(m) {
   return Math.floor(m.clientAt / 60000);
 }
@@ -2234,20 +3263,67 @@ function unreadCount(m) {
   ).length;
 }
 
+// 내 화면에 보여줄 메시지만 고르기
+function visibleMessages() {
+  const myJoin = (currentRoom.joinedAt && currentRoom.joinedAt[myPhone]) || 0;
+  const partner = isGroup(currentRoom) ? null : dmPartner(currentRoom);
+  const ranges = (partner && blockRanges.get(partner)) || [];
+  return roomMessages.filter((m) => {
+    if (m.clientAt < myJoin && m.sender !== myPhone) return false;       // 들어오기 전 대화
+    if (m.hiddenFor && m.hiddenFor.includes(myPhone)) return false;      // 나에게서 삭제
+    if (m.sender === partner && ranges.some((r) => m.clientAt >= r.from && m.clientAt < r.to)) return false; // 차단 중에 온 1:1 메시지
+    return true;
+  });
+}
+
+// 글자 속 링크를 누를 수 있게 (https://... 또는 www....)
+const URL_RE = /(https?:\/\/[^\s<]+|www\.[^\s<]+)/gi;
+function linkify(text) {
+  const frag = document.createDocumentFragment();
+  let last = 0;
+  for (const match of text.matchAll(URL_RE)) {
+    let url = match[0];
+    // 문장 끝 마침표·괄호는 링크에서 빼기
+    const trail = url.match(/[.,!?)\]'"]+$/);
+    if (trail) url = url.slice(0, -trail[0].length);
+    frag.append(text.slice(last, match.index));
+    const a = el("a", null, url);
+    a.href = url.startsWith("www.") ? "https://" + url : url;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    a.addEventListener("click", (e) => e.stopPropagation());
+    frag.append(a);
+    last = match.index + url.length;
+  }
+  frag.append(text.slice(last));
+  return frag;
+}
+
 function openViewer(src) {
   $("viewer-img").src = src;
   $("viewer").classList.remove("hidden");
 }
 $("viewer").addEventListener("click", () => $("viewer").classList.add("hidden"));
 
-function renderMessages(forceBottom) {
+function renderLoadMore() {
+  const box = $("msg-list");
+  let top = box.querySelector(".load-more");
+  if (hasMore || loadingOlder) {
+    if (!top) {
+      top = el("div", "load-more");
+      box.prepend(top);
+    }
+    top.textContent = loadingOlder ? "이전 대화 불러오는 중..." : "위로 올리면 이전 대화를 볼 수 있어요";
+  } else if (top) {
+    top.remove();
+  }
+}
+
+function renderMessages(forceBottom, applyKeep = false) {
   if (!currentRoom || !currentRoom.loaded) return;
   const box = $("msg-list");
   const nearBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 80;
-
-  // 내가 들어오기 전 대화는 안 보여줌
-  const myJoin = (currentRoom.joinedAt && currentRoom.joinedAt[myPhone]) || 0;
-  const msgs = roomMessages.filter((m) => m.clientAt >= myJoin);
+  const msgs = mergePhotoGroups(visibleMessages());
 
   const nodes = [];
   msgs.forEach((m, i) => {
@@ -2281,7 +3357,10 @@ function renderMessages(forceBottom) {
     if (!mine) {
       const sender = userOf(m.sender);
       if (first) {
-        row.appendChild(makeAvatar(sender));
+        const av = makeAvatar(sender);
+        av.style.cursor = "pointer";
+        av.addEventListener("click", () => openProfile(sender, false));
+        row.appendChild(av);
         body.appendChild(el("div", "sender", sender.nickname));
       } else {
         row.appendChild(el("div", "avatar-space"));
@@ -2295,19 +3374,27 @@ function renderMessages(forceBottom) {
     if (lastInGroup) meta.appendChild(el("span", "time", formatTime(m.clientAt)));
 
     let content;
-    if (m.type === "image") {
+    if (m.deleted) {
+      content = el("div", "bubble deleted", "삭제된 메시지입니다.");
+    } else if (m.groupMsgs) {
+      content = makePhotoGrid(m.groupMsgs.filter((g) => !g.deleted), true);
+    } else if (m.type === "image") {
       content = el("img", "photo");
-      content.src = m.image;
+      content.src = safeImage(m.image);
       content.alt = "사진";
       content.loading = "lazy";
-      content.addEventListener("click", () => openViewer(m.image));
+      content.addEventListener("click", () => {
+        if (!longPressed) openViewer(safeImage(m.image));
+      });
       // 사진이 늦게 로드되면 맨 아래 위치가 밀리니까 다시 맞춤
       content.addEventListener("load", () => {
-        if (box.scrollHeight - box.scrollTop - box.clientHeight < 400) box.scrollTop = box.scrollHeight;
+        if (!loadingOlder && box.scrollHeight - box.scrollTop - box.clientHeight < 400) box.scrollTop = box.scrollHeight;
       });
     } else {
-      content = el("div", "bubble", m.text);
+      content = el("div", "bubble");
+      content.appendChild(linkify(m.text || ""));
     }
+    if (!m.deleted && !m.groupMsgs) attachMessageMenu(content, m);
 
     line.append(content, meta);
     body.appendChild(line);
@@ -2315,14 +3402,207 @@ function renderMessages(forceBottom) {
     nodes.push(row);
   });
 
-  box.replaceChildren(...nodes);
+  // 보내지 못한 메시지는 맨 아래에 ! 표시와 함께
+  for (const f of failedOf(currentRoom.id)) nodes.push(makeFailedRow(f));
 
+  box.replaceChildren(...nodes);
+  renderLoadMore();
+
+  if (keepScroll && applyKeep) {
+    // 예전 대화를 위에 붙였으면 보던 메시지가 그 자리에 있도록
+    box.scrollTop = box.scrollHeight - keepScroll.height + keepScroll.top;
+    keepScroll = null;
+    return;
+  }
   // 맨 아래 보고 있었거나, 처음 열었거나, 내가 방금 보냈으면 맨 아래로
   const last = msgs[msgs.length - 1];
-  if (forceBottom || nearBottom || (last && last.sender === myPhone)) {
+  if (forceBottom || nearBottom || (last && last.sender === myPhone && last.type !== "system")) {
     box.scrollTop = box.scrollHeight;
   }
 }
+
+// 한 번에 보낸 사진 여러 장(같은 groupId)을 하나로 묶기
+function mergePhotoGroups(list) {
+  const out = [];
+  for (const m of list) {
+    const prev = out[out.length - 1];
+    if (m.type === "image" && m.groupId && prev && prev.groupId === m.groupId && prev.sender === m.sender) {
+      prev.groupMsgs.push(m);
+      // 시간/읽음은 마지막 사진 기준, 전부 지웠을 때만 "삭제된 메시지"
+      prev.clientAt = m.clientAt;
+      prev.deleted = prev.groupMsgs.every((g) => g.deleted);
+      continue;
+    }
+    if (m.type === "image" && m.groupId) {
+      out.push({ ...m, groupMsgs: [m] });
+    } else {
+      out.push(m);
+    }
+  }
+  // 묶음이 1장만 남았으면(나에게서 삭제 등) 그냥 사진 하나로
+  return out.map((m) => (m.groupMsgs && m.groupMsgs.length === 1 ? { ...m.groupMsgs[0] } : m));
+}
+
+// 사진 바둑판 (2~4장은 2줄, 5장 이상은 3줄)
+function makePhotoGrid(photoMsgs, withMenu) {
+  const grid = el("div", photoMsgs.length >= 5 ? "photo-grid cols3" : "photo-grid");
+  for (const pm of photoMsgs) {
+    const img = el("img", "photo");
+    img.src = safeImage(pm.image);
+    img.alt = "사진";
+    img.loading = "lazy";
+    img.addEventListener("click", () => {
+      if (!longPressed) openViewer(safeImage(pm.image));
+    });
+    if (withMenu) attachMessageMenu(img, pm);
+    grid.appendChild(img);
+  }
+  return grid;
+}
+
+function makeFailedRow(f) {
+  const row = el("div", "msg mine first failed");
+  const body = el("div", "body");
+  const line = el("div", "line");
+  let content;
+  const first = f.items[0];
+  if (first.type === "text") {
+    content = el("div", "bubble");
+    content.appendChild(linkify(first.text));
+  } else if (f.items.length > 1) {
+    content = makePhotoGrid(f.items, false);
+  } else {
+    content = el("img", "photo");
+    content.src = safeImage(first.image);
+    content.alt = "사진";
+  }
+  const btn = el("button", "fail-btn", "!");
+  btn.type = "button";
+  btn.title = "전송 실패 - 눌러서 재전송";
+  btn.setAttribute("aria-label", "전송 실패, 재전송 또는 삭제");
+  btn.addEventListener("click", () => openFailMenu(f));
+  line.append(content, btn);
+  body.appendChild(line);
+  row.appendChild(body);
+  return row;
+}
+
+/* ================= 메시지 길게 누르기 / 오른쪽 클릭 메뉴 ================= */
+const UNSEND_LIMIT = 5 * 60 * 1000; // 모두에게서 삭제는 보낸 뒤 5분까지 (카톡처럼)
+let menuMsg = null;
+let longPressed = false;
+
+function attachMessageMenu(node, m) {
+  // 컴퓨터: 오른쪽 클릭
+  node.addEventListener("contextmenu", (e) => {
+    e.preventDefault();
+    openMessageMenu(m);
+  });
+  // 폰: 0.5초 길게 누르기
+  let timer = null;
+  node.addEventListener("touchstart", () => {
+    longPressed = false;
+    timer = setTimeout(() => {
+      longPressed = true;
+      openMessageMenu(m);
+    }, 500);
+  }, { passive: true });
+  const cancel = () => clearTimeout(timer);
+  node.addEventListener("touchend", cancel);
+  node.addEventListener("touchmove", cancel);
+  node.addEventListener("touchcancel", cancel);
+}
+
+function openMessageMenu(m) {
+  menuMsg = m;
+  const mine = m.sender === myPhone;
+  const isImage = m.type === "image";
+  $("msg-menu-preview").textContent = isImage ? "사진" : m.text;
+  $("mm-copy").classList.toggle("hidden", isImage);
+  $("mm-save").classList.toggle("hidden", !isImage);
+  $("mm-unsend").classList.toggle("hidden", !(mine && Date.now() - m.clientAt < UNSEND_LIMIT));
+  openModal("msg-menu");
+}
+
+async function copyText(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+  } catch (e) {
+    // 파일로 열었거나 권한이 없을 때 예전 방식으로
+    const ta = el("textarea");
+    ta.value = text;
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand("copy");
+    ta.remove();
+  }
+}
+
+$("mm-copy").addEventListener("click", async () => {
+  if (!menuMsg) return;
+  await copyText(menuMsg.text || "");
+  closeModal("msg-menu");
+  toast("복사했어요");
+});
+
+$("mm-save").addEventListener("click", () => {
+  if (!menuMsg) return;
+  const a = el("a");
+  const src = safeImage(menuMsg.image);
+  if (!src) return;
+  a.href = src;
+  a.download = `onchat-${menuMsg.clientAt}.jpg`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  closeModal("msg-menu");
+});
+
+// 모두에게서 삭제: 내용을 지우고 "삭제된 메시지입니다."로 표시
+$("mm-unsend").addEventListener("click", async () => {
+  const m = menuMsg;
+  const room = currentRoom;
+  if (!m || !room) return;
+  if (Date.now() - m.clientAt >= UNSEND_LIMIT) {
+    toast("보낸 지 5분이 지나서 모두에게서 삭제할 수 없어요");
+    closeModal("msg-menu");
+    return;
+  }
+  if (!confirm("모두에게서 삭제할까요? 상대방 화면에서도 지워져요.")) return;
+
+  const batch = writeBatch(db);
+  batch.update(doc(db, "rooms", room.id, "messages", m.id), { deleted: true, text: "", image: "" });
+  if (room.lastAt === m.clientAt) {
+    // 방 목록 미리보기도 바꿈
+    batch.update(doc(db, "rooms", room.id), { lastMessage: "삭제된 메시지입니다." });
+  }
+  try {
+    await batch.commit();
+    closeModal("msg-menu");
+    patchLocalMessage(m.id, { deleted: true, text: "", image: "" });
+  } catch (err) {
+    console.error(err);
+    toast("삭제하지 못했어요");
+  }
+});
+
+// 나에게서 삭제: 내 화면에서만 안 보이게 (다른 기기에서도 안 보임)
+$("mm-hide").addEventListener("click", async () => {
+  const m = menuMsg;
+  if (!m || !currentRoom) return;
+  try {
+    await updateDoc(doc(db, "rooms", currentRoom.id, "messages", m.id), {
+      hiddenFor: arrayUnion(myPhone),
+    });
+    closeModal("msg-menu");
+    patchLocalMessage(m.id, { hiddenFor: [...(m.hiddenFor || []), myPhone] });
+  } catch (err) {
+    console.error(err);
+    toast("삭제하지 못했어요");
+  }
+});
 
 /* ================= 메시지 보내기 ================= */
 const chatText = $("chat-text");
@@ -2330,14 +3610,18 @@ const chatText = $("chat-text");
 function autoGrow() {
   chatText.style.height = "auto";
   chatText.style.height = Math.min(chatText.scrollHeight, 110) + "px";
-  $("send-btn").disabled = chatText.value.trim() === "";
+  $("send-btn").disabled = chatText.value.trim() === "" || chatText.disabled;
 }
-chatText.addEventListener("input", autoGrow);
+chatText.addEventListener("input", () => {
+  autoGrow();
+  if (chatText.value.trim()) sendTyping();
+  else clearTyping();
+});
 
 // Enter = 보내기, Shift+Enter = 줄바꿈
 // isComposing: 한글 조합 중 Enter는 무시 (안 그러면 마지막 글자가 한 번 더 보내짐)
 chatText.addEventListener("keydown", (e) => {
-  if (e.key === "Enter" && !e.shiftKey && !e.isComposing) {
+  if (e.key === "Enter" && !e.shiftKey && !e.isComposing && e.keyCode !== 229) {
     e.preventDefault();
     sendText();
   }
@@ -2351,61 +3635,79 @@ $("chat-form").addEventListener("submit", (e) => {
 async function sendText() {
   const text = chatText.value.trim();
   if (!text || !currentRoom || !currentRoom.loaded) return;
-
   chatText.value = "";
   autoGrow();
   chatText.focus();
-
-  const ok = await sendPayload({ type: "text", text }, text);
-  if (!ok && !chatText.value) {
-    chatText.value = text; // 실패하면 입력창에 되돌려 놓기
-    autoGrow();
-  }
+  clearTyping();
+  await sendItems([{ type: "text", text }], text);
 }
 
-// 사진 보내기
+// 사진 보내기 (한 번에 최대 10장)
+const MAX_PHOTOS = 10;
 $("attach-btn").addEventListener("click", () => $("photo-input").click());
 
 $("photo-input").addEventListener("change", async (e) => {
-  const file = e.target.files[0];
+  let files = [...e.target.files];
   e.target.value = "";
-  if (!file || !currentRoom) return;
+  if (!files.length || !currentRoom) return;
+  const room = currentRoom; // 압축하는 동안 다른 방으로 가도 원래 방으로 보냄
+  if (files.length > MAX_PHOTOS) {
+    toast(`사진은 한 번에 ${MAX_PHOTOS}장까지 보낼 수 있어요`);
+    files = files.slice(0, MAX_PHOTOS);
+  }
 
   $("attach-btn").disabled = true;
-  toast("사진 보내는 중...");
+  toast(files.length > 1 ? `사진 ${files.length}장 보내는 중...` : "사진 보내는 중...");
   try {
-    // 채팅 사진: 긴 쪽 1280px, Firestore 1MB 제한 안쪽으로
-    const image = await compressImage(file, { maxSide: 1280, quality: 0.75, maxBytes: 700000 });
-    await sendPayload({ type: "image", image, text: "" }, "사진");
+    // 여러 장이면 한 번에 보내는 양(10MB)을 넘지 않게 장당 조금 더 작게
+    const maxBytes = files.length > 1 ? 450000 : 700000;
+    const images = [];
+    for (const f of files) {
+      images.push(await compressImage(f, { maxSide: 1280, quality: 0.75, maxBytes }));
+    }
+    const groupId = images.length > 1 ? "g" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6) : null;
+    const items = images.map((image) =>
+      groupId ? { type: "image", image, text: "", groupId } : { type: "image", image, text: "" }
+    );
+    await sendItems(items, images.length > 1 ? `사진 ${images.length}장` : "사진", null, room);
   } catch (err) {
     toast(err.message || "사진을 보내지 못했어요");
   } finally {
-    $("attach-btn").disabled = false;
+    $("attach-btn").disabled = chatText.disabled;
   }
 });
 
-// 메시지 저장 + 방 정보 갱신을 한 번에 (둘 중 하나만 되는 일 없게)
-async function sendPayload(payload, preview) {
-  const room = currentRoom;
-  const now = Date.now();
-  const roomRef = doc(db, "rooms", room.id);
-  const msgRef = doc(collection(db, "rooms", room.id, "messages")); // 새 메시지 자리 (자동 ID)
+/* ---------- 실제로 보내기 (실패하면 ! 표시로 남겨둠) ---------- */
+const failedSends = new Map(); // 방 번호 → [{ id, items, preview }]
+function failedOf(roomId) {
+  return failedSends.get(roomId) || [];
+}
 
+// 메시지 저장 + 방 정보 갱신을 한 번에 (둘 중 하나만 되는 일 없게)
+async function sendItems(items, preview, retryId = null, room = currentRoom) {
+  if (!room) return false;
+
+  // 인터넷이 끊겨 있으면 보내지 않고 바로 "실패"로 (나중에 재전송)
+  if (!navigator.onLine) {
+    keepFailed(room.id, items, preview, retryId);
+    toast("인터넷 연결이 없어서 보내지 못했어요");
+    return false;
+  }
+
+  const now = Date.now();
+  const lastAt = now + items.length - 1;
   const batch = writeBatch(db);
-  batch.set(msgRef, {
-    ...payload,
-    sender: myPhone,
-    clientAt: now,
-    createdAt: serverTimestamp(),
+  items.forEach((item, i) => {
+    const msgRef = doc(collection(db, "rooms", room.id, "messages")); // 새 메시지 자리 (자동 ID)
+    batch.set(msgRef, { ...item, sender: myPhone, clientAt: now + i, createdAt: serverTimestamp() });
   });
 
   const roomUpdate = {
     lastMessage: preview,
-    lastAt: now,
+    lastAt,
     lastSender: myPhone,
-    [`lastRead.${myPhone}`]: now,
+    [`lastRead.${myPhone}`]: lastAt,
   };
-
   // 받을 사람: 단톡은 지금 멤버, 1:1은 상대가 나갔어도 다시 불러옴 (카톡 방식)
   let recipients = room.members.filter((p) => p !== myPhone);
   if (!isGroup(room)) {
@@ -2417,17 +3719,235 @@ async function sendPayload(payload, preview) {
     }
   }
   recipients.forEach((p) => (roomUpdate[`unread.${p}`] = increment(1)));
-  batch.update(roomRef, roomUpdate);
+  batch.update(doc(db, "rooms", room.id), roomUpdate);
 
   try {
     await batch.commit();
+    if (retryId) dropFailed(room.id, retryId);
     return true;
   } catch (err) {
-    console.error(err);
+    console.warn(err);
+    keepFailed(room.id, items, preview, retryId);
     toast("메시지를 보내지 못했어요");
     return false;
   }
 }
+
+function keepFailed(roomId, items, preview, retryId) {
+  if (!retryId) {
+    const entry = { id: "f" + Date.now() + Math.random().toString(36).slice(2, 6), items, preview, at: Date.now() };
+    failedSends.set(roomId, [...failedOf(roomId), entry]);
+  }
+  if (currentRoom && currentRoom.id === roomId) renderMessages(true);
+}
+
+function dropFailed(roomId, id) {
+  failedSends.set(roomId, failedOf(roomId).filter((f) => f.id !== id));
+  if (currentRoom && currentRoom.id === roomId) renderMessages(false);
+}
+
+let failMenuEntry = null;
+function openFailMenu(entry) {
+  failMenuEntry = entry;
+  openModal("fail-menu");
+}
+$("fm-retry").addEventListener("click", async () => {
+  const entry = failMenuEntry;
+  closeModal("fail-menu");
+  if (entry && currentRoom) await sendItems(entry.items, entry.preview, entry.id);
+});
+$("fm-delete").addEventListener("click", () => {
+  const entry = failMenuEntry;
+  closeModal("fail-menu");
+  if (entry && currentRoom) dropFailed(currentRoom.id, entry.id);
+});
+
+/* ================= 접속 중 / 입력 중 (Realtime Database) ================= */
+// Firestore엔 "창 닫히면 자동으로 지우기" 기능이 없어서, 이것만 Realtime Database를 씀
+const presence = new Map();      // 번호 → { online, lastSeen }
+const presenceWatch = new Map(); // 번호 → 감시 끄기 함수
+let presenceStops = [];
+
+// 접속 정보는 계정 ID(uid)로 저장 (Realtime Database 규칙이 전화번호를 모르기 때문)
+function startPresence() {
+  const uid = auth.currentUser && auth.currentUser.uid;
+  if (!uid) return;
+  let myConn = null;
+  const lastSeenRef = dbRef(rtdb, `presence/${uid}/lastSeen`);
+  const stop = onValue(dbRef(rtdb, ".info/connected"), async (snap) => {
+    if (snap.val() !== true) return;
+    try {
+      myConn = dbPush(dbRef(rtdb, `presence/${uid}/conns`)); // 기기(창)마다 하나
+      await onDisconnect(myConn).remove();
+      await onDisconnect(lastSeenRef).set(rtdbNow());
+      await dbSet(myConn, true);
+    } catch (e) {
+      console.warn("접속 표시를 저장하지 못했어요 (Realtime Database 규칙 확인)", e);
+    }
+  });
+  presenceStops.push(() => {
+    stop();
+    if (myConn) {
+      dbRemove(myConn).catch(() => {});
+      dbSet(lastSeenRef, Date.now()).catch(() => {});
+    }
+  });
+}
+
+function stopPresence() {
+  presenceStops.forEach((s) => s());
+  presenceStops = [];
+  presenceWatch.forEach((s) => s());
+  presenceWatch.clear();
+  presence.clear();
+}
+
+function watchPresence(phone) {
+  if (!phone || phone === myPhone || presenceWatch.has(phone)) return;
+  const uid = userOf(phone).uid;
+  if (!uid) return; // 예전 버전 프로필(계정 연결 전)은 접속 표시 없음
+  const stop = onValue(
+    dbRef(rtdb, `presence/${uid}`),
+    (snap) => {
+      const v = snap.val() || {};
+      presence.set(phone, { online: !!(v.conns && Object.keys(v.conns).length), lastSeen: v.lastSeen || 0 });
+      onPresenceChange(phone);
+    },
+    (e) => console.warn(e)
+  );
+  presenceWatch.set(phone, stop);
+}
+
+function isOnline(phone) {
+  return !!(presence.get(phone) && presence.get(phone).online);
+}
+
+function onPresenceChange(phone) {
+  if (friendSet.has(phone)) renderFriends();
+  if (currentRoom && !isGroup(currentRoom) && dmPartner(currentRoom) === phone) renderChatSub();
+}
+
+// 1:1 방 제목 아래: "접속 중" / "5분 전 접속"
+function renderChatSub() {
+  const sub = $("chat-sub");
+  if (!currentRoom || isGroup(currentRoom)) {
+    sub.textContent = "";
+    return;
+  }
+  const p = presence.get(dmPartner(currentRoom));
+  sub.classList.toggle("on", !!(p && p.online));
+  if (!p) sub.textContent = "";
+  else if (p.online) sub.textContent = "접속 중";
+  else if (p.lastSeen) sub.textContent = lastSeenText(p.lastSeen);
+  else sub.textContent = "";
+}
+
+function lastSeenText(ms) {
+  const min = Math.floor((Date.now() - ms) / 60000);
+  if (min < 1) return "방금 전 접속";
+  if (min < 60) return `${min}분 전 접속`;
+  const hours = Math.floor(min / 60);
+  if (hours < 24) return `${hours}시간 전 접속`;
+  const days = Math.floor(hours / 24);
+  return days < 7 ? `${days}일 전 접속` : "접속한 지 오래됨";
+}
+setInterval(renderChatSub, 60000);
+
+// 입력 중: 글자 칠 때 3초에 한 번만 저장, 6초 넘게 소식 없으면 안 보이게
+let typingState = {};
+let typingStop = null;
+let lastTypingSent = 0;
+
+function listenTyping(roomId) {
+  typingState = {};
+  typingStop = onValue(
+    dbRef(rtdb, `typing/${roomId}`),
+    (snap) => {
+      typingState = snap.val() || {};
+      renderTyping();
+    },
+    (e) => console.warn(e)
+  );
+}
+setInterval(renderTyping, 2000);
+
+function renderTyping() {
+  const line = $("typing-line");
+  if (!currentRoom || !currentRoom.loaded) {
+    line.classList.add("hidden");
+    return;
+  }
+  const now = Date.now();
+  const who = Object.values(typingState)
+    .filter((v) => v && v.p !== myPhone && now - v.t < 6000 && currentRoom.members.includes(v.p) && !blocked.has(v.p))
+    .map((v) => nameOf(v.p));
+  if (who.length === 0) {
+    line.classList.add("hidden");
+    return;
+  }
+  line.textContent = who.length === 1 ? `${who[0]}님이 입력 중...` : `${who[0]}님 외 ${who.length - 1}명이 입력 중...`;
+  line.classList.remove("hidden");
+}
+
+function sendTyping() {
+  if (!currentRoom || !myPhone) return;
+  const now = Date.now();
+  if (now - lastTypingSent < 3000) return;
+  lastTypingSent = now;
+  const uid = auth.currentUser && auth.currentUser.uid;
+  if (!uid) return;
+  const r = dbRef(rtdb, `typing/${currentRoom.id}/${uid}`);
+  dbSet(r, { p: myPhone, t: now }).catch(() => {});
+  onDisconnect(r).remove().catch(() => {});
+}
+
+function clearTyping(roomId) {
+  const id = roomId || (currentRoom && currentRoom.id);
+  const uid = auth.currentUser && auth.currentUser.uid;
+  if (id && uid && lastTypingSent) {
+    dbRemove(dbRef(rtdb, `typing/${id}/${uid}`)).catch(() => {});
+  }
+  lastTypingSent = 0;
+}
+
+/* ================= 홈 화면에 앱 추가 (PWA) ================= */
+const canUseSW = "serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost" || location.hostname === "127.0.0.1");
+if (canUseSW) {
+  navigator.serviceWorker.register("sw.js").catch((e) => console.warn("서비스 워커 등록 실패", e));
+  // 알림을 눌렀을 때 서비스 워커가 보내는 "이 방 열어줘"
+  navigator.serviceWorker.addEventListener("message", (e) => {
+    if (e.data && e.data.type === "open-room" && e.data.roomId && myPhone) {
+      closeAllModals();
+      openRoom(e.data.roomId);
+    }
+  });
+}
+
+// 알림을 눌러서 새로 열린 경우: ?room=방번호
+let pendingOpenRoom = new URLSearchParams(location.search).get("room");
+
+let installPrompt = null;
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  installPrompt = e; // 안드로이드/컴퓨터 크롬: 버튼으로 바로 설치 가능
+});
+const isStandalone = window.matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+if (isStandalone) $("install-row").classList.add("hidden");
+
+$("install-row").addEventListener("click", async () => {
+  if (installPrompt) {
+    installPrompt.prompt();
+    const { outcome } = await installPrompt.userChoice;
+    installPrompt = null;
+    if (outcome === "accepted") {
+      toast("홈 화면에 추가했어요");
+      $("install-row").classList.add("hidden");
+    }
+    return;
+  }
+  openModal("install-modal");
+});
+window.addEventListener("appinstalled", () => $("install-row").classList.add("hidden"));
 
 /* ================= 로그아웃 ================= */
 // 화면과 실시간 감시를 전부 정리 (로그아웃 때)
@@ -2444,13 +3964,26 @@ function cleanupSession() {
   me = null;
   friends = [];
   friendSet = new Set();
-  confirmation = null;
+  loginPhone = "";
+  blocked = new Map();
+  allRooms = [];
+  roomsLoaded = false;
+  seenUnread.clear();
+  $("notice").classList.add("hidden");
+  updateTitle(0);
+  stopPresence();
+  failedSends.clear();
+  blockRanges = new Map();
+  olderMessages = [];
+  liveMessages = [];
+  session++;
 }
 
 $("logout-btn").addEventListener("click", async () => {
   if (!confirm("로그아웃할까요?")) return;
   cleanupSession();
-  await signOut(auth); // → onAuthStateChanged가 번호 입력 화면으로 보냄
+  showWelcome();
+  await signOut(auth);
 });
   </script>
 </body>
