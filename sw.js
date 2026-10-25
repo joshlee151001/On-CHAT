@@ -1,5 +1,5 @@
 // OnChat 서비스 워커: 홈 화면 앱으로 열리게 하고, 알림을 누르면 그 채팅방을 열어 줌
-const CACHE = "onchat-v3"; // 앱 꺼져도 알림
+const CACHE = "onchat-v4"; // 알림 소리·진동
 const SHELL = ["./", "./index.html", "./manifest.json", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", (e) => {
@@ -49,6 +49,9 @@ self.addEventListener("push", (e) => {
         body: data.body || "새 메시지가 왔어요",
         tag: data.roomId || "onchat",
         renotify: true,
+        silent: false,
+        vibrate: [200, 100, 200],
+        timestamp: Date.now(),
         icon: "icon-192.png",
         badge: "icon-192.png",
         data: { roomId: data.roomId },
