@@ -1087,6 +1087,10 @@ mark.hl { background: #FFE066; color: #222; border-radius: 3px; padding: 0 1px; 
           <span>새 메시지 알림<small id="notify-sub" class="setting-sub"></small></span>
           <span id="notify-switch" class="switch"></span>
         </button>
+        <button id="push-row" class="setting-row">
+          <span>앱 꺼져도 알림 받기<small id="push-sub" class="setting-sub"></small></span>
+          <span id="push-switch" class="switch"></span>
+        </button>
         <button id="sound-row" class="setting-row">
           알림 소리 <span id="sound-switch" class="switch"></span>
         </button>
@@ -1414,6 +1418,9 @@ const firebaseConfig = {
   appId: "1:939252436157:web:d8a55283aa9c17fa6e3bd4",
   measurementId: "G-0B96XSHJK1",
 };
+
+// 👉 Cloudflare 알림 서버 주소 (예: "https://onchat-push.아이디.workers.dev"). 비어 있으면 앱 꺼진 알림은 꺼짐
+const PUSH_URL = "https://onchat.joshlee151001.workers.dev".replace(/\/$/, "");
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -2255,6 +2262,8 @@ function enterMain(phone) {
 
   stopListeners = [stopMe, stopFriends, stopRooms, stopBlocked];
   startPresence();
+  if (pushOn()) subscribePush(false).catch((e) => console.warn(e));
+  renderPushSettings();
 
   // 알림을 눌러서 열린 경우 그 방으로
   if (pendingOpenRoom) {
@@ -2374,9 +2383,12 @@ async function notifyMessage(room) {
   const title = isGroup(room) ? roomTitle(room) : sender;
   const body = isGroup(room) ? `${sender}: ${room.lastMessage}` : room.lastMessage;
 
+  const hidden = document.visibilityState !== "visible";
+  if (hidden && pushOn() && PUSH_URL) return; // 서버 알림이 따로 옴
+
   if (prefs.sound) playDing();
 
-  if (document.visibilityState === "visible") {
+  if (!hidden) {
     showNotice(room, title, body);
     return;
   }
@@ -2432,6 +2444,116 @@ $("notice").addEventListener("click", () => {
 // 탭 제목에 안 읽은 수: "(3) OnChat"
 function updateTitle(total) {
   document.title = total > 0 ? `(${total > 99 ? "99+" : total}) OnChat` : "OnChat";
+}
+
+/* ================= 앱 꺼져도 오는 알림 (웹 푸시) ================= */
+function pushSupported() {
+  return canUseSW && "PushManager" in window && "Notification" in window;
+}
+function pushOn() {
+  return readPref("onchat-push", "off") === "on";
+}
+function isIOS() {
+  return /iPhone|iPad|iPod/.test(navigator.userAgent);
+}
+
+function renderPushSettings() {
+  $("push-switch").classList.toggle("on", pushOn());
+  let sub;
+  if (!PUSH_URL) sub = "알림 서버를 아직 연결하지 않았어요";
+  else if (!pushSupported()) sub = isIOS() ? "홈 화면에 추가한 온챗 아이콘으로 열어야 쓸 수 있어요" : "이 브라우저는 지원하지 않아요";
+  else if (Notification.permission === "denied") sub = "알림이 차단돼 있어요 (브라우저/폰 설정에서 허용)";
+  else sub = pushOn() ? "앱을 꺼도 새 메시지를 알려드려요" : "켜면 앱을 꺼도 카톡처럼 알림이 와요";
+  $("push-sub").textContent = sub;
+}
+
+function b64urlToBytes(str) {
+  const s = str.replace(/-/g, "+").replace(/_/g, "/");
+  const bin = atob(s + "===".slice((s.length + 3) % 4));
+  return Uint8Array.from(bin, (c) => c.charCodeAt(0));
+}
+
+async function pushApi(path, body) {
+  const user = auth.currentUser;
+  if (!PUSH_URL || !user) return null;
+  const token = await user.getIdToken();
+  return fetch(PUSH_URL + path, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
+    body: JSON.stringify(body || {}),
+    keepalive: true,
+  });
+}
+
+// 이 기기를 알림 받는 기기로 등록 (askPermission: 버튼 눌렀을 때만 허락 창)
+async function subscribePush(askPermission) {
+  if (!PUSH_URL || !pushSupported()) return false;
+  if (Notification.permission !== "granted") {
+    if (!askPermission) return false;
+    if ((await Notification.requestPermission()) !== "granted") return false;
+  }
+  const reg = await navigator.serviceWorker.ready;
+  const key = b64urlToBytes(await (await fetch(PUSH_URL + "/vapid")).text());
+  let sub = await reg.pushManager.getSubscription();
+  // 서버 키가 바뀌었으면 새로 등록
+  if (sub && sub.options && sub.options.applicationServerKey) {
+    const old = new Uint8Array(sub.options.applicationServerKey);
+    if (old.length !== key.length || old.some((b, i) => b !== key[i])) {
+      await sub.unsubscribe();
+      sub = null;
+    }
+  }
+  if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: key });
+  const res = await pushApi("/subscribe", { subscription: sub.toJSON() });
+  return !!(res && res.ok);
+}
+
+async function unsubscribePush() {
+  if (!pushSupported()) return;
+  const reg = await navigator.serviceWorker.ready;
+  const sub = await reg.pushManager.getSubscription();
+  if (sub) {
+    await pushApi("/unsubscribe", { endpoint: sub.endpoint }).catch(() => {});
+    await sub.unsubscribe().catch(() => {});
+  }
+}
+
+$("push-row").addEventListener("click", async () => {
+  if (!PUSH_URL) {
+    toast("알림 서버 주소가 아직 연결되지 않았어요");
+    return;
+  }
+  if (!pushSupported()) {
+    toast(isIOS() ? "홈 화면에 추가한 온챗 아이콘으로 열어서 켜 주세요" : "이 브라우저는 앱 꺼진 알림을 지원하지 않아요");
+    return;
+  }
+  const row = $("push-row");
+  row.disabled = true;
+  try {
+    if (pushOn()) {
+      await unsubscribePush();
+      writePref("onchat-push", false);
+      toast("앱 꺼진 알림을 껐어요");
+    } else if (await subscribePush(true)) {
+      writePref("onchat-push", true);
+      toast("이제 앱을 꺼도 알림이 와요 🔔");
+    } else {
+      toast(Notification.permission === "denied" ? "알림이 차단돼 있어요. 설정에서 허용해 주세요" : "알림을 켜지 못했어요");
+    }
+  } catch (err) {
+    console.warn(err);
+    toast("알림을 켜지 못했어요");
+  } finally {
+    row.disabled = false;
+    renderPushSettings();
+  }
+});
+setTimeout(renderPushSettings, 0); // 아래쪽 설정(서비스 워커)이 준비된 뒤에 그림
+
+// 메시지 보낸 뒤: 받는 사람들 폰으로 알림 보내 달라고 서버에 부탁 (실패해도 채팅엔 영향 없음)
+function requestPush(roomId) {
+  if (!PUSH_URL) return;
+  pushApi("/notify", { roomId }).catch(() => {});
 }
 
 /* ================= 차단 ================= */
@@ -4223,6 +4345,7 @@ async function sendItems(items, preview, retryId = null, room = currentRoom) {
   try {
     await batch.commit();
     if (retryId) dropFailed(room.id, retryId);
+    requestPush(room.id);
     return true;
   } catch (err) {
     console.warn(err);
@@ -4480,6 +4603,11 @@ function cleanupSession() {
 
 $("logout-btn").addEventListener("click", async () => {
   if (!confirm("로그아웃할까요?")) return;
+  // 이 기기로 내 알림이 계속 오지 않게
+  if (pushOn()) {
+    await unsubscribePush().catch(() => {});
+    writePref("onchat-push", false);
+  }
   cleanupSession();
   showWelcome();
   await signOut(auth);
