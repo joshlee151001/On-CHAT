@@ -8,6 +8,7 @@
   <meta name="theme-color" content="#FF9F43">
   <link rel="icon" href="icon-192.png">
   <link rel="apple-touch-icon" href="icon-192.png">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="OnChat">
   <style>
@@ -1570,7 +1571,7 @@ function authErrorMessage(err) {
     "auth/wrong-password": "Gmail 또는 비밀번호가 맞지 않아요.",
     "auth/user-not-found": "Gmail 또는 비밀번호가 맞지 않아요.",
     "auth/user-disabled": "사용이 정지된 계정이에요.",
-    "auth/too-many-requests": "요청이 너무 많아요. 잠시 후 다시 시도해 주세요.",
+    "auth/too-many-requests": "너무 자주 시도해서 잠깐 막혔어요. 1시간쯤 뒤에 다시 해 주세요. (그동안 누르면 더 오래 막혀요)",
     "auth/network-request-failed": "인터넷 연결을 확인해 주세요.",
     "auth/operation-not-allowed": "Firebase에서 '이메일/비밀번호' 로그인이 꺼져 있어요. (Authentication → 로그인 방법)",
     "auth/operation-not-supported-in-this-environment": "파일로 열면 로그인이 안 돼요. GitHub Pages 주소로 열어 주세요.",
@@ -1727,7 +1728,29 @@ function fail(text, focusId) {
 }
 
 async function doSignup(nickname, phone, email, password) {
-  const { user } = await createUserWithEmailAndPassword(auth, email, password);
+  let user;
+  try {
+    ({ user } = await createUserWithEmailAndPassword(auth, email, password));
+  } catch (err) {
+    if (err && err.code === "auth/email-already-in-use") {
+      // 예전에 가입하다 만 Gmail일 수 있음 → 비밀번호가 맞으면 이어서 진행
+      try {
+        ({ user } = await signInWithEmailAndPassword(auth, email, password));
+      } catch (e) {
+        throw err; // 비밀번호가 다르면 "이미 가입된 Gmail" 안내
+      }
+      savePending(email, { nickname, phone });
+      if (!user.emailVerified) {
+        showVerify(user);
+        await autoResend(user);
+        return;
+      }
+      loginPhone = phone;
+      await afterVerified(user);
+      return;
+    }
+    throw err;
+  }
   // 이미 다른 사람이 쓰는 번호면 방금 만든 계정은 지우고 안내
   const taken = await phoneOwner(phone);
   if (taken && taken !== user.uid) {
@@ -1747,8 +1770,9 @@ async function doLogin(phone, email, password) {
   const { user } = await signInWithEmailAndPassword(auth, email, password);
   loginPhone = phone;
   if (!user.emailVerified) {
-    // 가입하고 아직 링크를 안 누른 경우 → 인증 화면으로 (메일 다시 보낼 수 있음)
+    // 가입하고 아직 링크를 안 누른 경우 → 인증 화면으로 + 메일 새로 보내기
     showVerify(user);
+    await autoResend(user);
     return;
   }
   await afterVerified(user);
@@ -1761,6 +1785,15 @@ async function phoneOwner(phone) {
 }
 
 /* ---------- Gmail 인증 기다리기 ---------- */
+let mailBlocked = false; // Firebase가 메일 발송을 잠깐 막은 상태
+const AUTO_MAIL_GAP = 10 * 60 * 1000; // 로그인할 때 자동으로 다시 보내는 건 10분에 한 번만
+
+function lastMailAt(email) {
+  try { return Number(localStorage.getItem("onchat-mail:" + email)) || 0; } catch (e) { return 0; }
+}
+function rememberMail(email) {
+  try { localStorage.setItem("onchat-mail:" + email, String(Date.now())); } catch (e) { /* 괜찮음 */ }
+}
 function verifyUrl() {
   // 링크를 누른 뒤 "계속" 버튼으로 돌아올 주소 (웹 주소일 때만)
   return location.protocol.startsWith("http") ? { url: location.origin + location.pathname } : undefined;
@@ -1768,15 +1801,34 @@ function verifyUrl() {
 
 async function sendVerifyMail(user) {
   try {
-    await sendEmailVerification(user, verifyUrl());
-  } catch (err) {
-    if (err && /continue-uri|unauthorized/.test(err.code || "")) {
-      await sendEmailVerification(user); // 돌아올 주소가 등록 안 됐으면 주소 없이
-    } else {
-      throw err;
+    try {
+      await sendEmailVerification(user, verifyUrl());
+    } catch (err) {
+      if (err && /continue-uri|unauthorized/.test(err.code || "")) {
+        await sendEmailVerification(user); // 돌아올 주소가 등록 안 됐으면 주소 없이
+      } else {
+        throw err;
+      }
     }
+  } catch (err) {
+    if (err && err.code === "auth/too-many-requests") mailBlocked = true;
+    throw err;
   }
+  mailBlocked = false;
+  rememberMail(user.email);
   startResendCooldown();
+}
+
+// 로그인했는데 인증이 안 된 계정: 최근에 보낸 적 없으면 메일을 새로 보냄
+async function autoResend(user) {
+  if (Date.now() - lastMailAt(user.email) < AUTO_MAIL_GAP) return;
+  try {
+    await sendVerifyMail(user);
+    toast("인증 메일을 새로 보냈어요");
+  } catch (err) {
+    console.warn(err);
+    showLoginMsg(authErrorMessage(err));
+  }
 }
 
 function showVerify(user) {
@@ -1806,7 +1858,13 @@ async function checkVerified(fromButton = false) {
   try {
     await user.reload();
     if (!user.emailVerified) {
-      if (fromButton) showLoginMsg("아직 인증이 안 됐어요. Gmail에서 링크를 눌러 주세요.");
+      if (fromButton) {
+        showLoginMsg(
+          mailBlocked
+            ? "아직 인증이 안 됐어요. 메일을 너무 자주 보내서 잠깐 막혔으니 1시간쯤 뒤에 '메일 다시 보내기'를 한 번만 눌러 주세요."
+            : "아직 인증이 안 됐어요. Gmail에서 링크를 눌러 주세요. (스팸함, 'firebaseapp' 검색도 확인)"
+        );
+      }
       return;
     }
     stopVerifyWatch();
