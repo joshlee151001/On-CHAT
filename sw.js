@@ -1,5 +1,5 @@
 // OnChat 서비스 워커: 홈 화면 앱으로 열리게 하고, 알림을 누르면 그 채팅방을 열어 줌
-const CACHE = "onchat-v2"; // 아이콘 바꿈
+const CACHE = "onchat-v3"; // 앱 꺼져도 알림
 const SHELL = ["./", "./index.html", "./manifest.json", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", (e) => {
@@ -27,6 +27,33 @@ self.addEventListener("fetch", (e) => {
         return res;
       })
       .catch(() => caches.match(e.request).then((hit) => hit || caches.match("./index.html")))
+  );
+});
+
+// 앱이 꺼져 있을 때 서버에서 온 새 메시지 알림 띄우기
+self.addEventListener("push", (e) => {
+  let data = {};
+  try {
+    data = e.data ? e.data.json() : {};
+  } catch (err) {
+    data = { body: e.data ? e.data.text() : "" };
+  }
+  e.waitUntil(
+    (async () => {
+      // 온챗을 보고 있는 중이면 앱 안 배너가 뜨니까 안 띄움 (아이폰은 꼭 띄워야 해서 예외)
+      const list = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
+      const watching = list.some((c) => c.visibilityState === "visible" && c.focused);
+      const ios = /iPhone|iPad|iPod/.test(self.navigator.userAgent);
+      if (watching && !ios) return;
+      await self.registration.showNotification(data.title || "OnChat", {
+        body: data.body || "새 메시지가 왔어요",
+        tag: data.roomId || "onchat",
+        renotify: true,
+        icon: "icon-192.png",
+        badge: "icon-192.png",
+        data: { roomId: data.roomId },
+      });
+    })()
   );
 });
 
