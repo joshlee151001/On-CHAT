@@ -2600,7 +2600,7 @@ setTimeout(renderPushSettings, 0); // 아래쪽 설정(서비스 워커)이 준�
 // 메시지 보낸 뒤: 받는 사람들 폰으로 알림 보내 달라고 서버에 부탁 (실패해도 채팅엔 영향 없음)
 function requestPush(roomId) {
   if (!PUSH_URL) return;
-  pushApi("/notify", { roomId }).catch(() => {});
+  pushApi("/notify", { roomId, appUrl: location.origin + location.pathname }).catch(() => {});
 }
 
 /* ================= 차단 ================= */
