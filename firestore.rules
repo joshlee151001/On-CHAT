@@ -75,7 +75,15 @@ service cloud.firestore {
         && request.resource.data.nickname is string
         && request.resource.data.nickname.size() > 0
         && request.resource.data.nickname.size() <= 12
-        && okImage(request.resource.data, 'photo');
+        && okImage(request.resource.data, 'photo')
+        && okBg(request.resource.data);
+    }
+    // 프로필 배경: 없음 / 정해진 무늬(preset:이름) / 앱이 만든 JPEG 사진
+    function okBg(data) {
+      return data.get('bg', '') == ''
+        || (data.bg is string
+            && (data.bg.matches('^preset:[a-z]+$')
+                || data.bg.matches('^data:image/jpeg;base64,[A-Za-z0-9+/=]+$')));
     }
     // 가입할 때: 이 번호를 내 계정에 연결하는 중 (accounts 문서를 같이 만듦)
     function claimingPhone(phone) {
@@ -162,6 +170,9 @@ service cloud.firestore {
           && request.resource.data.sender == me()
           && request.resource.data.clientAt is number
           && okImage(request.resource.data, 'image')
+          // 이모티콘은 "묶음/이름" 형태만
+          && (request.resource.data.get('emo', '') == ''
+              || request.resource.data.emo.matches('^[a-z]+/[a-z]+$'))
           && (memberBefore(roomId) || memberAfter(roomId));
 
         // 수정:
@@ -170,10 +181,11 @@ service cloud.firestore {
         allow update: if signedIn() && memberBefore(roomId) && (
           (resource.data.sender == me()
             && request.resource.data.diff(resource.data).affectedKeys()
-                 .hasOnly(['deleted', 'text', 'image'])
+                 .hasOnly(['deleted', 'text', 'image', 'emo'])
             && request.resource.data.deleted == true
             && request.resource.data.get('text', '') == ''
-            && request.resource.data.get('image', '') == '')
+            && request.resource.data.get('image', '') == ''
+            && request.resource.data.get('emo', '') == '')
           ||
           (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['hiddenFor'])
             && request.resource.data.hiddenFor.toSet()
