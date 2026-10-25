@@ -1,5 +1,5 @@
 // OnChat 서비스 워커: 홈 화면 앱으로 열리게 하고, 알림을 누르면 그 채팅방을 열어 줌
-const CACHE = "onchat-v4"; // 알림 소리·진동
+const CACHE = "onchat-v5"; // 알림마다 새로 울리게
 const SHELL = ["./", "./index.html", "./manifest.json", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", (e) => {
@@ -47,7 +47,8 @@ self.addEventListener("push", (e) => {
       if (watching && !ios) return;
       await self.registration.showNotification(data.title || "OnChat", {
         body: data.body || "새 메시지가 왔어요",
-        tag: data.roomId || "onchat",
+        // 아이폰은 같은 tag면 조용히 바꿔치기만 해서 소리가 안 남 → 알림마다 다른 tag
+        tag: (data.roomId || "onchat") + "-" + Date.now(),
         renotify: true,
         silent: false,
         vibrate: [200, 100, 200],
