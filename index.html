@@ -946,6 +946,28 @@ mark.hl { background: #FFE066; color: #222; border-radius: 3px; padding: 0 1px; 
 .bg-tile.upload { background: var(--input-bg); align-items: center; padding: 0; font-size: 22px; }
 .bg-tile .lbl { background: rgba(255,255,255,0.85); color: #333; border-radius: 6px; padding: 0 3px; font-size: 10px; white-space: nowrap; }
 
+/* ===== 배경 꾸미기 (이모티콘 붙이기) ===== */
+.sticker-layer { position: absolute; inset: 0; container-type: size; pointer-events: none; overflow: hidden; }
+.sticker-layer .stk { position: absolute; transform: translate(-50%, -50%); line-height: 1; user-select: none; -webkit-user-select: none; }
+.sticker-layer .stk img { width: 26cqw; height: 26cqw; display: block; pointer-events: none; }
+.sticker-layer .stk.emoji { font-size: 15cqw; }
+.sticker-layer.edit { pointer-events: auto; }
+.sticker-layer.edit .stk { cursor: grab; touch-action: none; }
+.sticker-layer.edit .stk:active { cursor: grabbing; }
+.stk .x { position: absolute; top: -8px; right: -8px; width: 20px; height: 20px; border-radius: 50%; background: rgba(0,0,0,0.7); color: #fff; font-size: 11px; border: 2px solid #fff; display: flex; align-items: center; justify-content: center; padding: 0; cursor: pointer; }
+.deco-wrap { display: flex; gap: 10px; align-items: flex-start; }
+.deco-preview { position: relative; flex-shrink: 0; width: 120px; aspect-ratio: 9 / 16; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); touch-action: none; }
+.deco-bg { position: absolute; inset: 0; }
+.deco-side { flex: 1; min-width: 0; display: flex; flex-direction: column; height: 214px; }
+.deco-tabs { display: flex; gap: 6px; margin-bottom: 4px; }
+.deco-grid { flex: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; align-content: start; background: var(--input-bg); border-radius: 10px; padding: 4px; }
+.deco-grid.emoji { grid-template-columns: repeat(5, 1fr); }
+.deco-grid button { border: none; background: none; padding: 2px; cursor: pointer; font-size: 22px; border-radius: 8px; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; }
+.deco-grid button:active { background: var(--border); }
+.deco-grid img { width: 100%; height: 100%; }
+.deco-foot { display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--text-sub); margin-top: 4px; }
+.deco-foot .link-btn { margin: 0; font-size: 12px; }
+
 /* ===== Gmail 인증 ===== */
 .hint { font-size: 11px; color: var(--text-sub); font-weight: 400; }
 #auth-submit { margin-top: 12px; }
@@ -1202,6 +1224,7 @@ mark.hl { background: #FFE066; color: #222; border-radius: 3px; padding: 0 1px; 
       <div class="pv">
         <div id="pv-bg" class="pv-bg"></div>
         <div class="pv-shade"></div>
+        <div id="pv-stickers" class="sticker-layer"></div>
         <button class="icon-btn pv-close" data-close aria-label="닫기">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
         </button>
@@ -1240,6 +1263,21 @@ mark.hl { background: #FFE066; color: #222; border-radius: 3px; padding: 0 1px; 
           <label class="field-label">프로필 배경</label>
           <div id="bg-picker" class="bg-picker"></div>
           <input id="edit-bg-input" type="file" accept="image/*" hidden>
+          <label class="field-label">배경 꾸미기 <span class="hint">눌러서 붙이고, 끌어서 옮겨요</span></label>
+          <div class="deco-wrap">
+            <div class="deco-preview">
+              <div id="deco-bg" class="deco-bg"></div>
+              <div id="deco-layer" class="sticker-layer edit"></div>
+            </div>
+            <div class="deco-side">
+              <div class="deco-tabs">
+                <button class="emo-tab deco-tab on" data-pack="oni" type="button">온이</button>
+                <button class="emo-tab deco-tab" data-pack="emoji" type="button">😀 이모지</button>
+              </div>
+              <div id="deco-grid" class="deco-grid"></div>
+              <div class="deco-foot"><span id="deco-count">0 / 6</span><button id="deco-clear" class="link-btn" type="button">모두 떼기</button></div>
+            </div>
+          </div>
           <button id="edit-save" class="btn" type="submit">저장</button>
         </form>
       </div>
@@ -1701,8 +1739,8 @@ function showWelcome() {
 const AUTH_TEXT = {
   signup: {
     title: "새 프로필 만들기",
-    desc: "가입하면 입력한 Gmail로 인증 링크가 가요. 링크를 누르면 바로 시작할 수 있어요.",
-    submit: "가입하고 인증 메일 받기",
+    desc: "Gmail과 비밀번호는 다른 기기에서 로그인할 때 써요. 비밀번호를 잊으면 이 Gmail로 재설정 메일이 가요.",
+    submit: "가입하고 시작하기",
     switchText: "이미 프로필이 있나요?",
     switchBtn: "기존 프로필로 로그인",
   },
@@ -1722,7 +1760,7 @@ const AUTH_TEXT = {
   },
   finish: {
     title: "프로필 만들기",
-    desc: "Gmail 인증은 끝났어요. 닉네임과 전화번호를 정하면 시작할 수 있어요.",
+    desc: "닉네임과 전화번호를 정하면 시작할 수 있어요.",
     submit: "시작하기",
     switchText: "",
     switchBtn: "다른 계정으로 로그인",
@@ -1849,11 +1887,6 @@ async function doSignup(nickname, phone, email, password) {
         throw err; // 비밀번호가 다르면 "이미 가입된 Gmail" 안내
       }
       savePending(email, { nickname, phone });
-      if (!user.emailVerified) {
-        showVerify(user);
-        await autoResend(user);
-        return;
-      }
       loginPhone = phone;
       await afterVerified(user);
       return;
@@ -1870,20 +1903,12 @@ async function doSignup(nickname, phone, email, password) {
     fail("이미 다른 사람이 가입한 전화번호예요.", "phone");
     return;
   }
-  savePending(email, { nickname, phone });
-  await sendVerifyMail(user);
-  showVerify(user);
+  await createProfile(user, phone, nickname);
 }
 
 async function doLogin(phone, email, password) {
   const { user } = await signInWithEmailAndPassword(auth, email, password);
   loginPhone = phone;
-  if (!user.emailVerified) {
-    // 가입하고 아직 링크를 안 누른 경우 → 인증 화면으로 + 메일 새로 보내기
-    showVerify(user);
-    await autoResend(user);
-    return;
-  }
   await afterVerified(user);
 }
 
@@ -2149,10 +2174,6 @@ onAuthStateChanged(auth, async (user) => {
   if (inFlow || myPhone) return; // 가입/로그인 버튼 쪽에서 처리 중이거나 이미 들어와 있음
 
   try {
-    if (!user.emailVerified) {
-      showVerify(user);
-      return;
-    }
     inFlow = true;
     await afterVerified(user);
   } catch (err) {
@@ -2795,6 +2816,7 @@ let profileShown = null; // 지금 보고 있는 프로필 (사진 크게 보기
 function openProfile(user, isMe) {
   profileShown = user;
   paintBg($("pv-bg"), user.bg);
+  renderStickers($("pv-stickers"), user.bgStickers, false);
   paintAvatar($("pf-avatar"), user);
   $("pf-name").textContent = user.nickname;
   $("pf-status").textContent = user.statusMessage || "";
@@ -2867,10 +2889,12 @@ let editBg = "";    // 편집 중인 배경
 function openEditProfile() {
   editPhoto = me.photo || "";
   editBg = me.bg || "";
+  editStickers = cleanStickers(me.bgStickers);
   $("edit-nickname").value = me.nickname;
   $("edit-status").value = me.statusMessage || "";
   refreshEditAvatar();
   renderBgPicker();
+  renderDecoGrid();
   openModal("edit-modal");
 }
 
@@ -2902,7 +2926,125 @@ function renderBgPicker() {
   add("", "기본", BG_DEFAULT);
   for (const [id, preset] of Object.entries(BG_PRESETS)) add("preset:" + id, preset.name, preset.css);
   $("bg-picker").replaceChildren(...tiles);
+  renderDeco();
 }
+
+/* ---------- 배경 꾸미기: 이모티콘 붙이기 ---------- */
+// 저장 형태: bgStickers = [{ e: "oni/hi" 또는 "😀", x: 0~100(%), y: 0~100(%) }] 최대 6개
+const MAX_STICKERS = 6;
+let editStickers = [];
+let decoPack = "oni";
+
+function clampPct(v) {
+  v = Number(v);
+  return Number.isFinite(v) ? Math.min(95, Math.max(5, Math.round(v * 10) / 10)) : 50;
+}
+// 이상한 값은 버림 (앱에 있는 이모티콘/이모지만)
+function cleanStickers(list) {
+  return (Array.isArray(list) ? list : [])
+    .filter((s) => s && typeof s.e === "string" && (emoticonOf(s.e) || EMOJI_LIST.includes(s.e)))
+    .slice(0, MAX_STICKERS)
+    .map((s) => ({ e: s.e, x: clampPct(s.x), y: clampPct(s.y) }));
+}
+
+function renderStickers(layer, list, editable) {
+  const items = editable ? list : cleanStickers(list);
+  layer.replaceChildren(
+    ...items.map((s, i) => {
+      const isEmo = !!emoticonOf(s.e);
+      const n = el("div", "stk" + (isEmo ? "" : " emoji"));
+      n.style.left = s.x + "%";
+      n.style.top = s.y + "%";
+      if (isEmo) n.appendChild(emoticonImg(s.e));
+      else n.appendChild(document.createTextNode(s.e));
+      if (editable) {
+        const x = el("button", "x", "✕");
+        x.type = "button";
+        x.setAttribute("aria-label", "떼기");
+        x.addEventListener("pointerdown", (ev) => ev.stopPropagation());
+        x.addEventListener("click", () => {
+          editStickers.splice(i, 1);
+          renderDeco();
+        });
+        n.appendChild(x);
+        makeDraggable(n, s);
+      }
+      return n;
+    })
+  );
+}
+
+function makeDraggable(node, s) {
+  node.addEventListener("pointerdown", (ev) => {
+    ev.preventDefault();
+    const box = $("deco-layer").getBoundingClientRect();
+    try { node.setPointerCapture(ev.pointerId); } catch (e) { /* 괜찮음 */ }
+    const move = (e) => {
+      s.x = clampPct(((e.clientX - box.left) / box.width) * 100);
+      s.y = clampPct(((e.clientY - box.top) / box.height) * 100);
+      node.style.left = s.x + "%";
+      node.style.top = s.y + "%";
+    };
+    const up = () => {
+      node.removeEventListener("pointermove", move);
+      node.removeEventListener("pointerup", up);
+      node.removeEventListener("pointercancel", up);
+    };
+    node.addEventListener("pointermove", move);
+    node.addEventListener("pointerup", up);
+    node.addEventListener("pointercancel", up);
+  });
+}
+
+function renderDeco() {
+  paintBg($("deco-bg"), editBg);
+  renderStickers($("deco-layer"), editStickers, true);
+  $("deco-count").textContent = `${editStickers.length} / ${MAX_STICKERS}`;
+  $("deco-clear").classList.toggle("hidden", editStickers.length === 0);
+}
+
+function addSticker(e) {
+  if (editStickers.length >= MAX_STICKERS) {
+    toast(`이모티콘은 ${MAX_STICKERS}개까지 붙일 수 있어요`);
+    return;
+  }
+  // 이름/버튼이 있는 아래쪽은 피해서 위쪽에 랜덤으로
+  editStickers.push({ e, x: clampPct(20 + Math.random() * 60), y: clampPct(12 + Math.random() * 45) });
+  renderDeco();
+}
+
+function renderDecoGrid() {
+  document.querySelectorAll(".deco-tab").forEach((t) => t.classList.toggle("on", t.dataset.pack === decoPack));
+  const grid = $("deco-grid");
+  grid.classList.toggle("emoji", decoPack === "emoji");
+  const btn = (label, child, value) => {
+    const b = el("button");
+    b.type = "button";
+    b.title = label;
+    b.setAttribute("aria-label", label);
+    b.appendChild(child);
+    b.addEventListener("click", () => addSticker(value));
+    return b;
+  };
+  if (decoPack === "emoji") {
+    grid.replaceChildren(...EMOJI_LIST.map((e) => btn(e, document.createTextNode(e), e)));
+  } else {
+    grid.replaceChildren(
+      ...Object.entries(EMOTICONS.oni.items).map(([key, item]) => btn(item.name, emoticonImg("oni/" + key), "oni/" + key))
+    );
+  }
+}
+
+document.querySelectorAll(".deco-tab").forEach((t) =>
+  t.addEventListener("click", () => {
+    decoPack = t.dataset.pack;
+    renderDecoGrid();
+  })
+);
+$("deco-clear").addEventListener("click", () => {
+  editStickers = [];
+  renderDeco();
+});
 
 $("edit-bg-input").addEventListener("change", async (e) => {
   const file = e.target.files[0];
@@ -2955,7 +3097,7 @@ $("edit-form").addEventListener("submit", async (e) => {
 
   $("edit-save").disabled = true;
   try {
-    await updateDoc(doc(db, "users", myPhone), { nickname, statusMessage, photo: editPhoto, bg: editBg });
+    await updateDoc(doc(db, "users", myPhone), { nickname, statusMessage, photo: editPhoto, bg: editBg, bgStickers: cleanStickers(editStickers) });
     closeModal("edit-modal");
     toast("프로필을 저장했어요");
   } catch (err) {
@@ -3948,7 +4090,7 @@ function toggleEmoPanel(force) {
 }
 
 function renderEmoGrid() {
-  document.querySelectorAll(".emo-tab").forEach((t) => t.classList.toggle("on", t.dataset.pack === emoPack));
+  document.querySelectorAll(".emo-tabs .emo-tab").forEach((t) => t.classList.toggle("on", t.dataset.pack === emoPack));
   const grid = $("emo-grid");
   grid.classList.toggle("emoji", emoPack === "emoji");
   if (emoPack === "emoji") {
@@ -3992,7 +4134,7 @@ async function sendEmoticon(id) {
 }
 
 $("emo-btn").addEventListener("click", () => toggleEmoPanel());
-document.querySelectorAll(".emo-tab").forEach((t) =>
+document.querySelectorAll(".emo-tabs .emo-tab").forEach((t) =>
   t.addEventListener("click", () => {
     emoPack = t.dataset.pack;
     renderEmoGrid();
