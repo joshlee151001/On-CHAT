@@ -971,7 +971,7 @@ mark.hl { background: #FFE066; color: #222; border-radius: 3px; padding: 0 1px; 
 /* ===== Gmail 인증 ===== */
 .hint { font-size: 11px; color: var(--text-sub); font-weight: 400; }
 #auth-submit { margin-top: 12px; }
-#forgot-btn { margin: 6px auto 0; }
+#forgot-btn, #gmail-toggle { margin: 6px auto 0; }
 .verify-box { text-align: center; display: flex; flex-direction: column; gap: 10px; }
 .verify-box .mail-icon { font-size: 44px; }
 .verify-to { font-size: 15px; line-height: 1.6; }
@@ -1048,6 +1048,7 @@ mark.hl { background: #FFE066; color: #222; border-radius: 3px; padding: 0 1px; 
               <input id="password" class="input" type="password" minlength="6" placeholder="비밀번호" autocomplete="current-password">
             </div>
             <button id="auth-submit" class="btn" type="submit"></button>
+            <button id="gmail-toggle" class="link-btn" type="button">예전에 Gmail로 가입했어요</button>
             <button id="forgot-btn" class="link-btn" type="button">비밀번호를 잊었어요</button>
           </form>
 
@@ -1698,6 +1699,12 @@ let inFlow = false;       // 가입/로그인 버튼 처리 중 (이때는 화�
 let loginPhone = "";      // 로그인할 때 입력한 번호 (계정 번호와 맞는지 확인용)
 let verifyTimer = null;
 let resendTimer = null;
+let useGmail = false;     // 예전에 Gmail로 가입한 사람이 로그인할 때만 Gmail 칸 보임
+
+// Gmail 없이 가입: 전화번호로 계정용 주소를 만듦 (메일은 안 감)
+function phoneEmail(phone) {
+  return phone + "@onchat-fc78e.firebaseapp.com";
+}
 
 function showLoginMsg(text) {
   $("login-msg").textContent = text;
@@ -1739,14 +1746,14 @@ function showWelcome() {
 const AUTH_TEXT = {
   signup: {
     title: "새 프로필 만들기",
-    desc: "Gmail과 비밀번호는 다른 기기에서 로그인할 때 써요. 비밀번호를 잊으면 이 Gmail로 재설정 메일이 가요.",
+    desc: "전화번호와 비밀번호로 다른 기기에서도 로그인할 수 있어요. 비밀번호는 꼭 기억해 주세요.",
     submit: "가입하고 시작하기",
     switchText: "이미 프로필이 있나요?",
     switchBtn: "기존 프로필로 로그인",
   },
   login: {
     title: "기존 프로필로 로그인",
-    desc: "가입할 때 쓴 전화번호, Gmail, 비밀번호를 입력해 주세요. 다른 기기에서도 그대로 이어서 쓸 수 있어요.",
+    desc: "가입할 때 쓴 전화번호와 비밀번호를 입력해 주세요. 다른 기기에서도 그대로 이어서 쓸 수 있어요.",
     submit: "로그인",
     switchText: "처음이신가요?",
     switchBtn: "새 프로필 만들기",
@@ -1787,9 +1794,10 @@ function showAuth(mode) {
   $("auth-form").classList.toggle("hidden", isVerify);
   $("verify-box").classList.toggle("hidden", !isVerify);
   $("nick-field").classList.toggle("hidden", mode === "login");
-  $("email-field").classList.toggle("hidden", mode === "finish");
+  $("email-field").classList.toggle("hidden", !(mode === "login" && useGmail));
+  $("gmail-toggle").classList.toggle("hidden", mode !== "login" || useGmail);
   $("pw-field").classList.toggle("hidden", mode === "finish");
-  $("forgot-btn").classList.toggle("hidden", mode !== "login");
+  $("forgot-btn").classList.toggle("hidden", !(mode === "login" && useGmail));
   $("password").autocomplete = mode === "signup" ? "new-password" : "current-password";
 
   if (!isVerify) stopVerifyWatch();
@@ -1802,11 +1810,18 @@ function showAuth(mode) {
   }, 50);
 }
 
+$("gmail-toggle").addEventListener("click", () => {
+  useGmail = true;
+  showAuth("login");
+  $("email").focus();
+});
 $("go-signup").addEventListener("click", () => {
+  useGmail = false;
   $("auth-form").reset();
   showAuth("signup");
 });
 $("go-login").addEventListener("click", () => {
+  useGmail = false;
   $("auth-form").reset();
   showAuth("login");
 });
@@ -1819,6 +1834,7 @@ $("switch-btn").addEventListener("click", async () => {
     await signOut(auth); // → 첫 화면
     return;
   }
+  useGmail = false;
   showAuth(authMode === "login" ? "signup" : "login");
 });
 
@@ -1840,13 +1856,15 @@ $("auth-form").addEventListener("submit", async (e) => {
   showLoginMsg("");
   const nickname = $("nickname").value.trim();
   const phone = onlyDigits($("phone").value);
-  const email = $("email").value.trim().toLowerCase();
+  const typed = $("email").value.trim().toLowerCase();
+  const gmailLogin = authMode === "login" && useGmail;
+  const email = gmailLogin ? typed : phoneEmail(phone);
   const password = $("password").value;
 
   if ((authMode === "signup" || authMode === "finish") && !nickname) return fail("닉네임을 입력해 주세요.", "nickname");
   if (!isValidPhone(phone)) return fail("전화번호를 다시 확인해 주세요.", "phone");
   if (authMode !== "finish") {
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return fail("Gmail 주소를 다시 확인해 주세요.", "email");
+    if (gmailLogin && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return fail("Gmail 주소를 다시 확인해 주세요.", "email");
     if (password.length < 6) return fail("비밀번호는 6자 이상으로 해 주세요.", "password");
   }
 
@@ -1861,7 +1879,15 @@ $("auth-form").addEventListener("submit", async (e) => {
     else if (authMode === "finish") await createProfile(auth.currentUser, phone, nickname);
   } catch (err) {
     console.warn(err);
-    showLoginMsg(authErrorMessage(err));
+    const code = err && err.code;
+    const badLogin = ["auth/invalid-credential", "auth/invalid-login-credentials", "auth/wrong-password", "auth/user-not-found"].includes(code);
+    if (authMode === "signup" && code === "auth/email-already-in-use") {
+      showLoginMsg("이미 가입된 전화번호예요. '기존 프로필로 로그인'으로 들어가 주세요.");
+    } else if (authMode === "login" && !gmailLogin && badLogin) {
+      showLoginMsg("전화번호 또는 비밀번호가 맞지 않아요. 예전에 Gmail로 가입했다면 위의 '예전에 Gmail로 가입했어요'를 눌러 주세요.");
+    } else {
+      showLoginMsg(authErrorMessage(err));
+    }
   } finally {
     inFlow = false;
     btn.disabled = false;
