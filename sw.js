@@ -1,5 +1,5 @@
 // OnChat 서비스 워커: 홈 화면 앱으로 열리게 하고, 알림을 누르면 그 채팅방을 열어 줌
-const CACHE = "onchat-v5"; // 알림마다 새로 울리게
+const CACHE = "onchat-v6"; // 아이폰 새 알림 방식
 const SHELL = ["./", "./index.html", "./manifest.json", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", (e) => {
@@ -45,6 +45,8 @@ self.addEventListener("push", (e) => {
       const watching = list.some((c) => c.visibilityState === "visible" && c.focused);
       const ios = /iPhone|iPad|iPod/.test(self.navigator.userAgent);
       if (watching && !ios) return;
+      // 아이폰이 새 방식(web_push 8030) 알림을 직접 띄워 주는 경우 → 우리가 따로 안 띄움 (소리/진동은 폰이 처리)
+      if (ios && data.web_push === 8030 && e.notification) return;
       await self.registration.showNotification(data.title || "OnChat", {
         body: data.body || "새 메시지가 왔어요",
         // 아이폰은 같은 tag면 조용히 바꿔치기만 해서 소리가 안 남 → 알림마다 다른 tag
