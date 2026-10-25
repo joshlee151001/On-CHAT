@@ -869,6 +869,83 @@ button { font-family: inherit; }
 .install-guide .note { font-size: 12px; color: var(--text-sub); }
 .kbd { display: inline-block; padding: 0 6px; border: 1px solid var(--border); border-radius: 6px; background: var(--input-bg); }
 
+/* ===== 이모티콘 ===== */
+.emo-panel { background: var(--bg); border-top: 1px solid var(--border); height: 260px; display: flex; flex-direction: column; }
+.emo-tabs { display: flex; gap: 6px; padding: 8px 10px 4px; }
+.emo-tab { border: none; background: var(--input-bg); color: var(--text-sub); border-radius: 14px; padding: 6px 12px; font-size: 13px; cursor: pointer; }
+.emo-tab.on { background: var(--primary); color: #fff; font-weight: 700; }
+.emo-grid { flex: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; padding: 6px 10px 12px; align-content: start; }
+.emo-grid.emoji { grid-template-columns: repeat(8, 1fr); }
+.emo-item { border: none; background: none; border-radius: 12px; cursor: pointer; padding: 4px; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; }
+.emo-item:hover { background: var(--input-bg); }
+.emo-item img { width: 100%; height: 100%; }
+.emo-grid.emoji .emo-item { font-size: 26px; padding: 0; }
+.sticker { width: 130px; height: 130px; display: block; cursor: default; }
+.bubble.big-emoji { background: none !important; font-size: 46px; line-height: 1.15; padding: 0 2px; }
+#emo-btn.on { color: var(--primary); }
+
+/* ===== 검색 ===== */
+.search-box { padding: 0 16px 8px; }
+.search-input {
+  width: 100%;
+  padding: 9px 12px;
+  border: none;
+  border-radius: 10px;
+  background: var(--input-bg);
+  color: var(--text);
+  font-size: 16px;
+  outline: none;
+}
+.msg-search { display: flex; align-items: center; gap: 4px; padding: 8px 10px; background: var(--bg); border-bottom: 1px solid var(--border); }
+.msg-search .search-input { flex: 1; min-width: 0; }
+.msg-search .icon-btn { width: 32px; height: 32px; }
+.msg-search .link-btn { margin: 0 0 0 4px; text-decoration: none; color: var(--text); }
+.msg-search-count { font-size: 12px; color: var(--text-sub); white-space: nowrap; min-width: 34px; text-align: center; }
+mark.hl { background: #FFE066; color: #222; border-radius: 3px; padding: 0 1px; }
+.msg.current .bubble { box-shadow: 0 0 0 2px #FFD43B; }
+
+/* ===== 프로필 보기 (전체 화면) ===== */
+.overlay.profile-view { align-items: stretch; background: #000; }
+.pv { position: relative; width: 100%; height: 100%; color: #fff; display: flex; flex-direction: column; animation: fadein 0.18s ease-out; }
+@keyframes fadein { from { opacity: 0; } }
+.pv-bg { position: absolute; inset: 0; background-size: cover; background-position: center; }
+.pv-shade { position: absolute; inset: 0; background: linear-gradient(rgba(0,0,0,0.28), transparent 18%, transparent 40%, rgba(0,0,0,0.62) 78%, rgba(0,0,0,0.72)); pointer-events: none; }
+.pv-close { position: absolute; top: 12px; left: 10px; color: #fff; z-index: 1; }
+.pv-close:hover { background: rgba(255,255,255,0.15); }
+.pv-main { position: relative; margin-top: auto; text-align: center; padding: 0 24px 22px; }
+.pv-main .avatar { width: 96px; height: 96px; border-radius: 36px; font-size: 36px; margin: 0 auto 12px; border: 3px solid rgba(255,255,255,0.85); cursor: pointer; }
+.pv-main .name { font-size: 21px; font-weight: 700; text-shadow: 0 1px 4px rgba(0,0,0,0.3); }
+.pv-main .status { font-size: 14px; margin-top: 6px; min-height: 18px; opacity: 0.9; text-shadow: 0 1px 4px rgba(0,0,0,0.3); }
+.pv-main .phone { font-size: 12px; margin-top: 4px; opacity: 0.75; }
+.pv-actions { position: relative; display: flex; justify-content: center; gap: 10px; padding: 18px 16px 30px; border-top: 1px solid rgba(255,255,255,0.25); }
+.pv-actions .btn { flex: 1; max-width: 140px; padding: 12px 8px; font-size: 14px; background: rgba(0,0,0,0.35); color: #fff; backdrop-filter: blur(6px); }
+.pv-actions .btn:first-child { background: var(--primary); }
+.pv-actions .btn.danger { color: #FFC9C9; }
+
+/* ===== 배경 고르기 ===== */
+.sheet.scroll { max-height: 92%; overflow-y: auto; }
+.bg-picker { display: flex; gap: 8px; overflow-x: auto; padding: 4px 2px 8px; }
+.bg-tile {
+  flex-shrink: 0;
+  width: 54px;
+  height: 80px;
+  border-radius: 10px;
+  border: 2px solid var(--border);
+  background-size: cover;
+  background-position: center;
+  cursor: pointer;
+  position: relative;
+  font-size: 11px;
+  color: var(--text-sub);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 4px;
+}
+.bg-tile.on { border-color: var(--primary); box-shadow: 0 0 0 2px var(--primary); }
+.bg-tile.upload { background: var(--input-bg); align-items: center; padding: 0; font-size: 22px; }
+.bg-tile .lbl { background: rgba(255,255,255,0.85); color: #333; border-radius: 6px; padding: 0 3px; font-size: 10px; white-space: nowrap; }
+
 /* ===== Gmail 인증 ===== */
 .hint { font-size: 11px; color: var(--text-sub); font-weight: 400; }
 #auth-submit { margin-top: 12px; }
@@ -981,6 +1058,7 @@ button { font-family: inherit; }
           </button>
         </header>
 
+        <div class="search-box"><input id="friend-search" class="search-input" type="search" placeholder="친구 이름 검색" autocomplete="off"></div>
         <div id="my-row"></div>
         <div class="divider"></div>
         <div id="friend-title" class="section-title"></div>
@@ -995,6 +1073,7 @@ button { font-family: inherit; }
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12c0 4.4-4 8-9 8-1.4 0-2.7-.3-3.9-.8L3 20l1.1-3.9C3.4 14.9 3 13.5 3 12c0-4.4 4-8 9-8s9 3.6 9 8z"/><path d="M12 9v6M9 12h6"/></svg>
           </button>
         </header>
+        <div class="search-box"><input id="room-search" class="search-input" type="search" placeholder="채팅방 이름, 메시지 검색" autocomplete="off"></div>
         <div id="room-list"></div>
       </div>
 
@@ -1053,10 +1132,18 @@ button { font-family: inherit; }
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
         </button>
         <div class="chat-titles"><h3 id="chat-title"></h3><div id="chat-sub" class="chat-sub"></div></div>
+        <button id="chat-search-btn" class="icon-btn" aria-label="대화 내용 검색"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></button>
         <button id="chat-menu-btn" class="icon-btn" aria-label="채팅방 메뉴">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
         </button>
       </header>
+      <div id="msg-search" class="msg-search hidden">
+        <input id="msg-search-input" class="search-input" type="search" placeholder="대화 내용 검색" autocomplete="off">
+        <span id="msg-search-count" class="msg-search-count"></span>
+        <button id="ms-up" class="icon-btn" type="button" aria-label="이전 결과"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg></button>
+        <button id="ms-down" class="icon-btn" type="button" aria-label="다음 결과"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+        <button id="ms-close" class="link-btn" type="button">닫기</button>
+      </div>
       <div id="dm-banner" class="dm-banner hidden">
         <span id="dm-banner-text"></span>
         <div class="dm-banner-actions">
@@ -1072,11 +1159,21 @@ button { font-family: inherit; }
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/></svg>
         </button>
         <input id="photo-input" type="file" accept="image/*" multiple hidden>
+        <button id="emo-btn" class="attach-btn" type="button" aria-label="이모티콘">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 14.5q3.5 3 7 0"/><circle cx="9" cy="10" r="0.8" fill="currentColor"/><circle cx="15" cy="10" r="0.8" fill="currentColor"/></svg>
+        </button>
         <textarea id="chat-text" rows="1" placeholder="메시지 입력"></textarea>
         <button id="send-btn" class="send-btn" type="submit" disabled aria-label="전송">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
         </button>
       </form>
+      <div id="emo-panel" class="emo-panel hidden">
+        <div class="emo-tabs">
+          <button class="emo-tab on" data-pack="oni" type="button">온이</button>
+          <button class="emo-tab" data-pack="emoji" type="button">😀 이모지</button>
+        </div>
+        <div id="emo-grid" class="emo-grid"></div>
+      </div>
     </section>
 
     <!-- ========== 친구 추가 팝업 ========== -->
@@ -1097,27 +1194,26 @@ button { font-family: inherit; }
     </div>
 
     <!-- ========== 프로필 팝업 ========== -->
-    <div id="profile-modal" class="overlay hidden">
-      <div class="sheet">
-        <div class="sheet-head">
-          <h3></h3>
-          <button class="icon-btn" data-close aria-label="닫기">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
-          </button>
-        </div>
-        <div class="profile-big">
+    <div id="profile-modal" class="overlay profile-view hidden">
+      <div class="pv">
+        <div id="pv-bg" class="pv-bg"></div>
+        <div class="pv-shade"></div>
+        <button class="icon-btn pv-close" data-close aria-label="닫기">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+        <div class="pv-main">
           <div id="pf-avatar" class="avatar"></div>
           <div id="pf-name" class="name"></div>
           <div id="pf-status" class="status"></div>
           <div id="pf-phone" class="phone"></div>
         </div>
-        <div id="pf-actions" class="profile-actions"></div>
+        <div id="pf-actions" class="pv-actions"></div>
       </div>
     </div>
 
     <!-- ========== 프로필 편집 ========== -->
     <div id="edit-modal" class="overlay hidden">
-      <div class="sheet">
+      <div class="sheet scroll">
         <div class="sheet-head">
           <h3>프로필 편집</h3>
           <button class="icon-btn" data-close aria-label="닫기">
@@ -1137,6 +1233,9 @@ button { font-family: inherit; }
           <input id="edit-nickname" class="input" type="text" maxlength="12" required>
           <label class="field-label" for="edit-status">상태메시지</label>
           <input id="edit-status" class="input" type="text" maxlength="40" placeholder="상태메시지를 입력해 주세요">
+          <label class="field-label">프로필 배경</label>
+          <div id="bg-picker" class="bg-picker"></div>
+          <input id="edit-bg-input" type="file" accept="image/*" hidden>
           <button id="edit-save" class="btn" type="submit">저장</button>
         </form>
       </div>
@@ -1458,7 +1557,7 @@ function compressImage(file, { maxSide, quality, maxBytes }) {
       URL.revokeObjectURL(url);
       let side = maxSide;
       let q = quality;
-      for (let tries = 0; tries < 8; tries++) {
+      for (let tries = 0; tries < 14; tries++) {
         const scale = Math.min(1, side / Math.max(img.width, img.height));
         const canvas = document.createElement("canvas");
         canvas.width = Math.round(img.width * scale);
@@ -1650,6 +1749,9 @@ function showAuth(mode) {
 
   if (!isVerify) stopVerifyWatch();
   setTimeout(() => {
+    // 이미 다른 칸에 입력 중이면 커서를 뺏지 않음
+    const a = document.activeElement;
+    if (a && (a.tagName === "INPUT" || a.tagName === "TEXTAREA")) return;
     if (mode === "signup" || mode === "finish") $("nickname").focus();
     else if (mode === "login") $("phone").focus();
   }, 50);
@@ -2422,8 +2524,16 @@ function renderMe() {
 
 function renderFriends() {
   if (currentRoom && currentRoom.loaded) renderDmBanner();
-  $("friend-title").textContent = `친구 ${friends.length}`;
   const list = $("friend-list");
+  const q = $("friend-search").value.trim().toLowerCase();
+  if (q) {
+    // 이름이나 상태메시지에 검색어가 들어간 친구만
+    const found = friends.filter((f) => (f.nickname + " " + (f.statusMessage || "")).toLowerCase().includes(q));
+    $("friend-title").textContent = `검색 결과 ${found.length}`;
+    list.replaceChildren(...(found.length ? found.map((f) => makePersonRow(f)) : [el("p", "empty", "찾는 친구가 없어요.")]));
+    return;
+  }
+  $("friend-title").textContent = `친구 ${friends.length}`;
 
   if (friends.length === 0) {
     const empty = el("p", "empty");
@@ -2433,6 +2543,9 @@ function renderFriends() {
   }
   list.replaceChildren(...friends.map((f) => makePersonRow(f)));
 }
+
+$("friend-search").addEventListener("input", renderFriends);
+$("room-search").addEventListener("input", renderRooms);
 
 /* ================= 친구 추가 ================= */
 $("open-add-friend").addEventListener("click", () => {
@@ -2519,8 +2632,47 @@ $("search-form").addEventListener("submit", async (e) => {
   }
 });
 
+/* ================= 프로필 배경 ================= */
+// 저장 형태: "" (기본) / "preset:이름" / "data:image/jpeg;base64,..." (내 사진)
+const BG_PRESETS = {
+  sunset: { name: "노을", css: "linear-gradient(170deg, #FFC37A 0%, #FF8A4C 55%, #E8603C 100%)" },
+  pastel: { name: "파스텔", css: "linear-gradient(170deg, #FFF1E0, #FFD3B0)" },
+  night: { name: "밤 노을", css: "radial-gradient(120% 70% at 50% 110%, #FF9F43 0%, #7A3E2B 35%, #1E1F2E 75%)" },
+  dots: { name: "물방울", css: "radial-gradient(#FFB36B 2.6px, transparent 3px) 0 0 / 22px 22px, #FFF6EC" },
+  check: {
+    name: "체크",
+    css: "linear-gradient(45deg, #FFE1BF 25%, transparent 25%, transparent 75%, #FFE1BF 75%) 0 0 / 36px 36px, linear-gradient(45deg, #FFE1BF 25%, transparent 25%, transparent 75%, #FFE1BF 75%) 18px 18px / 36px 36px, #FFF4E6",
+  },
+  mint: { name: "민트", css: "linear-gradient(170deg, #C9F0E1, #FFE6CC)" },
+  logo: {
+    name: "온챗",
+    css: `url("data:image/svg+xml,${encodeURIComponent(
+      "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 300'><text x='-12' y='200' font-family='Arial,sans-serif' font-size='150' font-weight='900' fill='#FFE4C8' transform='rotate(-12 100 150)'>On</text></svg>"
+    )}") center / cover no-repeat, #FFF8F0`,
+  },
+};
+const BG_DEFAULT = "linear-gradient(170deg, #A7B4C2, #7D8B99)";
+
+function bgCss(bg) {
+  if (typeof bg === "string" && bg.startsWith("preset:")) {
+    const preset = BG_PRESETS[bg.slice(7)];
+    if (preset) return preset.css;
+  }
+  const photo = safeImage(bg);
+  if (photo) return `url("${photo}") center / cover no-repeat`;
+  return BG_DEFAULT;
+}
+
+function paintBg(node, bg) {
+  node.style.background = bgCss(bg);
+}
+
 /* ================= 프로필 팝업 ================= */
+let profileShown = null; // 지금 보고 있는 프로필 (사진 크게 보기용)
+
 function openProfile(user, isMe) {
+  profileShown = user;
+  paintBg($("pv-bg"), user.bg);
   paintAvatar($("pf-avatar"), user);
   $("pf-name").textContent = user.nickname;
   $("pf-status").textContent = user.statusMessage || "";
@@ -2577,16 +2729,71 @@ function openProfile(user, isMe) {
   openModal("profile-modal");
 }
 
+$("pf-avatar").addEventListener("click", () => {
+  const photo = profileShown && safeImage(profileShown.photo);
+  if (photo) openViewer(photo);
+});
+$("pv-bg").addEventListener("click", () => {
+  const photo = profileShown && safeImage(profileShown.bg);
+  if (photo) openViewer(photo);
+});
+
 /* ================= 프로필 편집 ================= */
 let editPhoto = ""; // 편집 중인 사진 (저장 누르기 전까지는 여기만 바뀜)
+let editBg = "";    // 편집 중인 배경
 
 function openEditProfile() {
   editPhoto = me.photo || "";
+  editBg = me.bg || "";
   $("edit-nickname").value = me.nickname;
   $("edit-status").value = me.statusMessage || "";
   refreshEditAvatar();
+  renderBgPicker();
   openModal("edit-modal");
 }
+
+// 배경 고르기: 기본 + 7가지 + 내 사진
+function renderBgPicker() {
+  const tiles = [];
+  const add = (value, label, css, cls = "") => {
+    const t = el("button", "bg-tile " + cls);
+    t.type = "button";
+    t.dataset.bg = value;
+    t.title = label;
+    t.setAttribute("aria-label", label);
+    if (css) t.style.background = css;
+    if (cls !== "upload") t.appendChild(el("span", "lbl", label));
+    else t.textContent = "📷";
+    t.classList.toggle("on", cls !== "upload" && (value === editBg || (value === "photo" && safeImage(editBg) !== "")));
+    t.addEventListener("click", () => {
+      if (value === "photo") {
+        $("edit-bg-input").click();
+        return;
+      }
+      editBg = value;
+      renderBgPicker();
+    });
+    tiles.push(t);
+  };
+  add("photo", "내 사진 올리기", "", "upload");
+  if (safeImage(editBg)) add("photo", "내 사진", bgCss(editBg));
+  add("", "기본", BG_DEFAULT);
+  for (const [id, preset] of Object.entries(BG_PRESETS)) add("preset:" + id, preset.name, preset.css);
+  $("bg-picker").replaceChildren(...tiles);
+}
+
+$("edit-bg-input").addEventListener("change", async (e) => {
+  const file = e.target.files[0];
+  e.target.value = "";
+  if (!file) return;
+  try {
+    // 배경은 화면 전체라 프로필 사진보다 크게, 그래도 프로필 문서(1MB)에 들어가게
+    editBg = await compressImage(file, { maxSide: 1080, quality: 0.75, maxBytes: 350000 });
+    renderBgPicker();
+  } catch (err) {
+    toast(err.message);
+  }
+});
 
 function refreshEditAvatar() {
   paintAvatar($("edit-avatar"), { nickname: $("edit-nickname").value || me.nickname, photo: editPhoto });
@@ -2626,7 +2833,7 @@ $("edit-form").addEventListener("submit", async (e) => {
 
   $("edit-save").disabled = true;
   try {
-    await updateDoc(doc(db, "users", myPhone), { nickname, statusMessage, photo: editPhoto });
+    await updateDoc(doc(db, "users", myPhone), { nickname, statusMessage, photo: editPhoto, bg: editBg });
     closeModal("edit-modal");
     toast("프로필을 저장했어요");
   } catch (err) {
@@ -2726,8 +2933,16 @@ function renderRooms() {
     return;
   }
 
+  // 채팅방 이름이나 마지막 메시지로 검색
+  const q = $("room-search").value.trim().toLowerCase();
+  const shown = q ? rooms.filter((r) => (roomTitle(r) + " " + (r.lastMessage || "")).toLowerCase().includes(q)) : rooms;
+  if (q && shown.length === 0) {
+    list.replaceChildren(el("p", "empty", "찾는 채팅방이 없어요."));
+    return;
+  }
+
   list.replaceChildren(
-    ...rooms.map((room) => {
+    ...shown.map((room) => {
       const row = el("div", "room-row");
 
       const info = el("div", "info");
@@ -3210,6 +3425,11 @@ $("msg-list").addEventListener("scroll", () => {
 
 function closeRoom() {
   if (currentRoom) clearTyping(currentRoom.id);
+  toggleEmoPanel(false);
+  $("msg-search").classList.add("hidden");
+  searchQuery = "";
+  searchHits = [];
+  searchIndex = -1;
   stopRoomListeners.forEach((stop) => stop());
   typingStop = null;
   typingState = {};
@@ -3411,6 +3631,8 @@ function renderMessages(forceBottom, applyKeep = false) {
     const mine = m.sender === myPhone;
 
     const row = el("div", `msg ${mine ? "mine" : "other"}${first ? " first" : ""}`);
+    row.dataset.id = m.id;
+    if (searchHits.length && searchHits[searchIndex] === m.id) row.classList.add("current");
     const body = el("div", "body");
 
     if (!mine) {
@@ -3437,6 +3659,8 @@ function renderMessages(forceBottom, applyKeep = false) {
       content = el("div", "bubble deleted", "삭제된 메시지입니다.");
     } else if (m.groupMsgs) {
       content = makePhotoGrid(m.groupMsgs.filter((g) => !g.deleted), true);
+    } else if (m.type === "emoticon") {
+      content = emoticonImg(m.emo);
     } else if (m.type === "image") {
       content = el("img", "photo");
       content.src = safeImage(m.image);
@@ -3450,8 +3674,9 @@ function renderMessages(forceBottom, applyKeep = false) {
         if (!loadingOlder && box.scrollHeight - box.scrollTop - box.clientHeight < 400) box.scrollTop = box.scrollHeight;
       });
     } else {
-      content = el("div", "bubble");
+      content = el("div", isOnlyEmoji(m.text) ? "bubble big-emoji" : "bubble");
       content.appendChild(linkify(m.text || ""));
+      if (searchQuery) highlight(content, searchQuery);
     }
     if (!m.deleted && !m.groupMsgs) attachMessageMenu(content, m);
 
@@ -3475,6 +3700,7 @@ function renderMessages(forceBottom, applyKeep = false) {
   }
   // 맨 아래 보고 있었거나, 처음 열었거나, 내가 방금 보냈으면 맨 아래로
   const last = msgs[msgs.length - 1];
+  if (searchHits.length && !forceBottom) return;
   if (forceBottom || nearBottom || (last && last.sender === myPhone && last.type !== "system")) {
     box.scrollTop = box.scrollHeight;
   }
@@ -3528,6 +3754,8 @@ function makeFailedRow(f) {
   if (first.type === "text") {
     content = el("div", "bubble");
     content.appendChild(linkify(first.text));
+  } else if (first.type === "emoticon") {
+    content = emoticonImg(first.emo);
   } else if (f.items.length > 1) {
     content = makePhotoGrid(f.items, false);
   } else {
@@ -3544,6 +3772,215 @@ function makeFailedRow(f) {
   body.appendChild(line);
   row.appendChild(body);
   return row;
+}
+
+/* ================= 이모티콘 ================= */
+// 온챗 프렌즈 이모티콘 (그림은 코드 안에 들어 있음 → 메시지에는 "oni/hi" 같은 이름만 저장)
+const EMOTICONS = {
+  oni: {
+    name: "온이",
+    items: {
+    hi: { name: "안녕!", svg: "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><linearGradient id=\"g190\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#FFBE6E\"/><stop offset=\"1\" stop-color=\"#FF8A2A\"/></linearGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(-4) translate(-100 -100)\"><ellipse cx=\"100\" cy=\"190\" rx=\"46\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><path d=\"M184 44q8 10 4 22M190 36q14 16 6 36\" stroke=\"#7A3F12\" stroke-width=\"3\" fill=\"none\" stroke-linecap=\"round\" opacity=\".6\"/><path d=\"M176 30l4 10 10 4-10 4-4 10-4-10-10-4 10-4z\" fill=\"#FFD84D\"/><path d=\"M22 52l3 7 7 3-7 3-3 7-3-7-7-3 7-3z\" fill=\"#FFD84D\"/><rect x=\"76\" y=\"156\" width=\"18\" height=\"28\" rx=\"9\" fill=\"#F07F1E\" stroke=\"#7A3F12\" stroke-width=\"3.5\"/><rect x=\"106\" y=\"156\" width=\"18\" height=\"28\" rx=\"9\" fill=\"#F07F1E\" stroke=\"#7A3F12\" stroke-width=\"3.5\"/><path d=\"M100 34q-4-16 8-22\" stroke=\"#7A3F12\" stroke-width=\"3.5\" fill=\"none\" stroke-linecap=\"round\"/><circle cx=\"110\" cy=\"12\" r=\"6\" fill=\"#FFD84D\" stroke=\"#7A3F12\" stroke-width=\"3\"/><path d=\"M84 34h32q46 0 46 46v34q0 46-46 46H86l-24 20v-24q-24-10-24-42V80q0-46 46-46z\" fill=\"url(#g190)\" stroke=\"#7A3F12\" stroke-width=\"4\" stroke-linejoin=\"round\"/><ellipse cx=\"74\" cy=\"60\" rx=\"16\" ry=\"9\" transform=\"rotate(-25 74 60)\" fill=\"#fff\" opacity=\".45\"/><ellipse cx=\"66\" cy=\"114\" rx=\"9\" ry=\"5.5\" fill=\"#FF5E5E\" opacity=\".35\"/><ellipse cx=\"134\" cy=\"114\" rx=\"9\" ry=\"5.5\" fill=\"#FF5E5E\" opacity=\".35\"/><path d=\"M71 98 q9 -10 18 0\" stroke=\"#2B1E16\" stroke-width=\"4.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M111 98 q9 -10 18 0\" stroke=\"#2B1E16\" stroke-width=\"4.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M86 110q14 22 28 0z\" fill=\"#2B1E16\" stroke=\"#2B1E16\" stroke-width=\"3\" stroke-linejoin=\"round\"/><path d=\"M93 120q7 6 14 0q-7-5-14 0z\" fill=\"#FF7B7B\"/><ellipse cx=\"40\" cy=\"118\" rx=\"11\" ry=\"16\" transform=\"rotate(25 40 118)\" fill=\"#FF9A3C\" stroke=\"#7A3F12\" stroke-width=\"3.5\"/><ellipse cx=\"168\" cy=\"62\" rx=\"11\" ry=\"16\" transform=\"rotate(-160 168 62)\" fill=\"#FF9A3C\" stroke=\"#7A3F12\" stroke-width=\"3.5\"/></g><rect x=\"61.5\" y=\"166\" width=\"77\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#7A3F12\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#4A3426\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">안녕!</text></svg>" },
+    lol: { name: "ㅋㅋㅋ", svg: "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><linearGradient id=\"g190\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#FFBE6E\"/><stop offset=\"1\" stop-color=\"#FF8A2A\"/></linearGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(8) translate(-100 -100)\"><ellipse cx=\"100\" cy=\"190\" rx=\"46\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><path d=\"M60 92q-12 6-10 16q6 4 12-4z\" fill=\"#7CC8FF\"/><path d=\"M140 92q12 6 10 16q-6 4-12-4z\" fill=\"#7CC8FF\"/><text x=\"150\" y=\"34\" font-size=\"22\" font-weight=\"900\" fill=\"#E8603C\" font-family=\"sans-serif\" transform=\"rotate(14 150 34)\">ㅋㅋ</text><text x=\"14\" y=\"44\" font-size=\"18\" font-weight=\"900\" fill=\"#E8603C\" font-family=\"sans-serif\" transform=\"rotate(-14 14 44)\">ㅋ</text><rect x=\"76\" y=\"156\" width=\"18\" height=\"28\" rx=\"9\" fill=\"#F07F1E\" stroke=\"#7A3F12\" stroke-width=\"3.5\"/><rect x=\"106\" y=\"156\" width=\"18\" height=\"28\" rx=\"9\" fill=\"#F07F1E\" stroke=\"#7A3F12\" stroke-width=\"3.5\"/><path d=\"M100 34q-4-16 8-22\" stroke=\"#7A3F12\" stroke-width=\"3.5\" fill=\"none\" stroke-linecap=\"round\"/><circle cx=\"110\" cy=\"12\" r=\"6\" fill=\"#FFD84D\" stroke=\"#7A3F12\" stroke-width=\"3\"/><path d=\"M84 34h32q46 0 46 46v34q0 46-46 46H86l-24 20v-24q-24-10-24-42V80q0-46 46-46z\" fill=\"url(#g190)\" stroke=\"#7A3F12\" stroke-width=\"4\" stroke-linejoin=\"round\"/><ellipse cx=\"74\" cy=\"60\" rx=\"16\" ry=\"9\" transform=\"rotate(-25 74 60)\" fill=\"#fff\" opacity=\".45\"/><ellipse cx=\"66\" cy=\"114\" rx=\"9\" ry=\"5.5\" fill=\"#FF5E5E\" opacity=\".35\"/><ellipse cx=\"134\" cy=\"114\" rx=\"9\" ry=\"5.5\" fill=\"#FF5E5E\" opacity=\".35\"/><path d=\"M71 94l10 5-10 5\" stroke=\"#2B1E16\" stroke-width=\"4.5\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M129 94l-10 5 10 5\" stroke=\"#2B1E16\" stroke-width=\"4.5\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M80 108q20 34 40 0z\" fill=\"#2B1E16\" stroke=\"#2B1E16\" stroke-width=\"3\" stroke-linejoin=\"round\"/><path d=\"M90 124q10 8 20 0q-10-7-20 0z\" fill=\"#FF7B7B\"/><ellipse cx=\"64\" cy=\"116\" rx=\"11\" ry=\"16\" transform=\"rotate(-20 64 116)\" fill=\"#FF9A3C\" stroke=\"#7A3F12\" stroke-width=\"3.5\"/><ellipse cx=\"136\" cy=\"116\" rx=\"11\" ry=\"16\" transform=\"rotate(20 136 116)\" fill=\"#FF9A3C\" stroke=\"#7A3F12\" stroke-width=\"3.5\"/></g><rect x=\"61.5\" y=\"166\" width=\"77\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#7A3F12\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#4A3426\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">ㅋㅋㅋ</text></svg>" },
+    ok: { name: "오케이", svg: "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><linearGradient id=\"g190\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#FFBE6E\"/><stop offset=\"1\" stop-color=\"#FF8A2A\"/></linearGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(0) translate(-100 -100)\"><ellipse cx=\"100\" cy=\"190\" rx=\"46\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><path d=\"M176 30l4 10 10 4-10 4-4 10-4-10-10-4 10-4z\" fill=\"#FFD84D\"/><path d=\"M22 52l3 7 7 3-7 3-3 7-3-7-7-3 7-3z\" fill=\"#FFD84D\"/><rect x=\"76\" y=\"156\" width=\"18\" height=\"28\" rx=\"9\" fill=\"#F07F1E\" stroke=\"#7A3F12\" stroke-width=\"3.5\"/><rect x=\"106\" y=\"156\" width=\"18\" height=\"28\" rx=\"9\" fill=\"#F07F1E\" stroke=\"#7A3F12\" stroke-width=\"3.5\"/><path d=\"M100 34q-4-16 8-22\" stroke=\"#7A3F12\" stroke-width=\"3.5\" fill=\"none\" stroke-linecap=\"round\"/><circle cx=\"110\" cy=\"12\" r=\"6\" fill=\"#FFD84D\" stroke=\"#7A3F12\" stroke-width=\"3\"/><path d=\"M84 34h32q46 0 46 46v34q0 46-46 46H86l-24 20v-24q-24-10-24-42V80q0-46 46-46z\" fill=\"url(#g190)\" stroke=\"#7A3F12\" stroke-width=\"4\" stroke-linejoin=\"round\"/><ellipse cx=\"74\" cy=\"60\" rx=\"16\" ry=\"9\" transform=\"rotate(-25 74 60)\" fill=\"#fff\" opacity=\".45\"/><ellipse cx=\"66\" cy=\"114\" rx=\"9\" ry=\"5.5\" fill=\"#FF5E5E\" opacity=\".35\"/><ellipse cx=\"134\" cy=\"114\" rx=\"9\" ry=\"5.5\" fill=\"#FF5E5E\" opacity=\".35\"/><ellipse cx=\"80\" cy=\"96\" rx=\"7.5\" ry=\"9.0\" fill=\"#2B1E16\"/><circle cx=\"82.5\" cy=\"92.5\" r=\"3.0\" fill=\"#fff\"/><path d=\"M111 98 q9 -10 18 0\" stroke=\"#2B1E16\" stroke-width=\"4.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M90 112q10 10 20 0\" stroke=\"#2B1E16\" stroke-width=\"4\" fill=\"none\" stroke-linecap=\"round\"/><ellipse cx=\"40\" cy=\"118\" rx=\"11\" ry=\"16\" transform=\"rotate(25 40 118)\" fill=\"#FF9A3C\" stroke=\"#7A3F12\" stroke-width=\"3.5\"/><ellipse cx=\"164\" cy=\"84\" rx=\"11\" ry=\"16\" transform=\"rotate(-140 164 84)\" fill=\"#FF9A3C\" stroke=\"#7A3F12\" stroke-width=\"3.5\"/><circle cx=\"170\" cy=\"66\" r=\"9\" fill=\"#FF9A3C\" stroke=\"#7A3F12\" stroke-width=\"3.5\"/><circle cx=\"170\" cy=\"66\" r=\"3.5\" fill=\"#fff\" stroke=\"#7A3F12\" stroke-width=\"2\"/></g><rect x=\"61.5\" y=\"166\" width=\"77\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#7A3F12\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#4A3426\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">오케이</text></svg>" },
+    fight: { name: "화이팅", svg: "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><linearGradient id=\"g190\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#FFBE6E\"/><stop offset=\"1\" stop-color=\"#FF8A2A\"/></linearGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(0) translate(-100 -100)\"><ellipse cx=\"100\" cy=\"190\" rx=\"46\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><path d=\"M30 150q-14-22 4-40q-2 14 8 18q4-14 14-20q-4 22 6 30q4 10-4 16q-14 6-28-4z\" fill=\"#FF6B3D\" opacity=\".9\"/><path d=\"M40 150q-6-12 4-20q0 8 6 10q4 8-2 12q-4 2-8-2z\" fill=\"#FFD84D\"/><rect x=\"76\" y=\"156\" width=\"18\" height=\"28\" rx=\"9\" fill=\"#F07F1E\" stroke=\"#7A3F12\" stroke-width=\"3.5\"/><rect x=\"106\" y=\"156\" width=\"18\" height=\"28\" rx=\"9\" fill=\"#F07F1E\" stroke=\"#7A3F12\" stroke-width=\"3.5\"/><path d=\"M100 34q-4-16 8-22\" stroke=\"#7A3F12\" stroke-width=\"3.5\" fill=\"none\" stroke-linecap=\"round\"/><circle cx=\"110\" cy=\"12\" r=\"6\" fill=\"#FFD84D\" stroke=\"#7A3F12\" stroke-width=\"3\"/><path d=\"M84 34h32q46 0 46 46v34q0 46-46 46H86l-24 20v-24q-24-10-24-42V80q0-46 46-46z\" fill=\"url(#g190)\" stroke=\"#7A3F12\" stroke-width=\"4\" stroke-linejoin=\"round\"/><ellipse cx=\"74\" cy=\"60\" rx=\"16\" ry=\"9\" transform=\"rotate(-25 74 60)\" fill=\"#fff\" opacity=\".45\"/><ellipse cx=\"66\" cy=\"114\" rx=\"9\" ry=\"5.5\" fill=\"#FF5E5E\" opacity=\".35\"/><ellipse cx=\"134\" cy=\"114\" rx=\"9\" ry=\"5.5\" fill=\"#FF5E5E\" opacity=\".35\"/><path d=\"M68 78l20 6M132 78l-20 6\" stroke=\"#2B1E16\" stroke-width=\"5\" stroke-linecap=\"round\"/><ellipse cx=\"80\" cy=\"96\" rx=\"7.5\" ry=\"9.0\" fill=\"#2B1E16\"/><circle cx=\"82.5\" cy=\"92.5\" r=\"3.0\" fill=\"#fff\"/><ellipse cx=\"120\" cy=\"96\" rx=\"7.5\" ry=\"9.0\" fill=\"#2B1E16\"/><circle cx=\"122.5\" cy=\"92.5\" r=\"3.0\" fill=\"#fff\"/><rect x=\"86\" y=\"110\" width=\"28\" height=\"13\" rx=\"5\" fill=\"#fff\" stroke=\"#2B1E16\" stroke-width=\"3.5\"/><path d=\"M95 110v13M105 110v13\" stroke=\"#2B1E16\" stroke-width=\"2.5\"/><ellipse cx=\"40\" cy=\"118\" rx=\"11\" ry=\"16\" transform=\"rotate(25 40 118)\" fill=\"#FF9A3C\" stroke=\"#7A3F12\" stroke-width=\"3.5\"/><ellipse cx=\"166\" cy=\"64\" rx=\"11\" ry=\"16\" transform=\"rotate(-170 166 64)\" fill=\"#FF9A3C\" stroke=\"#7A3F12\" stroke-width=\"3.5\"/><circle cx=\"168\" cy=\"48\" r=\"13\" fill=\"#FF9A3C\" stroke=\"#7A3F12\" stroke-width=\"3.5\"/><path d=\"M160 46h14M161 52h12\" stroke=\"#7A3F12\" stroke-width=\"2\"/></g><rect x=\"52.0\" y=\"166\" width=\"96\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#7A3F12\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#4A3426\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">화이팅!</text></svg>" },
+    thanks: { name: "고마워", svg: "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><linearGradient id=\"g190\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#FFBE6E\"/><stop offset=\"1\" stop-color=\"#FF8A2A\"/></linearGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(-12) translate(-100 -100)\"><ellipse cx=\"100\" cy=\"190\" rx=\"46\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><path d=\"M172 40c-6-6-16 0-10 8l10 10 10-10c6-8-4-14-10-8z\" fill=\"#FF4D6D\"/><path d=\"M28 60c-4-4-11 0-7 5l7 7 7-7c4-5-3-9-7-5z\" fill=\"#FF8FA3\"/><rect x=\"76\" y=\"156\" width=\"18\" height=\"28\" rx=\"9\" fill=\"#F07F1E\" stroke=\"#7A3F12\" stroke-width=\"3.5\"/><rect x=\"106\" y=\"156\" width=\"18\" height=\"28\" rx=\"9\" fill=\"#F07F1E\" stroke=\"#7A3F12\" stroke-width=\"3.5\"/><path d=\"M100 34q-4-16 8-22\" stroke=\"#7A3F12\" stroke-width=\"3.5\" fill=\"none\" stroke-linecap=\"round\"/><circle cx=\"110\" cy=\"12\" r=\"6\" fill=\"#FFD84D\" stroke=\"#7A3F12\" stroke-width=\"3\"/><path d=\"M84 34h32q46 0 46 46v34q0 46-46 46H86l-24 20v-24q-24-10-24-42V80q0-46 46-46z\" fill=\"url(#g190)\" stroke=\"#7A3F12\" stroke-width=\"4\" stroke-linejoin=\"round\"/><ellipse cx=\"74\" cy=\"60\" rx=\"16\" ry=\"9\" transform=\"rotate(-25 74 60)\" fill=\"#fff\" opacity=\".45\"/><ellipse cx=\"66\" cy=\"114\" rx=\"9\" ry=\"5.5\" fill=\"#FF5E5E\" opacity=\".35\"/><ellipse cx=\"134\" cy=\"114\" rx=\"9\" ry=\"5.5\" fill=\"#FF5E5E\" opacity=\".35\"/><path d=\"M71 98 q9 -10 18 0\" stroke=\"#2B1E16\" stroke-width=\"4.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M111 98 q9 -10 18 0\" stroke=\"#2B1E16\" stroke-width=\"4.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M90 112q5 6 10 0q5 6 10 0\" stroke=\"#2B1E16\" stroke-width=\"3.5\" fill=\"none\" stroke-linecap=\"round\"/><ellipse cx=\"88\" cy=\"146\" rx=\"11\" ry=\"16\" transform=\"rotate(40 88 146)\" fill=\"#FF9A3C\" stroke=\"#7A3F12\" stroke-width=\"3.5\"/><ellipse cx=\"112\" cy=\"146\" rx=\"11\" ry=\"16\" transform=\"rotate(-40 112 146)\" fill=\"#FF9A3C\" stroke=\"#7A3F12\" stroke-width=\"3.5\"/></g><rect x=\"61.5\" y=\"166\" width=\"77\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#7A3F12\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#4A3426\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">고마워</text></svg>" },
+    sorry: { name: "미안해", svg: "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><linearGradient id=\"g190\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#FFBE6E\"/><stop offset=\"1\" stop-color=\"#FF8A2A\"/></linearGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(6) translate(-100 -100)\"><ellipse cx=\"100\" cy=\"190\" rx=\"46\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><path d=\"M156 40q8 12 4 18q-8 2-8-8z\" fill=\"#7CC8FF\" stroke=\"#3B8FD1\" stroke-width=\"2\"/><rect x=\"76\" y=\"156\" width=\"18\" height=\"28\" rx=\"9\" fill=\"#F07F1E\" stroke=\"#7A3F12\" stroke-width=\"3.5\"/><rect x=\"106\" y=\"156\" width=\"18\" height=\"28\" rx=\"9\" fill=\"#F07F1E\" stroke=\"#7A3F12\" stroke-width=\"3.5\"/><path d=\"M100 34q-4-16 8-22\" stroke=\"#7A3F12\" stroke-width=\"3.5\" fill=\"none\" stroke-linecap=\"round\"/><circle cx=\"110\" cy=\"12\" r=\"6\" fill=\"#FFD84D\" stroke=\"#7A3F12\" stroke-width=\"3\"/><path d=\"M84 34h32q46 0 46 46v34q0 46-46 46H86l-24 20v-24q-24-10-24-42V80q0-46 46-46z\" fill=\"url(#g190)\" stroke=\"#7A3F12\" stroke-width=\"4\" stroke-linejoin=\"round\"/><ellipse cx=\"74\" cy=\"60\" rx=\"16\" ry=\"9\" transform=\"rotate(-25 74 60)\" fill=\"#fff\" opacity=\".45\"/><ellipse cx=\"66\" cy=\"114\" rx=\"9\" ry=\"5.5\" fill=\"#FF5E5E\" opacity=\".35\"/><ellipse cx=\"134\" cy=\"114\" rx=\"9\" ry=\"5.5\" fill=\"#FF5E5E\" opacity=\".35\"/><path d=\"M70 84l18-6M130 84l-18-6\" stroke=\"#2B1E16\" stroke-width=\"4.5\" stroke-linecap=\"round\"/><ellipse cx=\"80\" cy=\"96\" rx=\"7.5\" ry=\"9.0\" fill=\"#2B1E16\"/><circle cx=\"82.5\" cy=\"92.5\" r=\"3.0\" fill=\"#fff\"/><ellipse cx=\"120\" cy=\"96\" rx=\"7.5\" ry=\"9.0\" fill=\"#2B1E16\"/><circle cx=\"122.5\" cy=\"92.5\" r=\"3.0\" fill=\"#fff\"/><path d=\"M86 118q4-5 7 0t7 0 7 0 7 0\" stroke=\"#2B1E16\" stroke-width=\"3.5\" fill=\"none\" stroke-linecap=\"round\"/><ellipse cx=\"88\" cy=\"146\" rx=\"11\" ry=\"16\" transform=\"rotate(40 88 146)\" fill=\"#FF9A3C\" stroke=\"#7A3F12\" stroke-width=\"3.5\"/><ellipse cx=\"112\" cy=\"146\" rx=\"11\" ry=\"16\" transform=\"rotate(-40 112 146)\" fill=\"#FF9A3C\" stroke=\"#7A3F12\" stroke-width=\"3.5\"/></g><rect x=\"61.5\" y=\"166\" width=\"77\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#7A3F12\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#4A3426\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">미안해</text></svg>" },
+    love: { name: "사랑해", svg: "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><linearGradient id=\"g190\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#FFBE6E\"/><stop offset=\"1\" stop-color=\"#FF8A2A\"/></linearGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(0) translate(-100 -100)\"><ellipse cx=\"100\" cy=\"190\" rx=\"46\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><rect x=\"76\" y=\"156\" width=\"18\" height=\"28\" rx=\"9\" fill=\"#F07F1E\" stroke=\"#7A3F12\" stroke-width=\"3.5\"/><rect x=\"106\" y=\"156\" width=\"18\" height=\"28\" rx=\"9\" fill=\"#F07F1E\" stroke=\"#7A3F12\" stroke-width=\"3.5\"/><path d=\"M100 34q-4-16 8-22\" stroke=\"#7A3F12\" stroke-width=\"3.5\" fill=\"none\" stroke-linecap=\"round\"/><circle cx=\"110\" cy=\"12\" r=\"6\" fill=\"#FFD84D\" stroke=\"#7A3F12\" stroke-width=\"3\"/><path d=\"M84 34h32q46 0 46 46v34q0 46-46 46H86l-24 20v-24q-24-10-24-42V80q0-46 46-46z\" fill=\"url(#g190)\" stroke=\"#7A3F12\" stroke-width=\"4\" stroke-linejoin=\"round\"/><ellipse cx=\"74\" cy=\"60\" rx=\"16\" ry=\"9\" transform=\"rotate(-25 74 60)\" fill=\"#fff\" opacity=\".45\"/><ellipse cx=\"66\" cy=\"114\" rx=\"9\" ry=\"5.5\" fill=\"#FF5E5E\" opacity=\".35\"/><ellipse cx=\"134\" cy=\"114\" rx=\"9\" ry=\"5.5\" fill=\"#FF5E5E\" opacity=\".35\"/><path d=\"M80 105 C66 95 71 83 80 91 C89 83 94 95 80 105z\" fill=\"#FF4D6D\" stroke=\"#B3123A\" stroke-width=\"2\"/><path d=\"M120 105 C106 95 111 83 120 91 C129 83 134 95 120 105z\" fill=\"#FF4D6D\" stroke=\"#B3123A\" stroke-width=\"2\"/><path d=\"M90 112q10 10 20 0\" stroke=\"#2B1E16\" stroke-width=\"4\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M100 176c-24-14-36-26-36-40 0-11 9-18 19-18 8 0 14 5 17 11 3-6 9-11 17-11 10 0 19 7 19 18 0 14-12 26-36 40z\" fill=\"#FF4D6D\" stroke=\"#B3123A\" stroke-width=\"3.5\"/><ellipse cx=\"84\" cy=\"132\" rx=\"6\" ry=\"4\" fill=\"#fff\" opacity=\".6\" transform=\"rotate(-30 84 132)\"/><ellipse cx=\"58\" cy=\"142\" rx=\"11\" ry=\"16\" transform=\"rotate(50 58 142)\" fill=\"#FF9A3C\" stroke=\"#7A3F12\" stroke-width=\"3.5\"/><ellipse cx=\"142\" cy=\"142\" rx=\"11\" ry=\"16\" transform=\"rotate(-50 142 142)\" fill=\"#FF9A3C\" stroke=\"#7A3F12\" stroke-width=\"3.5\"/></g><rect x=\"61.5\" y=\"166\" width=\"77\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#7A3F12\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#4A3426\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">사랑해</text></svg>" },
+    wow: { name: "헉!", svg: "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><linearGradient id=\"g190\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#FFBE6E\"/><stop offset=\"1\" stop-color=\"#FF8A2A\"/></linearGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(0) translate(-100 -100)\"><ellipse cx=\"100\" cy=\"190\" rx=\"46\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><path d=\"M30 46l14 12M22 74l16 4M178 46l-14 12M186 74l-16 4\" stroke=\"#7A3F12\" stroke-width=\"4\" stroke-linecap=\"round\"/><text x=\"150\" y=\"40\" font-size=\"30\" font-weight=\"900\" fill=\"#E8603C\" font-family=\"sans-serif\">!</text><rect x=\"76\" y=\"156\" width=\"18\" height=\"28\" rx=\"9\" fill=\"#F07F1E\" stroke=\"#7A3F12\" stroke-width=\"3.5\"/><rect x=\"106\" y=\"156\" width=\"18\" height=\"28\" rx=\"9\" fill=\"#F07F1E\" stroke=\"#7A3F12\" stroke-width=\"3.5\"/><path d=\"M100 34q-4-16 8-22\" stroke=\"#7A3F12\" stroke-width=\"3.5\" fill=\"none\" stroke-linecap=\"round\"/><circle cx=\"110\" cy=\"12\" r=\"6\" fill=\"#FFD84D\" stroke=\"#7A3F12\" stroke-width=\"3\"/><path d=\"M84 34h32q46 0 46 46v34q0 46-46 46H86l-24 20v-24q-24-10-24-42V80q0-46 46-46z\" fill=\"url(#g190)\" stroke=\"#7A3F12\" stroke-width=\"4\" stroke-linejoin=\"round\"/><ellipse cx=\"74\" cy=\"60\" rx=\"16\" ry=\"9\" transform=\"rotate(-25 74 60)\" fill=\"#fff\" opacity=\".45\"/><ellipse cx=\"66\" cy=\"114\" rx=\"9\" ry=\"5.5\" fill=\"#FF5E5E\" opacity=\".35\"/><ellipse cx=\"134\" cy=\"114\" rx=\"9\" ry=\"5.5\" fill=\"#FF5E5E\" opacity=\".35\"/><circle cx=\"80\" cy=\"96\" r=\"12\" fill=\"#fff\" stroke=\"#2B1E16\" stroke-width=\"3\"/><circle cx=\"80\" cy=\"97\" r=\"4.5\" fill=\"#2B1E16\"/><circle cx=\"120\" cy=\"96\" r=\"12\" fill=\"#fff\" stroke=\"#2B1E16\" stroke-width=\"3\"/><circle cx=\"120\" cy=\"97\" r=\"4.5\" fill=\"#2B1E16\"/><ellipse cx=\"100\" cy=\"118\" rx=\"8\" ry=\"10\" fill=\"#2B1E16\"/><ellipse cx=\"32\" cy=\"62\" rx=\"11\" ry=\"16\" transform=\"rotate(160 32 62)\" fill=\"#FF9A3C\" stroke=\"#7A3F12\" stroke-width=\"3.5\"/><ellipse cx=\"168\" cy=\"62\" rx=\"11\" ry=\"16\" transform=\"rotate(-160 168 62)\" fill=\"#FF9A3C\" stroke=\"#7A3F12\" stroke-width=\"3.5\"/></g><rect x=\"71.0\" y=\"166\" width=\"58\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#7A3F12\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#4A3426\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">헉!</text></svg>" },
+    angry: { name: "흥!", svg: "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><linearGradient id=\"g3958\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#FF8C6B\"/><stop offset=\"1\" stop-color=\"#E8452C\"/></linearGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(0) translate(-100 -100)\"><ellipse cx=\"100\" cy=\"190\" rx=\"46\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><path d=\"M40 40q-10-8 0-16q10-8 0-16\" stroke=\"#C9C9C9\" stroke-width=\"6\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M160 40q10-8 0-16q-10-8 0-16\" stroke=\"#C9C9C9\" stroke-width=\"6\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M150 50l6 6m6-12l-6 6m-12-6l6 6m6 6l-6-6\" stroke=\"#E8343C\" stroke-width=\"4\" stroke-linecap=\"round\"/><rect x=\"76\" y=\"156\" width=\"18\" height=\"28\" rx=\"9\" fill=\"#F07F1E\" stroke=\"#7A3F12\" stroke-width=\"3.5\"/><rect x=\"106\" y=\"156\" width=\"18\" height=\"28\" rx=\"9\" fill=\"#F07F1E\" stroke=\"#7A3F12\" stroke-width=\"3.5\"/><path d=\"M100 34q-4-16 8-22\" stroke=\"#7A3F12\" stroke-width=\"3.5\" fill=\"none\" stroke-linecap=\"round\"/><circle cx=\"110\" cy=\"12\" r=\"6\" fill=\"#FFD84D\" stroke=\"#7A3F12\" stroke-width=\"3\"/><path d=\"M84 34h32q46 0 46 46v34q0 46-46 46H86l-24 20v-24q-24-10-24-42V80q0-46 46-46z\" fill=\"url(#g3958)\" stroke=\"#7A3F12\" stroke-width=\"4\" stroke-linejoin=\"round\"/><ellipse cx=\"74\" cy=\"60\" rx=\"16\" ry=\"9\" transform=\"rotate(-25 74 60)\" fill=\"#fff\" opacity=\".45\"/><ellipse cx=\"66\" cy=\"114\" rx=\"9\" ry=\"5.5\" fill=\"#FF5E5E\" opacity=\".35\"/><ellipse cx=\"134\" cy=\"114\" rx=\"9\" ry=\"5.5\" fill=\"#FF5E5E\" opacity=\".35\"/><path d=\"M68 80l20 8M132 80l-20 8\" stroke=\"#2B1E16\" stroke-width=\"5\" stroke-linecap=\"round\"/><ellipse cx=\"80\" cy=\"96\" rx=\"7.5\" ry=\"9.0\" fill=\"#2B1E16\"/><circle cx=\"82.5\" cy=\"92.5\" r=\"3.0\" fill=\"#fff\"/><ellipse cx=\"120\" cy=\"96\" rx=\"7.5\" ry=\"9.0\" fill=\"#2B1E16\"/><circle cx=\"122.5\" cy=\"92.5\" r=\"3.0\" fill=\"#fff\"/><path d=\"M90 120q10-10 20 0\" stroke=\"#2B1E16\" stroke-width=\"4\" fill=\"none\" stroke-linecap=\"round\"/><ellipse cx=\"40\" cy=\"118\" rx=\"11\" ry=\"16\" transform=\"rotate(25 40 118)\" fill=\"#FF9A3C\" stroke=\"#7A3F12\" stroke-width=\"3.5\"/><ellipse cx=\"160\" cy=\"104\" rx=\"11\" ry=\"16\" transform=\"rotate(-35 160 104)\" fill=\"#FF9A3C\" stroke=\"#7A3F12\" stroke-width=\"3.5\"/></g><rect x=\"71.0\" y=\"166\" width=\"58\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#7A3F12\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#4A3426\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">흥!</text></svg>" },
+    cry: { name: "엉엉", svg: "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><linearGradient id=\"g190\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#FFBE6E\"/><stop offset=\"1\" stop-color=\"#FF8A2A\"/></linearGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(0) translate(-100 -100)\"><ellipse cx=\"100\" cy=\"190\" rx=\"46\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><ellipse cx=\"100\" cy=\"186\" rx=\"60\" ry=\"8\" fill=\"#7CC8FF\" opacity=\".55\"/><rect x=\"76\" y=\"156\" width=\"18\" height=\"28\" rx=\"9\" fill=\"#F07F1E\" stroke=\"#7A3F12\" stroke-width=\"3.5\"/><rect x=\"106\" y=\"156\" width=\"18\" height=\"28\" rx=\"9\" fill=\"#F07F1E\" stroke=\"#7A3F12\" stroke-width=\"3.5\"/><path d=\"M100 34q-4-16 8-22\" stroke=\"#7A3F12\" stroke-width=\"3.5\" fill=\"none\" stroke-linecap=\"round\"/><circle cx=\"110\" cy=\"12\" r=\"6\" fill=\"#FFD84D\" stroke=\"#7A3F12\" stroke-width=\"3\"/><path d=\"M84 34h32q46 0 46 46v34q0 46-46 46H86l-24 20v-24q-24-10-24-42V80q0-46 46-46z\" fill=\"url(#g190)\" stroke=\"#7A3F12\" stroke-width=\"4\" stroke-linejoin=\"round\"/><ellipse cx=\"74\" cy=\"60\" rx=\"16\" ry=\"9\" transform=\"rotate(-25 74 60)\" fill=\"#fff\" opacity=\".45\"/><ellipse cx=\"66\" cy=\"114\" rx=\"9\" ry=\"5.5\" fill=\"#FF5E5E\" opacity=\".35\"/><ellipse cx=\"134\" cy=\"114\" rx=\"9\" ry=\"5.5\" fill=\"#FF5E5E\" opacity=\".35\"/><path d=\"M70 84l18-6M130 84l-18-6\" stroke=\"#2B1E16\" stroke-width=\"4.5\" stroke-linecap=\"round\"/><path d=\"M71 94 q9 8 18 0\" stroke=\"#2B1E16\" stroke-width=\"4.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M111 94 q9 8 18 0\" stroke=\"#2B1E16\" stroke-width=\"4.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M73 100q-2 26 4 40\" stroke=\"#5AB8FF\" stroke-width=\"7\" fill=\"none\" stroke-linecap=\"round\" opacity=\".85\"/><path d=\"M127 100q2 26-4 40\" stroke=\"#5AB8FF\" stroke-width=\"7\" fill=\"none\" stroke-linecap=\"round\" opacity=\".85\"/><path d=\"M80 108q20 34 40 0z\" fill=\"#2B1E16\" stroke=\"#2B1E16\" stroke-width=\"3\" stroke-linejoin=\"round\"/><path d=\"M90 124q10 8 20 0q-10-7-20 0z\" fill=\"#FF7B7B\"/><ellipse cx=\"40\" cy=\"118\" rx=\"11\" ry=\"16\" transform=\"rotate(25 40 118)\" fill=\"#FF9A3C\" stroke=\"#7A3F12\" stroke-width=\"3.5\"/><ellipse cx=\"160\" cy=\"104\" rx=\"11\" ry=\"16\" transform=\"rotate(-35 160 104)\" fill=\"#FF9A3C\" stroke=\"#7A3F12\" stroke-width=\"3.5\"/></g><rect x=\"71.0\" y=\"166\" width=\"58\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#7A3F12\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#4A3426\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">엉엉</text></svg>" },
+    sleepy: { name: "졸려", svg: "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><linearGradient id=\"g190\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#FFBE6E\"/><stop offset=\"1\" stop-color=\"#FF8A2A\"/></linearGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(-10) translate(-100 -100)\"><ellipse cx=\"100\" cy=\"190\" rx=\"46\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><text x=\"140\" y=\"44\" font-size=\"22\" font-weight=\"900\" fill=\"#7A8BD9\" font-family=\"sans-serif\">Z</text><text x=\"160\" y=\"30\" font-size=\"16\" font-weight=\"900\" fill=\"#7A8BD9\" font-family=\"sans-serif\">z</text><text x=\"174\" y=\"18\" font-size=\"12\" font-weight=\"900\" fill=\"#7A8BD9\" font-family=\"sans-serif\">z</text><rect x=\"76\" y=\"156\" width=\"18\" height=\"28\" rx=\"9\" fill=\"#F07F1E\" stroke=\"#7A3F12\" stroke-width=\"3.5\"/><rect x=\"106\" y=\"156\" width=\"18\" height=\"28\" rx=\"9\" fill=\"#F07F1E\" stroke=\"#7A3F12\" stroke-width=\"3.5\"/><path d=\"M100 34q-4-16 8-22\" stroke=\"#7A3F12\" stroke-width=\"3.5\" fill=\"none\" stroke-linecap=\"round\"/><circle cx=\"110\" cy=\"12\" r=\"6\" fill=\"#FFD84D\" stroke=\"#7A3F12\" stroke-width=\"3\"/><path d=\"M84 34h32q46 0 46 46v34q0 46-46 46H86l-24 20v-24q-24-10-24-42V80q0-46 46-46z\" fill=\"url(#g190)\" stroke=\"#7A3F12\" stroke-width=\"4\" stroke-linejoin=\"round\"/><ellipse cx=\"74\" cy=\"60\" rx=\"16\" ry=\"9\" transform=\"rotate(-25 74 60)\" fill=\"#fff\" opacity=\".45\"/><ellipse cx=\"66\" cy=\"114\" rx=\"9\" ry=\"5.5\" fill=\"#FF5E5E\" opacity=\".35\"/><ellipse cx=\"134\" cy=\"114\" rx=\"9\" ry=\"5.5\" fill=\"#FF5E5E\" opacity=\".35\"/><path d=\"M71 98h18\" stroke=\"#2B1E16\" stroke-width=\"4.5\" stroke-linecap=\"round\"/><path d=\"M111 98h18\" stroke=\"#2B1E16\" stroke-width=\"4.5\" stroke-linecap=\"round\"/><path d=\"M92 114q8 6 16 0\" stroke=\"#2B1E16\" stroke-width=\"3.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M106 117q3 10 0 14q-4-4 0-14z\" fill=\"#9FD8FF\"/><ellipse cx=\"40\" cy=\"118\" rx=\"11\" ry=\"16\" transform=\"rotate(25 40 118)\" fill=\"#FF9A3C\" stroke=\"#7A3F12\" stroke-width=\"3.5\"/><ellipse cx=\"160\" cy=\"104\" rx=\"11\" ry=\"16\" transform=\"rotate(-35 160 104)\" fill=\"#FF9A3C\" stroke=\"#7A3F12\" stroke-width=\"3.5\"/></g><rect x=\"61.5\" y=\"166\" width=\"77\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#7A3F12\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#4A3426\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">졸려…</text></svg>" },
+    what: { name: "뭐해?", svg: "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><linearGradient id=\"g190\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#FFBE6E\"/><stop offset=\"1\" stop-color=\"#FF8A2A\"/></linearGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(10) translate(-100 -100)\"><ellipse cx=\"100\" cy=\"190\" rx=\"46\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><text x=\"150\" y=\"48\" font-size=\"38\" font-weight=\"900\" fill=\"#5A7BD9\" font-family=\"sans-serif\">?</text><rect x=\"76\" y=\"156\" width=\"18\" height=\"28\" rx=\"9\" fill=\"#F07F1E\" stroke=\"#7A3F12\" stroke-width=\"3.5\"/><rect x=\"106\" y=\"156\" width=\"18\" height=\"28\" rx=\"9\" fill=\"#F07F1E\" stroke=\"#7A3F12\" stroke-width=\"3.5\"/><path d=\"M100 34q-4-16 8-22\" stroke=\"#7A3F12\" stroke-width=\"3.5\" fill=\"none\" stroke-linecap=\"round\"/><circle cx=\"110\" cy=\"12\" r=\"6\" fill=\"#FFD84D\" stroke=\"#7A3F12\" stroke-width=\"3\"/><path d=\"M84 34h32q46 0 46 46v34q0 46-46 46H86l-24 20v-24q-24-10-24-42V80q0-46 46-46z\" fill=\"url(#g190)\" stroke=\"#7A3F12\" stroke-width=\"4\" stroke-linejoin=\"round\"/><ellipse cx=\"74\" cy=\"60\" rx=\"16\" ry=\"9\" transform=\"rotate(-25 74 60)\" fill=\"#fff\" opacity=\".45\"/><ellipse cx=\"66\" cy=\"114\" rx=\"9\" ry=\"5.5\" fill=\"#FF5E5E\" opacity=\".35\"/><ellipse cx=\"134\" cy=\"114\" rx=\"9\" ry=\"5.5\" fill=\"#FF5E5E\" opacity=\".35\"/><path d=\"M70 82q10-8 20-2\" stroke=\"#2B1E16\" stroke-width=\"4.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M110 84h20\" stroke=\"#2B1E16\" stroke-width=\"4.5\" stroke-linecap=\"round\"/><ellipse cx=\"80\" cy=\"96\" rx=\"7.5\" ry=\"9.0\" fill=\"#2B1E16\"/><circle cx=\"82.5\" cy=\"92.5\" r=\"3.0\" fill=\"#fff\"/><ellipse cx=\"120\" cy=\"96\" rx=\"7.5\" ry=\"9.0\" fill=\"#2B1E16\"/><circle cx=\"122.5\" cy=\"92.5\" r=\"3.0\" fill=\"#fff\"/><path d=\"M93 116h14\" stroke=\"#2B1E16\" stroke-width=\"4\" stroke-linecap=\"round\"/><ellipse cx=\"40\" cy=\"118\" rx=\"11\" ry=\"16\" transform=\"rotate(25 40 118)\" fill=\"#FF9A3C\" stroke=\"#7A3F12\" stroke-width=\"3.5\"/><ellipse cx=\"132\" cy=\"128\" rx=\"11\" ry=\"16\" transform=\"rotate(-50 132 128)\" fill=\"#FF9A3C\" stroke=\"#7A3F12\" stroke-width=\"3.5\"/></g><rect x=\"61.5\" y=\"166\" width=\"77\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#7A3F12\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#4A3426\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">뭐해?</text></svg>" }
+    },
+  },
+};
+const EMOJI_LIST = ["😀", "😄", "😂", "🤣", "😊", "😍", "🥰", "😘", "😎", "🤩", "🥳", "😇", "🙂", "😉", "😋", "😜", "🤔", "🤗", "🤭", "😴", "😪", "😮", "😲", "😱", "😭", "😢", "🥲", "😤", "😡", "🤬", "😳", "🥺", "🙄", "😏", "😬", "🤐", "🤒", "🤧", "😷", "🥶", "🥵", "👍", "👎", "👏", "🙌", "🙏", "💪", "👋", "✌️", "🤞", "👌", "🤙", "❤️", "🧡", "💛", "💚", "💙", "💜", "🖤", "💔", "💕", "💯", "🔥", "✨", "🎉", "🎂", "🎁", "⭐", "🌙", "☀️", "🌈", "☔", "🍕", "🍔", "🍜", "🍰", "☕", "🍺", "⚽", "🎮", "🎵", "📚", "💤", "✅", "❌", "❓", "❗"];
+
+function emoticonOf(id) {
+  const [pack, key] = String(id || "").split("/");
+  return (EMOTICONS[pack] && EMOTICONS[pack].items[key]) || null;
+}
+
+function emoticonImg(id) {
+  const emo = emoticonOf(id);
+  const img = el("img", "sticker");
+  img.alt = emo ? emo.name : "이모티콘";
+  if (emo) img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(emo.svg);
+  return img;
+}
+
+// 이모지만 1~3개 보내면 크게
+const ONLY_EMOJI = /^(?:\p{Extended_Pictographic}(?:\uFE0F|\u200D\p{Extended_Pictographic}\uFE0F?)*\s*){1,3}$/u;
+function isOnlyEmoji(text) {
+  return !!text && ONLY_EMOJI.test(text.trim());
+}
+
+let emoPack = "oni";
+function toggleEmoPanel(force) {
+  const panel = $("emo-panel");
+  const open = force !== undefined ? force : panel.classList.contains("hidden");
+  panel.classList.toggle("hidden", !open);
+  $("emo-btn").classList.toggle("on", open);
+  if (open) renderEmoGrid();
+}
+
+function renderEmoGrid() {
+  document.querySelectorAll(".emo-tab").forEach((t) => t.classList.toggle("on", t.dataset.pack === emoPack));
+  const grid = $("emo-grid");
+  grid.classList.toggle("emoji", emoPack === "emoji");
+  if (emoPack === "emoji") {
+    grid.replaceChildren(
+      ...EMOJI_LIST.map((e) => {
+        const b = el("button", "emo-item", e);
+        b.type = "button";
+        b.addEventListener("click", () => insertEmoji(e));
+        return b;
+      })
+    );
+    return;
+  }
+  const pack = EMOTICONS[emoPack];
+  grid.replaceChildren(
+    ...Object.entries(pack.items).map(([key, item]) => {
+      const b = el("button", "emo-item");
+      b.type = "button";
+      b.title = item.name;
+      b.setAttribute("aria-label", item.name);
+      b.appendChild(emoticonImg(emoPack + "/" + key));
+      b.addEventListener("click", () => sendEmoticon(emoPack + "/" + key));
+      return b;
+    })
+  );
+}
+
+function insertEmoji(e) {
+  const ta = $("chat-text");
+  if (ta.disabled) return;
+  const start = ta.selectionStart ?? ta.value.length;
+  const end = ta.selectionEnd ?? ta.value.length;
+  ta.value = ta.value.slice(0, start) + e + ta.value.slice(end);
+  ta.selectionStart = ta.selectionEnd = start + e.length;
+  ta.dispatchEvent(new Event("input"));
+}
+
+async function sendEmoticon(id) {
+  if (!currentRoom || !currentRoom.loaded || $("chat-text").disabled) return;
+  await sendItems([{ type: "emoticon", emo: id, text: "" }], "이모티콘");
+}
+
+$("emo-btn").addEventListener("click", () => toggleEmoPanel());
+document.querySelectorAll(".emo-tab").forEach((t) =>
+  t.addEventListener("click", () => {
+    emoPack = t.dataset.pack;
+    renderEmoGrid();
+  })
+);
+
+/* ================= 대화 내용 검색 ================= */
+let searchQuery = "";
+let searchHits = [];   // 찾은 메시지 id (오래된 것 → 최근 것)
+let searchIndex = -1;  // 지금 보고 있는 결과
+let searchTimer = null;
+
+// 말풍선 글자 중 검색어 부분을 노랗게
+function highlight(node, q) {
+  const lower = q.toLowerCase();
+  const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
+  const texts = [];
+  while (walker.nextNode()) texts.push(walker.currentNode);
+  for (const t of texts) {
+    const text = t.nodeValue;
+    const low = text.toLowerCase();
+    if (!low.includes(lower)) continue;
+    const frag = document.createDocumentFragment();
+    let i = 0;
+    let at;
+    while ((at = low.indexOf(lower, i)) !== -1) {
+      frag.append(text.slice(i, at), el("mark", "hl", text.slice(at, at + q.length)));
+      i = at + q.length;
+    }
+    frag.append(text.slice(i));
+    t.replaceWith(frag);
+  }
+}
+
+function openSearch() {
+  $("msg-search").classList.remove("hidden");
+  $("msg-search-input").value = "";
+  $("msg-search-count").textContent = "";
+  setTimeout(() => $("msg-search-input").focus(), 30);
+}
+
+function closeSearch() {
+  $("msg-search").classList.add("hidden");
+  searchQuery = "";
+  searchHits = [];
+  searchIndex = -1;
+  if (currentRoom) renderMessages(false);
+}
+
+$("chat-search-btn").addEventListener("click", () => {
+  if ($("msg-search").classList.contains("hidden")) openSearch();
+  else closeSearch();
+});
+$("ms-close").addEventListener("click", closeSearch);
+$("msg-search-input").addEventListener("input", () => {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(runSearch, 250);
+});
+$("msg-search-input").addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && !e.isComposing) {
+    e.preventDefault();
+    moveSearch(e.shiftKey ? 1 : -1); // Enter = 더 예전 결과, Shift+Enter = 더 최근
+  }
+});
+$("ms-up").addEventListener("click", () => moveSearch(-1));
+$("ms-down").addEventListener("click", () => moveSearch(1));
+
+async function runSearch() {
+  const q = $("msg-search-input").value.trim();
+  searchQuery = q;
+  if (!q || !currentRoom) {
+    searchHits = [];
+    searchIndex = -1;
+    $("msg-search-count").textContent = "";
+    renderMessages(false);
+    return;
+  }
+  const roomId = currentRoom.id;
+  $("msg-search-count").textContent = "찾는 중";
+  // 예전 대화도 찾을 수 있게 남은 대화를 불러옴 (최대 1,000개)
+  for (let pages = 0; hasMore && pages < 20; pages++) {
+    if (loadingOlder) {
+      await new Promise((r) => setTimeout(r, 150));
+      continue;
+    }
+    await loadOlder();
+    if (!currentRoom || currentRoom.id !== roomId || searchQuery !== q) return;
+  }
+  const lower = q.toLowerCase();
+  searchHits = visibleMessages()
+    .filter((m) => (m.type || "text") === "text" && !m.deleted && (m.text || "").toLowerCase().includes(lower))
+    .map((m) => m.id);
+  searchIndex = searchHits.length - 1; // 가장 최근 결과부터
+  showSearchResult();
+}
+
+function moveSearch(step) {
+  if (!searchHits.length) return;
+  searchIndex = (searchIndex + step + searchHits.length) % searchHits.length;
+  showSearchResult();
+}
+
+function showSearchResult() {
+  const count = $("msg-search-count");
+  count.textContent = searchHits.length ? `${searchIndex + 1}/${searchHits.length}` : "0개";
+  renderMessages(false);
+  const id = searchHits[searchIndex];
+  if (!id) return;
+  const row = $("msg-list").querySelector(`.msg[data-id="${CSS.escape(id)}"]`);
+  if (row) row.scrollIntoView({ block: "center" });
 }
 
 /* ================= 메시지 길게 누르기 / 오른쪽 클릭 메뉴 ================= */
@@ -3576,8 +4013,9 @@ function openMessageMenu(m) {
   menuMsg = m;
   const mine = m.sender === myPhone;
   const isImage = m.type === "image";
-  $("msg-menu-preview").textContent = isImage ? "사진" : m.text;
-  $("mm-copy").classList.toggle("hidden", isImage);
+  const isEmo = m.type === "emoticon";
+  $("msg-menu-preview").textContent = isImage ? "사진" : isEmo ? "이모티콘" : m.text;
+  $("mm-copy").classList.toggle("hidden", isImage || isEmo);
   $("mm-save").classList.toggle("hidden", !isImage);
   $("mm-unsend").classList.toggle("hidden", !(mine && Date.now() - m.clientAt < UNSEND_LIMIT));
   openModal("msg-menu");
@@ -3632,7 +4070,9 @@ $("mm-unsend").addEventListener("click", async () => {
   if (!confirm("모두에게서 삭제할까요? 상대방 화면에서도 지워져요.")) return;
 
   const batch = writeBatch(db);
-  batch.update(doc(db, "rooms", room.id, "messages", m.id), { deleted: true, text: "", image: "" });
+  const wipe = { deleted: true, text: "", image: "" };
+  if (m.type === "emoticon") wipe.emo = "";
+  batch.update(doc(db, "rooms", room.id, "messages", m.id), wipe);
   if (room.lastAt === m.clientAt) {
     // 방 목록 미리보기도 바꿈
     batch.update(doc(db, "rooms", room.id), { lastMessage: "삭제된 메시지입니다." });
