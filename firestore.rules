@@ -4,7 +4,7 @@ rules_version = '2';
 // OnChat 보안 규칙
 // Firebase 콘솔 → Firestore Database → 규칙 탭에 전부 붙여넣고 [게시]
 //
-// 핵심: Gmail 인증을 마친 계정(uid)만 사용 가능.
+// 핵심: 로그인한 계정(uid)만 사용 가능.
 //       accounts/{uid} 에 저장된 내 전화번호(010...)로
 //       "내 데이터인지", "내가 들어가 있는 방인지"를 확인함
 // ============================================================
@@ -12,9 +12,9 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     // ---------- 공통 ----------
-    // Gmail 링크 인증까지 끝낸 사람
+    // 로그인한 사람 (Gmail 인증은 없앰)
     function verified() {
-      return request.auth != null && request.auth.token.email_verified == true;
+      return request.auth != null;
     }
     function accountPath(uid) {
       return /databases/$(database)/documents/accounts/$(uid);
@@ -76,7 +76,13 @@ service cloud.firestore {
         && request.resource.data.nickname.size() > 0
         && request.resource.data.nickname.size() <= 12
         && okImage(request.resource.data, 'photo')
-        && okBg(request.resource.data);
+        && okBg(request.resource.data)
+        && okStickers(request.resource.data);
+    }
+    // 배경에 붙인 이모티콘: 최대 6개
+    function okStickers(data) {
+      return !('bgStickers' in data)
+        || (data.bgStickers is list && data.bgStickers.size() <= 6);
     }
     // 프로필 배경: 없음 / 정해진 무늬(preset:이름) / 앱이 만든 JPEG 사진
     function okBg(data) {
@@ -186,6 +192,22 @@ service cloud.firestore {
             && request.resource.data.get('text', '') == ''
             && request.resource.data.get('image', '') == ''
             && request.resource.data.get('emo', '') == '')
+          ||
+          // 내 글 수정: 글 내용만 (삭제된 메시지는 못 고침)
+          (resource.data.sender == me()
+            && resource.data.get('type', '') == 'text'
+            && resource.data.get('deleted', false) != true
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['text', 'edited', 'editedAt'])
+            && request.resource.data.text is string
+            && request.resource.data.text.size() > 0
+            && request.resource.data.text.size() <= 5000
+            && request.resource.data.edited == true)
+          ||
+          // 30일 지난 내 사진 정리: 사진만 비우고 "기간 지남" 표시
+          (resource.data.sender == me()
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['image', 'expired'])
+            && request.resource.data.get('image', '') == ''
+            && request.resource.data.expired == true)
           ||
           (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['hiddenFor'])
             && request.resource.data.hiddenFor.toSet()
