@@ -128,20 +128,14 @@ async function notify(env, me, token, body, request) {
   let appUrl = typeof body.appUrl === "string" && /^https:\/\/[^\s]+$/.test(body.appUrl) ? body.appUrl.split("?")[0] : "";
   if (!appUrl) appUrl = (request.headers.get("Origin") || "https://github.io") + "/";
   const navigate = appUrl + "?room=" + encodeURIComponent(roomId);
-  // 아이폰(iOS 18.4+)은 "web_push: 8030" 형식이면 폰이 직접 알림을 띄움 (일반 앱 알림처럼)
-  // 안드로이드/예전 아이폰은 아래 title/body/roomId 를 서비스 워커가 읽어서 띄움
-  const payload = JSON.stringify({
-    web_push: 8030,
-    notification: { title, body: msgText, navigate, silent: false, tag: roomId + "-" + Date.now() },
-    title,
-    body: msgText,
-    roomId,
-  });
+  const payload = JSON.stringify({ title, body: msgText, roomId, navigate });
+  // 지금 앱 화면을 보고 있는 사람은 빼기 (앱 안에서 바로 보니까)
+  const skip = new Set(Array.isArray(body.skip) ? body.skip.filter((p) => typeof p === "string") : []);
 
   const vapid = await getVapid(env);
   let sent = 0;
   for (const phone of members) {
-    if (phone === me.phone) continue;
+    if (phone === me.phone || skip.has(phone)) continue;
     const list = await readSubs(env, phone);
     if (!list.length) continue;
     const alive = [];
