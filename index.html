@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
   <title>OnChat</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#FF9F43">
@@ -61,6 +61,7 @@
 /* ===== 기본 ===== */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
+html, body { height: 100%; overflow: hidden; overscroll-behavior: none; }
 body {
   font-family: -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
   background: var(--bg);
@@ -81,6 +82,21 @@ button { font-family: inherit; }
 }
 
 .hidden { display: none !important; }
+
+/* ===== 처음 로딩 (온이) ===== */
+#splash {
+  position: fixed; inset: 0; z-index: 100;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+  background: #FFF4E8; color: #8A5A2B; font-size: 15px; font-weight: 600;
+  transition: opacity 0.25s;
+}
+#splash.out { opacity: 0; pointer-events: none; }
+#splash img { width: 150px; height: 150px; animation: oni-hop 1s ease-in-out infinite; }
+#splash .dots::after { content: ""; animation: dots 1.2s steps(4) infinite; }
+#splash small { font-size: 12px; font-weight: 400; color: #B08560; min-height: 16px; text-align: center; padding: 0 24px; }
+@keyframes oni-hop { 0%, 100% { transform: translateY(0); } 40% { transform: translateY(-14px) rotate(-4deg); } 60% { transform: translateY(-14px) rotate(4deg); } }
+@keyframes dots { 0% { content: ""; } 25% { content: "."; } 50% { content: ".."; } 75% { content: "..."; } }
+@media (prefers-color-scheme: dark) { #splash { background: #26211C; color: #FFC58A; } }
 
 /* ===== 로그인 ===== */
 #login-screen {
@@ -871,7 +887,9 @@ button { font-family: inherit; }
 
 /* ===== 이모티콘 ===== */
 .emo-panel { background: var(--bg); border-top: 1px solid var(--border); height: 260px; display: flex; flex-direction: column; }
-.emo-tabs { display: flex; gap: 6px; padding: 8px 10px 4px; }
+.emo-tabs { display: flex; gap: 6px; padding: 8px 10px 4px; overflow-x: auto; scrollbar-width: none; }
+.emo-tabs::-webkit-scrollbar, .deco-tabs::-webkit-scrollbar { display: none; }
+.emo-tab { flex-shrink: 0; }
 .emo-tab { border: none; background: var(--input-bg); color: var(--text-sub); border-radius: 14px; padding: 6px 12px; font-size: 13px; cursor: pointer; }
 .emo-tab.on { background: var(--primary); color: #fff; font-weight: 700; }
 .emo-grid { flex: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; padding: 6px 10px 12px; align-content: start; }
@@ -959,7 +977,7 @@ mark.hl { background: #FFE066; color: #222; border-radius: 3px; padding: 0 1px; 
 .deco-preview { position: relative; flex-shrink: 0; width: 120px; aspect-ratio: 9 / 16; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); touch-action: none; }
 .deco-bg { position: absolute; inset: 0; }
 .deco-side { flex: 1; min-width: 0; display: flex; flex-direction: column; height: 214px; }
-.deco-tabs { display: flex; gap: 6px; margin-bottom: 4px; }
+.deco-tabs { display: flex; gap: 6px; margin-bottom: 4px; overflow-x: auto; scrollbar-width: none; }
 .deco-grid { flex: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; align-content: start; background: var(--input-bg); border-radius: 10px; padding: 4px; }
 .deco-grid.emoji { grid-template-columns: repeat(5, 1fr); }
 .deco-grid button { border: none; background: none; padding: 2px; cursor: pointer; font-size: 22px; border-radius: 8px; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; }
@@ -967,6 +985,51 @@ mark.hl { background: #FFE066; color: #222; border-radius: 3px; padding: 0 1px; 
 .deco-grid img { width: 100%; height: 100%; }
 .deco-foot { display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--text-sub); margin-top: 4px; }
 .deco-foot .link-btn { margin: 0; font-size: 12px; }
+
+/* ===== 답장 ===== */
+.reply-bar { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: var(--bg); border-top: 1px solid var(--border); font-size: 13px; }
+.reply-bar .rb-body { flex: 1; min-width: 0; border-left: 3px solid var(--primary); padding-left: 8px; }
+.reply-bar .rb-name { font-weight: 700; color: var(--primary); }
+.reply-bar .rb-text { color: var(--text-sub); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+.reply-bar .icon-btn { width: 30px; height: 30px; flex-shrink: 0; }
+.msg .meta .edited { font-size: 10px; color: var(--text-sub); }
+.reply-wrap { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.msg.mine .reply-wrap { align-items: flex-end; }
+.msg.other .reply-wrap { align-items: flex-start; }
+.reply-quote { max-width: 220px; background: rgba(0,0,0,0.06); border-left: 3px solid var(--primary); border-radius: 8px; padding: 5px 9px; font-size: 12px; cursor: pointer; }
+.reply-quote .rq-name { font-weight: 700; color: var(--text-sub); }
+.reply-quote .rq-text { color: var(--text-sub); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .reply-quote { background: rgba(255,255,255,0.08); } }
+:root[data-theme="dark"] .reply-quote { background: rgba(255,255,255,0.08); }
+.msg.flash .bubble, .msg.flash .photo, .msg.flash .sticker { animation: flash 1.2s ease-out; }
+@keyframes flash { 0%, 40% { box-shadow: 0 0 0 3px #FFD43B; } 100% { box-shadow: 0 0 0 0 transparent; } }
+
+/* ===== 기간 지난 사진 ===== */
+.photo-expired { width: 160px; height: 110px; border-radius: 12px; background: var(--input-bg); color: var(--text-sub); font-size: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border: 1px dashed var(--border); }
+.photo-grid .photo-expired { width: 100%; height: auto; aspect-ratio: 1; border-radius: 6px; font-size: 10px; }
+
+/* ===== 친구 이름 바꾸기 ===== */
+.pv-main .name-row { display: flex; align-items: center; justify-content: center; gap: 4px; }
+.pv-main .alias-btn { width: 28px; height: 28px; color: #fff; opacity: 0.85; }
+.pv-main .alias-btn svg { width: 16px; height: 16px; }
+.pv-main .real-name { font-size: 12px; opacity: 0.75; margin-top: 2px; min-height: 0; }
+
+/* ===== 배경 꾸미기 (큰 화면) ===== */
+.bg-thumb-btn { display: flex; align-items: center; gap: 12px; width: 100%; border: 1px solid var(--border); background: var(--input-bg); border-radius: 12px; padding: 8px; cursor: pointer; color: var(--text); font-size: 14px; text-align: left; }
+.bg-thumb { position: relative; width: 54px; aspect-ratio: 9 / 16; border-radius: 8px; overflow: hidden; flex-shrink: 0; }
+.bg-thumb-btn .arrow { margin-left: auto; color: var(--text-sub); font-size: 18px; padding-right: 6px; }
+.be-top { position: relative; display: flex; align-items: center; justify-content: space-between; padding: 10px 10px; z-index: 2; }
+.be-top b { font-size: 16px; text-shadow: 0 1px 4px rgba(0,0,0,0.35); }
+.be-top button { border: none; background: rgba(0,0,0,0.35); color: #fff; border-radius: 16px; padding: 7px 14px; font-size: 14px; cursor: pointer; backdrop-filter: blur(6px); }
+.be-top #be-done { background: var(--primary); font-weight: 700; }
+.be-hint { position: relative; text-align: center; font-size: 12px; opacity: 0.85; text-shadow: 0 1px 4px rgba(0,0,0,0.4); pointer-events: none; }
+.be-preview { pointer-events: none; padding-bottom: 12px; }
+.be-panel { position: relative; z-index: 2; background: var(--bg); color: var(--text); border-radius: 18px 18px 0 0; padding: 10px 12px calc(12px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 8px; height: 230px; }
+.be-panel .deco-tabs { margin: 0; }
+.be-panel .bg-picker { padding-top: 2px; }
+.be-panel .deco-grid { flex: 1; grid-template-columns: repeat(6, 1fr); }
+.be-panel .deco-grid.emoji { grid-template-columns: repeat(8, 1fr); }
+.be-panel .deco-foot { margin: 0; }
 
 /* ===== Gmail 인증 ===== */
 .hint { font-size: 11px; color: var(--text-sub); font-weight: 400; }
@@ -1001,6 +1064,18 @@ mark.hl { background: #FFE066; color: #222; border-radius: 3px; padding: 0 1px; 
   </style>
 </head>
 <body>
+  <div id="splash">
+    <img src="data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20200%20200%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22g190%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%220%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%23FFBE6E%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23FF8A2A%22%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Cg%20transform%3D%22translate%28100%2096%29%20scale%280.8%29%20rotate%28-4%29%20translate%28-100%20-100%29%22%3E%3Cellipse%20cx%3D%22100%22%20cy%3D%22190%22%20rx%3D%2246%22%20ry%3D%227%22%20fill%3D%22%23000%22%20opacity%3D%22.1%22%2F%3E%3Cpath%20d%3D%22M184%2044q8%2010%204%2022M190%2036q14%2016%206%2036%22%20stroke%3D%22%237A3F12%22%20stroke-width%3D%223%22%20fill%3D%22none%22%20stroke-linecap%3D%22round%22%20opacity%3D%22.6%22%2F%3E%3Cpath%20d%3D%22M176%2030l4%2010%2010%204-10%204-4%2010-4-10-10-4%2010-4z%22%20fill%3D%22%23FFD84D%22%2F%3E%3Cpath%20d%3D%22M22%2052l3%207%207%203-7%203-3%207-3-7-7-3%207-3z%22%20fill%3D%22%23FFD84D%22%2F%3E%3Crect%20x%3D%2276%22%20y%3D%22156%22%20width%3D%2218%22%20height%3D%2228%22%20rx%3D%229%22%20fill%3D%22%23F07F1E%22%20stroke%3D%22%237A3F12%22%20stroke-width%3D%223.5%22%2F%3E%3Crect%20x%3D%22106%22%20y%3D%22156%22%20width%3D%2218%22%20height%3D%2228%22%20rx%3D%229%22%20fill%3D%22%23F07F1E%22%20stroke%3D%22%237A3F12%22%20stroke-width%3D%223.5%22%2F%3E%3Cpath%20d%3D%22M100%2034q-4-16%208-22%22%20stroke%3D%22%237A3F12%22%20stroke-width%3D%223.5%22%20fill%3D%22none%22%20stroke-linecap%3D%22round%22%2F%3E%3Ccircle%20cx%3D%22110%22%20cy%3D%2212%22%20r%3D%226%22%20fill%3D%22%23FFD84D%22%20stroke%3D%22%237A3F12%22%20stroke-width%3D%223%22%2F%3E%3Cpath%20d%3D%22M84%2034h32q46%200%2046%2046v34q0%2046-46%2046H86l-24%2020v-24q-24-10-24-42V80q0-46%2046-46z%22%20fill%3D%22url%28%23g190%29%22%20stroke%3D%22%237A3F12%22%20stroke-width%3D%224%22%20stroke-linejoin%3D%22round%22%2F%3E%3Cellipse%20cx%3D%2274%22%20cy%3D%2260%22%20rx%3D%2216%22%20ry%3D%229%22%20transform%3D%22rotate%28-25%2074%2060%29%22%20fill%3D%22%23fff%22%20opacity%3D%22.45%22%2F%3E%3Cellipse%20cx%3D%2266%22%20cy%3D%22114%22%20rx%3D%229%22%20ry%3D%225.5%22%20fill%3D%22%23FF5E5E%22%20opacity%3D%22.35%22%2F%3E%3Cellipse%20cx%3D%22134%22%20cy%3D%22114%22%20rx%3D%229%22%20ry%3D%225.5%22%20fill%3D%22%23FF5E5E%22%20opacity%3D%22.35%22%2F%3E%3Cpath%20d%3D%22M71%2098%20q9%20-10%2018%200%22%20stroke%3D%22%232B1E16%22%20stroke-width%3D%224.5%22%20fill%3D%22none%22%20stroke-linecap%3D%22round%22%2F%3E%3Cpath%20d%3D%22M111%2098%20q9%20-10%2018%200%22%20stroke%3D%22%232B1E16%22%20stroke-width%3D%224.5%22%20fill%3D%22none%22%20stroke-linecap%3D%22round%22%2F%3E%3Cpath%20d%3D%22M86%20110q14%2022%2028%200z%22%20fill%3D%22%232B1E16%22%20stroke%3D%22%232B1E16%22%20stroke-width%3D%223%22%20stroke-linejoin%3D%22round%22%2F%3E%3Cpath%20d%3D%22M93%20120q7%206%2014%200q-7-5-14%200z%22%20fill%3D%22%23FF7B7B%22%2F%3E%3Cellipse%20cx%3D%2240%22%20cy%3D%22118%22%20rx%3D%2211%22%20ry%3D%2216%22%20transform%3D%22rotate%2825%2040%20118%29%22%20fill%3D%22%23FF9A3C%22%20stroke%3D%22%237A3F12%22%20stroke-width%3D%223.5%22%2F%3E%3Cellipse%20cx%3D%22168%22%20cy%3D%2262%22%20rx%3D%2211%22%20ry%3D%2216%22%20transform%3D%22rotate%28-160%20168%2062%29%22%20fill%3D%22%23FF9A3C%22%20stroke%3D%22%237A3F12%22%20stroke-width%3D%223.5%22%2F%3E%3C%2Fg%3E%3Crect%20x%3D%2261.5%22%20y%3D%22166%22%20width%3D%2277%22%20height%3D%2230%22%20rx%3D%2215%22%20fill%3D%22%23fff%22%20stroke%3D%22%237A3F12%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%22100%22%20y%3D%22187%22%20text-anchor%3D%22middle%22%20font-size%3D%2218%22%20font-weight%3D%22800%22%20fill%3D%22%234A3426%22%20font-family%3D%22Apple%20SD%20Gothic%20Neo%2C%20Malgun%20Gothic%2C%20Noto%20Sans%20KR%2C%20sans-serif%22%3E%EC%95%88%EB%85%95%21%3C%2Ftext%3E%3C%2Fsvg%3E" alt="온이">
+    <div>온이가 불러오는 중이에요<span class="dots"></span></div>
+    <small id="splash-sub"></small>
+  </div>
+  <script>
+    // 15초 넘게 걸리면 안내
+    setTimeout(function () {
+      var s = document.getElementById("splash-sub");
+      if (s && document.getElementById("splash")) s.textContent = "조금 오래 걸리네요. 인터넷 연결을 확인해 주세요";
+    }, 15000);
+  </script>
   <div id="app">
 
     <!-- ========== 로그인 ========== -->
@@ -1181,6 +1256,15 @@ mark.hl { background: #FFE066; color: #222; border-radius: 3px; padding: 0 1px; 
       </div>
       <div id="msg-list"></div>
       <div id="typing-line" class="typing-line hidden"></div>
+      <div id="reply-bar" class="reply-bar hidden">
+        <div class="rb-body">
+          <div class="rb-name" id="reply-name"></div>
+          <div class="rb-text" id="reply-text"></div>
+        </div>
+        <button id="reply-cancel" class="icon-btn" type="button" aria-label="답장 취소">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
       <form id="chat-form" class="chat-input">
         <button id="attach-btn" class="attach-btn" type="button" aria-label="사진 보내기">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/></svg>
@@ -1197,6 +1281,9 @@ mark.hl { background: #FFE066; color: #222; border-radius: 3px; padding: 0 1px; 
       <div id="emo-panel" class="emo-panel hidden">
         <div class="emo-tabs">
           <button class="emo-tab on" data-pack="oni" type="button">온이</button>
+          <button class="emo-tab" data-pack="mochi" type="button">모찌</button>
+          <button class="emo-tab" data-pack="soda" type="button">소다</button>
+          <button class="emo-tab" data-pack="mungge" type="button">뭉게</button>
           <button class="emo-tab" data-pack="emoji" type="button">😀 이모지</button>
         </div>
         <div id="emo-grid" class="emo-grid"></div>
@@ -1231,7 +1318,13 @@ mark.hl { background: #FFE066; color: #222; border-radius: 3px; padding: 0 1px; 
         </button>
         <div class="pv-main">
           <div id="pf-avatar" class="avatar"></div>
-          <div id="pf-name" class="name"></div>
+          <div class="name-row">
+            <div id="pf-name" class="name"></div>
+            <button id="pf-alias" class="icon-btn alias-btn hidden" type="button" aria-label="친구 이름 바꾸기" title="친구 이름 바꾸기">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M14 6l4 4"/></svg>
+            </button>
+          </div>
+          <div id="pf-real" class="real-name hidden"></div>
           <div id="pf-status" class="status"></div>
           <div id="pf-phone" class="phone"></div>
         </div>
@@ -1262,25 +1355,46 @@ mark.hl { background: #FFE066; color: #222; border-radius: 3px; padding: 0 1px; 
           <label class="field-label" for="edit-status">상태메시지</label>
           <input id="edit-status" class="input" type="text" maxlength="40" placeholder="상태메시지를 입력해 주세요">
           <label class="field-label">프로필 배경</label>
-          <div id="bg-picker" class="bg-picker"></div>
+          <button id="open-bg-editor" class="bg-thumb-btn" type="button">
+            <span id="bg-thumb" class="bg-thumb"><span id="bg-thumb-layer" class="sticker-layer"></span></span>
+            <span>배경 바꾸기 · 이모티콘 꾸미기</span>
+            <span class="arrow">›</span>
+          </button>
           <input id="edit-bg-input" type="file" accept="image/*" hidden>
-          <label class="field-label">배경 꾸미기 <span class="hint">눌러서 붙이고, 끌어서 옮겨요</span></label>
-          <div class="deco-wrap">
-            <div class="deco-preview">
-              <div id="deco-bg" class="deco-bg"></div>
-              <div id="deco-layer" class="sticker-layer edit"></div>
-            </div>
-            <div class="deco-side">
-              <div class="deco-tabs">
-                <button class="emo-tab deco-tab on" data-pack="oni" type="button">온이</button>
-                <button class="emo-tab deco-tab" data-pack="emoji" type="button">😀 이모지</button>
-              </div>
-              <div id="deco-grid" class="deco-grid"></div>
-              <div class="deco-foot"><span id="deco-count">0 / 6</span><button id="deco-clear" class="link-btn" type="button">모두 떼기</button></div>
-            </div>
-          </div>
           <button id="edit-save" class="btn" type="submit">저장</button>
         </form>
+      </div>
+    </div>
+
+    <!-- ========== 배경 꾸미기 (큰 화면) ========== -->
+    <div id="bg-editor" class="overlay profile-view hidden">
+      <div class="pv">
+        <div id="deco-bg" class="pv-bg"></div>
+        <div class="pv-shade"></div>
+        <div id="deco-layer" class="sticker-layer edit"></div>
+        <div class="be-top">
+          <button id="be-cancel" type="button" data-close>취소</button>
+          <b>배경 꾸미기</b>
+          <button id="be-done" type="button">완료</button>
+        </div>
+        <div class="be-hint">이모티콘은 끌어서 옮기고, ✕로 떼요</div>
+        <div class="pv-main be-preview">
+          <div id="be-avatar" class="avatar"></div>
+          <div id="be-name" class="name"></div>
+        </div>
+        <div class="be-panel">
+          <div class="deco-tabs">
+            <button class="emo-tab deco-tab on" data-pack="bg" type="button">배경</button>
+            <button class="emo-tab deco-tab" data-pack="oni" type="button">온이</button>
+            <button class="emo-tab deco-tab" data-pack="mochi" type="button">모찌</button>
+            <button class="emo-tab deco-tab" data-pack="soda" type="button">소다</button>
+            <button class="emo-tab deco-tab" data-pack="mungge" type="button">뭉게</button>
+            <button class="emo-tab deco-tab" data-pack="emoji" type="button">😀</button>
+          </div>
+          <div id="bg-picker" class="bg-picker"></div>
+          <div id="deco-grid" class="deco-grid hidden"></div>
+          <div class="deco-foot"><span id="deco-count">0 / 6</span><button id="deco-clear" class="link-btn" type="button">모두 떼기</button></div>
+        </div>
       </div>
     </div>
 
@@ -1328,7 +1442,9 @@ mark.hl { background: #FFE066; color: #222; border-radius: 3px; padding: 0 1px; 
         </div>
         <p id="msg-menu-preview" class="msg-menu-preview"></p>
         <div class="menu-list">
+          <button id="mm-reply">답장</button>
           <button id="mm-copy">복사</button>
+          <button id="mm-edit">수정</button>
           <button id="mm-save">사진 저장</button>
           <button id="mm-unsend" class="danger">모두에게서 삭제</button>
           <button id="mm-hide">나에게서 삭제</button>
@@ -1432,8 +1548,12 @@ import {
   increment,
   getDocs,
   endBefore,
+  startAfter,
+  limit,
   arrayUnion,
   arrayRemove,
+  disableNetwork,
+  enableNetwork,
 } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
 import {
   getDatabase,
@@ -1444,6 +1564,8 @@ import {
   push as dbPush,
   onDisconnect,
   serverTimestamp as rtdbNow,
+  goOffline,
+  goOnline,
 } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-database.js";
 
 /* ================= Firebase 연결 ================= */
@@ -1522,7 +1644,15 @@ function getUser(phone) {
 
 function userOf(phone) {
   if (phone === myPhone && me) return me;
-  return userInfo.get(phone) || { phone, nickname: formatPhone(phone), photo: "" };
+  return withAlias(userInfo.get(phone) || { phone, nickname: formatPhone(phone), photo: "" });
+}
+
+// 내가 정한 친구 이름 (나한테만 보임)
+let aliases = new Map(); // 번호 → 이름
+function withAlias(user) {
+  if (!user || user.phone === myPhone) return user;
+  const alias = aliases.get(user.phone);
+  return alias ? { ...user, nickname: alias, realNickname: user.realNickname || user.nickname } : user;
 }
 
 function nameOf(phone) {
@@ -1733,7 +1863,15 @@ function authErrorMessage(err) {
 }
 
 /* ---------- 화면 전환 ---------- */
+function hideSplash() {
+  const sp = document.getElementById("splash");
+  if (!sp || sp.classList.contains("out")) return;
+  sp.classList.add("out");
+  setTimeout(() => sp.remove(), 300);
+}
+
 function showWelcome() {
+  hideSplash();
   stopVerifyWatch();
   $("auth-form").reset();
   $("welcome").classList.remove("hidden");
@@ -1775,6 +1913,7 @@ const AUTH_TEXT = {
 };
 
 function showAuth(mode) {
+  hideSplash();
   authMode = mode;
   const t = AUTH_TEXT[mode];
   $("welcome").classList.add("hidden");
@@ -2213,6 +2352,7 @@ onAuthStateChanged(auth, async (user) => {
 
 /* ================= 메인 화면 들어가기 ================= */
 function enterMain(phone) {
+  setTimeout(hideSplash, 6000); // 채팅 목록이 늦어도 6초 뒤엔 보여 줌
   myPhone = phone;
   const mySession = ++session;
   $("login-screen").classList.add("hidden");
@@ -2230,30 +2370,19 @@ function enterMain(phone) {
   // 2) 내 친구 목록 실시간 감시
   const stopFriends = onSnapshot(
     collection(db, "users", phone, "friends"),
-    async (snap) => {
+    (snap) => {
+      if (mySession !== session) return;
       const phones = snap.docs.map((d) => d.id);
       friendSet = new Set(phones);
-
-      // 친구 각각의 최신 프로필 읽어오기 (하나 실패해도 나머지는 보이게)
-      const profiles = await Promise.all(
-        phones.map(async (p) => {
-          try {
-            const s = await getDoc(doc(db, "users", p));
-            return s.exists() ? s.data() : null;
-          } catch (e) {
-            return userInfo.get(p) || null;
-          }
-        })
+      aliases = new Map(
+        snap.docs
+          .map((d) => [d.id, (d.data().alias || "").trim()])
+          .filter(([, a]) => a)
       );
-      if (mySession !== session) return;
-
-      profiles.filter(Boolean).forEach(cacheUser);
-      phones.forEach(watchPresence);
-
-      friends = profiles
-        .filter(Boolean)
-        .sort((a, b) => a.nickname.localeCompare(b.nickname, "ko"));
-      renderFriends();
+      // 친구 프로필은 실시간으로 (사진/이름/상태메시지 바꾸면 바로 반영)
+      phones.forEach(watchUser);
+      rebuildFriends();
+      applyRoomFilter();
     },
     (err) => console.error(err)
   );
@@ -2266,8 +2395,9 @@ function enterMain(phone) {
     async (snap) => {
       const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
 
-      // 방에 있는 상대들 프로필 미리 읽어두기
+      // 방에 있는 상대들 프로필 미리 읽어두기 (+ 바뀌면 바로 반영)
       const others = new Set(list.flatMap((r) => r.members).filter((p) => p !== myPhone));
+      others.forEach(watchUser);
       await Promise.all([...others].map(getUser));
       if (mySession !== session) return;
 
@@ -2277,6 +2407,11 @@ function enterMain(phone) {
         .sort((a, b) => b.lastAt - a.lastAt);
       applyRoomFilter();
       checkNewMessages();
+      hideSplash();
+      if (!cleanupScheduled) {
+        cleanupScheduled = true;
+        setTimeout(() => cleanupOldPhotos(mySession).catch((e) => console.warn("사진 정리 실패", e)), 15000);
+      }
     },
     (err) => console.error(err)
   );
@@ -2385,13 +2520,32 @@ function unlockAudio() {
     const Ctx = window.AudioContext || window.webkitAudioContext;
     if (Ctx) audioCtx = new Ctx();
   }
-  if (audioCtx && audioCtx.state === "suspended") audioCtx.resume();
+  if (!audioCtx || audioUnlocked) return;
+  const done = () => {
+    audioUnlocked = true;
+    sleepAudioSoon(); // 준비만 하고 바로 재움 (켜 두면 배터리를 계속 씀)
+  };
+  if (audioCtx.state === "suspended") audioCtx.resume().then(done).catch(() => {});
+  else done();
+}
+let audioUnlocked = false;
+let audioSleepTimer = null;
+function sleepAudioSoon() {
+  clearTimeout(audioSleepTimer);
+  audioSleepTimer = setTimeout(() => {
+    if (audioCtx && audioCtx.state === "running") audioCtx.suspend().catch(() => {});
+  }, 1000);
 }
 document.addEventListener("pointerdown", unlockAudio);
 document.addEventListener("keydown", unlockAudio);
 
 function playDing() {
   if (!audioCtx) return;
+  if (audioCtx.state === "suspended") {
+    audioCtx.resume().then(playDing).catch(() => {});
+    return;
+  }
+  sleepAudioSoon();
   const now = audioCtx.currentTime;
   [[880, 0], [1320, 0.12]].forEach(([freq, start]) => {
     const osc = audioCtx.createOscillator();
@@ -2697,7 +2851,7 @@ function renderFriends() {
   const q = $("friend-search").value.trim().toLowerCase();
   if (q) {
     // 이름이나 상태메시지에 검색어가 들어간 친구만
-    const found = friends.filter((f) => (f.nickname + " " + (f.statusMessage || "")).toLowerCase().includes(q));
+    const found = friends.filter((f) => (f.nickname + " " + (f.realNickname || "") + " " + (f.statusMessage || "")).toLowerCase().includes(q));
     $("friend-title").textContent = `검색 결과 ${found.length}`;
     list.replaceChildren(...(found.length ? found.map((f) => makePersonRow(f)) : [el("p", "empty", "찾는 친구가 없어요.")]));
     return;
@@ -2838,9 +2992,40 @@ function paintBg(node, bg) {
 
 /* ================= 프로필 팝업 ================= */
 let profileShown = null; // 지금 보고 있는 프로필 (사진 크게 보기용)
+let profileIsMe = false;
+
+function refreshProfileView() {
+  if (!profileShown) return;
+  const fresh = profileIsMe ? me : userOf(profileShown.phone);
+  if (fresh) openProfile(fresh, profileIsMe);
+}
+
+$("pf-alias").addEventListener("click", async () => {
+  const user = profileShown;
+  if (!user || !friendSet.has(user.phone)) return;
+  const now = aliases.get(user.phone) || "";
+  const real = user.realNickname || user.nickname;
+  const input = prompt(`${real}님의 이름을 나한테만 보이게 바꿔요.\n(비우면 원래 이름으로)`, now || real);
+  if (input === null) return;
+  const alias = input.trim().slice(0, 20);
+  try {
+    await setDoc(doc(db, "users", myPhone, "friends", user.phone), { alias: alias === real ? "" : alias }, { merge: true });
+    toast(alias && alias !== real ? "친구 이름을 바꿨어요" : "원래 이름으로 돌렸어요");
+  } catch (err) {
+    console.error(err);
+    toast("이름을 바꾸지 못했어요");
+  }
+});
 
 function openProfile(user, isMe) {
+  // 친구는 최신 프로필 + 내가 정한 이름으로
+  if (!isMe && user && user.phone) user = userInfo.has(user.phone) ? userOf(user.phone) : withAlias(user);
   profileShown = user;
+  profileIsMe = isMe;
+  const alias = !isMe && aliases.get(user.phone);
+  $("pf-alias").classList.toggle("hidden", isMe || !friendSet.has(user.phone));
+  $("pf-real").classList.toggle("hidden", !alias);
+  $("pf-real").textContent = alias ? `원래 이름: ${user.realNickname || ""}` : "";
   paintBg($("pv-bg"), user.bg);
   renderStickers($("pv-stickers"), user.bgStickers, false);
   paintAvatar($("pf-avatar"), user);
@@ -2924,6 +3109,31 @@ function openEditProfile() {
   openModal("edit-modal");
 }
 
+let editorBackup = null;
+$("open-bg-editor").addEventListener("click", () => {
+  editorBackup = { bg: editBg, stickers: editStickers.map((x) => ({ ...x })) };
+  paintAvatar($("be-avatar"), { nickname: $("edit-nickname").value || me.nickname, photo: editPhoto });
+  $("be-name").textContent = $("edit-nickname").value || me.nickname;
+  decoPack = "bg";
+  renderDecoGrid();
+  renderDeco();
+  openModal("bg-editor");
+});
+$("be-done").addEventListener("click", () => {
+  editorBackup = null;
+  closeModal("bg-editor");
+  toast("아래 '저장'을 누르면 적용돼요");
+});
+// 취소(또는 닫기) → 열기 전으로 되돌림
+$("be-cancel").addEventListener("click", () => {
+  if (editorBackup) {
+    editBg = editorBackup.bg;
+    editStickers = editorBackup.stickers;
+    editorBackup = null;
+    renderBgPicker();
+  }
+});
+
 // 배경 고르기: 기본 + 7가지 + 내 사진
 function renderBgPicker() {
   const tiles = [];
@@ -2959,7 +3169,7 @@ function renderBgPicker() {
 // 저장 형태: bgStickers = [{ e: "oni/hi" 또는 "😀", x: 0~100(%), y: 0~100(%) }] 최대 6개
 const MAX_STICKERS = 6;
 let editStickers = [];
-let decoPack = "oni";
+let decoPack = "bg";
 
 function clampPct(v) {
   v = Number(v);
@@ -3004,10 +3214,13 @@ function makeDraggable(node, s) {
   node.addEventListener("pointerdown", (ev) => {
     ev.preventDefault();
     const box = $("deco-layer").getBoundingClientRect();
+    // 아래 고르는 칸 밑으로는 못 들어가게 (들어가면 다시 못 잡음)
+    const panel = document.querySelector(".be-panel").getBoundingClientRect();
+    const maxY = ((panel.top - box.top) / box.height) * 100 - 4;
     try { node.setPointerCapture(ev.pointerId); } catch (e) { /* 괜찮음 */ }
     const move = (e) => {
       s.x = clampPct(((e.clientX - box.left) / box.width) * 100);
-      s.y = clampPct(((e.clientY - box.top) / box.height) * 100);
+      s.y = Math.min(clampPct(((e.clientY - box.top) / box.height) * 100), Math.round(maxY * 10) / 10);
       node.style.left = s.x + "%";
       node.style.top = s.y + "%";
     };
@@ -3025,6 +3238,8 @@ function makeDraggable(node, s) {
 function renderDeco() {
   paintBg($("deco-bg"), editBg);
   renderStickers($("deco-layer"), editStickers, true);
+  paintBg($("bg-thumb"), editBg);
+  renderStickers($("bg-thumb-layer"), editStickers, false);
   $("deco-count").textContent = `${editStickers.length} / ${MAX_STICKERS}`;
   $("deco-clear").classList.toggle("hidden", editStickers.length === 0);
 }
@@ -3035,13 +3250,16 @@ function addSticker(e) {
     return;
   }
   // 이름/버튼이 있는 아래쪽은 피해서 위쪽에 랜덤으로
-  editStickers.push({ e, x: clampPct(20 + Math.random() * 60), y: clampPct(12 + Math.random() * 45) });
+  editStickers.push({ e, x: clampPct(20 + Math.random() * 60), y: clampPct(18 + Math.random() * 35) });
   renderDeco();
 }
 
 function renderDecoGrid() {
   document.querySelectorAll(".deco-tab").forEach((t) => t.classList.toggle("on", t.dataset.pack === decoPack));
   const grid = $("deco-grid");
+  $("bg-picker").classList.toggle("hidden", decoPack !== "bg");
+  grid.classList.toggle("hidden", decoPack === "bg");
+  if (decoPack === "bg") return;
   grid.classList.toggle("emoji", decoPack === "emoji");
   const btn = (label, child, value) => {
     const b = el("button");
@@ -3056,7 +3274,8 @@ function renderDecoGrid() {
     grid.replaceChildren(...EMOJI_LIST.map((e) => btn(e, document.createTextNode(e), e)));
   } else {
     grid.replaceChildren(
-      ...Object.entries(EMOTICONS.oni.items).map(([key, item]) => btn(item.name, emoticonImg("oni/" + key), "oni/" + key))
+      ...Object.entries((EMOTICONS[decoPack] || EMOTICONS.oni).items).map(([key, item]) =>
+        btn(item.name, emoticonImg(decoPack + "/" + key), decoPack + "/" + key))
     );
   }
 }
@@ -3715,6 +3934,8 @@ $("msg-list").addEventListener("scroll", () => {
 
 function closeRoom() {
   if (currentRoom) clearTyping(currentRoom.id);
+  editing = null;
+  setReply(null);
   toggleEmoPanel(false);
   $("msg-search").classList.add("hidden");
   searchQuery = "";
@@ -3942,6 +4163,7 @@ function renderMessages(forceBottom, applyKeep = false) {
     const meta = el("div", "meta");
     const count = unreadCount(m);
     if (count > 0) meta.appendChild(el("span", "unread", String(count)));
+    if (m.edited && !m.deleted) meta.appendChild(el("span", "edited", "수정됨"));
     if (lastInGroup) meta.appendChild(el("span", "time", formatTime(m.clientAt)));
 
     let content;
@@ -3951,6 +4173,8 @@ function renderMessages(forceBottom, applyKeep = false) {
       content = makePhotoGrid(m.groupMsgs.filter((g) => !g.deleted), true);
     } else if (m.type === "emoticon") {
       content = emoticonImg(m.emo);
+    } else if (m.type === "image" && !safeImage(m.image)) {
+      content = expiredPhoto();
     } else if (m.type === "image") {
       content = el("img", "photo");
       content.src = safeImage(m.image);
@@ -3969,6 +4193,14 @@ function renderMessages(forceBottom, applyKeep = false) {
       if (searchQuery) highlight(content, searchQuery);
     }
     if (!m.deleted && !m.groupMsgs) attachMessageMenu(content, m);
+    if (m.groupMsgs) row.dataset.ids = m.groupMsgs.map((g) => g.id).join(",");
+
+    // 답장이면 위에 인용
+    if (m.reply && !m.deleted && typeof m.reply === "object" && typeof m.reply.id === "string") {
+      const wrap = el("div", "reply-wrap");
+      wrap.append(makeReplyQuote(m.reply), content);
+      content = wrap;
+    }
 
     line.append(content, meta);
     body.appendChild(line);
@@ -4018,10 +4250,22 @@ function mergePhotoGroups(list) {
   return out.map((m) => (m.groupMsgs && m.groupMsgs.length === 1 ? { ...m.groupMsgs[0] } : m));
 }
 
+function expiredPhoto() {
+  const box = el("div", "photo-expired");
+  box.append(el("div", null, "🖼️"), el("div", null, "기간이 지난 사진이에요"));
+  return box;
+}
+
 // 사진 바둑판 (2~4장은 2줄, 5장 이상은 3줄)
 function makePhotoGrid(photoMsgs, withMenu) {
   const grid = el("div", photoMsgs.length >= 5 ? "photo-grid cols3" : "photo-grid");
   for (const pm of photoMsgs) {
+    if (!safeImage(pm.image)) {
+      const ex = expiredPhoto();
+      if (withMenu) attachMessageMenu(ex, pm);
+      grid.appendChild(ex);
+      continue;
+    }
     const img = el("img", "photo");
     img.src = safeImage(pm.image);
     img.alt = "사진";
@@ -4085,6 +4329,12 @@ const EMOTICONS = {
     },
   },
 };
+// 온이 친구들 (모찌 · 소다 · 뭉게)
+Object.assign(EMOTICONS, {
+  mochi: {"name": "모찌", "items": {"hi": {"name": "안녕", "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><linearGradient id=\"G\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#FFFFFF\"/><stop offset=\"1\" stop-color=\"#F6E3DC\"/></linearGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(-6) translate(-100 -100)\"><ellipse cx=\"100\" cy=\"192\" rx=\"50\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><path d=\"M176 30l4 10 10 4-10 4-4 10-4-10-10-4 10-4z\" fill=\"#FFD84D\"/><path d=\"M22 52l3 7 7 3-7 3-3 7-3-7-7-3 7-3z\" fill=\"#FFD84D\"/><path d=\"M100 40C152 40 174 82 174 126C174 158 142 170 100 170C58 170 26 158 26 126C26 82 48 40 100 40Z\" fill=\"url(#G)\" stroke=\"#9C6B5E\" stroke-width=\"4\"/><path d=\"M44 150q56 14 112 0\" stroke=\"#E8CFC6\" stroke-width=\"5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M100 40q-6-14 6-24q10 8 0 22\" fill=\"#FF9BB8\" stroke=\"#C25A7C\" stroke-width=\"2.5\"/><path d=\"M100 40q8-12 22-8q-4 12-20 10\" fill=\"#FFC2D4\" stroke=\"#C25A7C\" stroke-width=\"2.5\"/><ellipse cx=\"70\" cy=\"66\" rx=\"16\" ry=\"8\" transform=\"rotate(-25 70 66)\" fill=\"#fff\" opacity=\".9\"/><ellipse cx=\"64\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF7FA0\" opacity=\".45\"/><ellipse cx=\"136\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF7FA0\" opacity=\".45\"/><path d=\"M71 98 q9 -10 18 0\" stroke=\"#2B1E16\" stroke-width=\"4.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M111 98 q9 -10 18 0\" stroke=\"#2B1E16\" stroke-width=\"4.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M86 110q14 22 28 0z\" fill=\"#2B1E16\" stroke=\"#2B1E16\" stroke-width=\"3\" stroke-linejoin=\"round\"/><path d=\"M93 120q7 6 14 0q-7-5-14 0z\" fill=\"#FF7B7B\"/><ellipse cx=\"38\" cy=\"122\" rx=\"11\" ry=\"15\" transform=\"rotate(25 38 122)\" fill=\"#FFF6F2\" stroke=\"#9C6B5E\" stroke-width=\"3.5\"/><ellipse cx=\"166\" cy=\"66\" rx=\"11\" ry=\"15\" transform=\"rotate(-160 166 66)\" fill=\"#FFF6F2\" stroke=\"#9C6B5E\" stroke-width=\"3.5\"/></g><rect x=\"61.5\" y=\"166\" width=\"77\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#9C6B5E\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#3E3550\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">안녕~</text></svg>"}, "yum": {"name": "맛있어", "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><linearGradient id=\"G\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#FFFFFF\"/><stop offset=\"1\" stop-color=\"#F6E3DC\"/></linearGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(0) translate(-100 -100)\"><ellipse cx=\"100\" cy=\"192\" rx=\"50\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><path d=\"M100 40C152 40 174 82 174 126C174 158 142 170 100 170C58 170 26 158 26 126C26 82 48 40 100 40Z\" fill=\"url(#G)\" stroke=\"#9C6B5E\" stroke-width=\"4\"/><path d=\"M44 150q56 14 112 0\" stroke=\"#E8CFC6\" stroke-width=\"5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M100 40q-6-14 6-24q10 8 0 22\" fill=\"#FF9BB8\" stroke=\"#C25A7C\" stroke-width=\"2.5\"/><path d=\"M100 40q8-12 22-8q-4 12-20 10\" fill=\"#FFC2D4\" stroke=\"#C25A7C\" stroke-width=\"2.5\"/><ellipse cx=\"70\" cy=\"66\" rx=\"16\" ry=\"8\" transform=\"rotate(-25 70 66)\" fill=\"#fff\" opacity=\".9\"/><ellipse cx=\"64\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF7FA0\" opacity=\".45\"/><ellipse cx=\"136\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF7FA0\" opacity=\".45\"/><path d=\"M71 98 q9 -10 18 0\" stroke=\"#2B1E16\" stroke-width=\"4.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M111 98 q9 -10 18 0\" stroke=\"#2B1E16\" stroke-width=\"4.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M92 114q8 6 16 0\" stroke=\"#2B1E16\" stroke-width=\"3.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M106 117q3 10 0 14q-4-4 0-14z\" fill=\"#9FD8FF\"/><path d=\"M150 150l34-60\" stroke=\"#B07A4A\" stroke-width=\"5\" stroke-linecap=\"round\"/><circle cx=\"176\" cy=\"104\" r=\"11\" fill=\"#FFB3C6\" stroke=\"#7A3F12\" stroke-width=\"3\"/><circle cx=\"166\" cy=\"122\" r=\"11\" fill=\"#FFF\" stroke=\"#7A3F12\" stroke-width=\"3\"/><circle cx=\"156\" cy=\"140\" r=\"11\" fill=\"#B8E29A\" stroke=\"#7A3F12\" stroke-width=\"3\"/><path d=\"M30 52c-4-4-11 0-7 5l7 7 7-7c4-5-3-9-7-5z\" fill=\"#FF8FA3\"/><path d=\"M178 36c-4-4-11 0-7 5l7 7 7-7c4-5-3-9-7-5z\" fill=\"#FF4D6D\"/><ellipse cx=\"38\" cy=\"122\" rx=\"11\" ry=\"15\" transform=\"rotate(25 38 122)\" fill=\"#FFF6F2\" stroke=\"#9C6B5E\" stroke-width=\"3.5\"/><ellipse cx=\"150\" cy=\"146\" rx=\"11\" ry=\"15\" transform=\"rotate(-60 150 146)\" fill=\"#FFF6F2\" stroke=\"#9C6B5E\" stroke-width=\"3.5\"/></g><rect x=\"71.0\" y=\"166\" width=\"58\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#9C6B5E\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#3E3550\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">냠냠</text></svg>"}, "shy": {"name": "부끄", "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><linearGradient id=\"G\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#FFFFFF\"/><stop offset=\"1\" stop-color=\"#F6E3DC\"/></linearGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(6) translate(-100 -100)\"><ellipse cx=\"100\" cy=\"192\" rx=\"50\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><path d=\"M100 40C152 40 174 82 174 126C174 158 142 170 100 170C58 170 26 158 26 126C26 82 48 40 100 40Z\" fill=\"url(#G)\" stroke=\"#9C6B5E\" stroke-width=\"4\"/><path d=\"M44 150q56 14 112 0\" stroke=\"#E8CFC6\" stroke-width=\"5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M100 40q-6-14 6-24q10 8 0 22\" fill=\"#FF9BB8\" stroke=\"#C25A7C\" stroke-width=\"2.5\"/><path d=\"M100 40q8-12 22-8q-4 12-20 10\" fill=\"#FFC2D4\" stroke=\"#C25A7C\" stroke-width=\"2.5\"/><ellipse cx=\"70\" cy=\"66\" rx=\"16\" ry=\"8\" transform=\"rotate(-25 70 66)\" fill=\"#fff\" opacity=\".9\"/><ellipse cx=\"64\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF7FA0\" opacity=\".45\"/><ellipse cx=\"136\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF7FA0\" opacity=\".45\"/><path d=\"M72 98q8-6 16 0M112 98q8-6 16 0\" stroke=\"#2B1E16\" stroke-width=\"4.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M90 112q5 6 10 0q5 6 10 0\" stroke=\"#2B1E16\" stroke-width=\"3.5\" fill=\"none\" stroke-linecap=\"round\"/><ellipse cx=\"66\" cy=\"114\" rx=\"14\" ry=\"8\" fill=\"#FF5E7E\" opacity=\".55\"/><ellipse cx=\"134\" cy=\"114\" rx=\"14\" ry=\"8\" fill=\"#FF5E7E\" opacity=\".55\"/><path d=\"M58 112l6-4M64 116l6-4M136 112l6-4M142 116l6-4\" stroke=\"#E0436A\" stroke-width=\"2\" stroke-linecap=\"round\"/><ellipse cx=\"62\" cy=\"118\" rx=\"11\" ry=\"15\" transform=\"rotate(-20 62 118)\" fill=\"#FFF6F2\" stroke=\"#9C6B5E\" stroke-width=\"3.5\"/><ellipse cx=\"138\" cy=\"118\" rx=\"11\" ry=\"15\" transform=\"rotate(20 138 118)\" fill=\"#FFF6F2\" stroke=\"#9C6B5E\" stroke-width=\"3.5\"/></g><rect x=\"71.0\" y=\"166\" width=\"58\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#9C6B5E\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#3E3550\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">부끄</text></svg>"}, "love": {"name": "좋아", "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><linearGradient id=\"G\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#FFFFFF\"/><stop offset=\"1\" stop-color=\"#F6E3DC\"/></linearGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(0) translate(-100 -100)\"><ellipse cx=\"100\" cy=\"192\" rx=\"50\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><path d=\"M100 40C152 40 174 82 174 126C174 158 142 170 100 170C58 170 26 158 26 126C26 82 48 40 100 40Z\" fill=\"url(#G)\" stroke=\"#9C6B5E\" stroke-width=\"4\"/><path d=\"M44 150q56 14 112 0\" stroke=\"#E8CFC6\" stroke-width=\"5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M100 40q-6-14 6-24q10 8 0 22\" fill=\"#FF9BB8\" stroke=\"#C25A7C\" stroke-width=\"2.5\"/><path d=\"M100 40q8-12 22-8q-4 12-20 10\" fill=\"#FFC2D4\" stroke=\"#C25A7C\" stroke-width=\"2.5\"/><ellipse cx=\"70\" cy=\"66\" rx=\"16\" ry=\"8\" transform=\"rotate(-25 70 66)\" fill=\"#fff\" opacity=\".9\"/><ellipse cx=\"64\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF7FA0\" opacity=\".45\"/><ellipse cx=\"136\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF7FA0\" opacity=\".45\"/><path d=\"M80 105 C66 95 71 83 80 91 C89 83 94 95 80 105z\" fill=\"#FF4D6D\" stroke=\"#B3123A\" stroke-width=\"2\"/><path d=\"M120 105 C106 95 111 83 120 91 C129 83 134 95 120 105z\" fill=\"#FF4D6D\" stroke=\"#B3123A\" stroke-width=\"2\"/><path d=\"M90 112q10 10 20 0\" stroke=\"#2B1E16\" stroke-width=\"4\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M100 176c-24-14-36-26-36-40 0-11 9-18 19-18 8 0 14 5 17 11 3-6 9-11 17-11 10 0 19 7 19 18 0 14-12 26-36 40z\" fill=\"#FF4D6D\" stroke=\"#B3123A\" stroke-width=\"3.5\"/><ellipse cx=\"84\" cy=\"132\" rx=\"6\" ry=\"4\" fill=\"#fff\" opacity=\".6\" transform=\"rotate(-30 84 132)\"/><ellipse cx=\"58\" cy=\"146\" rx=\"11\" ry=\"15\" transform=\"rotate(50 58 146)\" fill=\"#FFF6F2\" stroke=\"#9C6B5E\" stroke-width=\"3.5\"/><ellipse cx=\"142\" cy=\"146\" rx=\"11\" ry=\"15\" transform=\"rotate(-50 142 146)\" fill=\"#FFF6F2\" stroke=\"#9C6B5E\" stroke-width=\"3.5\"/></g><rect x=\"61.5\" y=\"166\" width=\"77\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#9C6B5E\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#3E3550\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">좋아해</text></svg>"}, "ok": {"name": "응응", "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><linearGradient id=\"G\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#FFFFFF\"/><stop offset=\"1\" stop-color=\"#F6E3DC\"/></linearGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(0) translate(-100 -100)\"><ellipse cx=\"100\" cy=\"192\" rx=\"50\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><path d=\"M176 30l4 10 10 4-10 4-4 10-4-10-10-4 10-4z\" fill=\"#FFD84D\"/><path d=\"M22 52l3 7 7 3-7 3-3 7-3-7-7-3 7-3z\" fill=\"#FFD84D\"/><path d=\"M100 40C152 40 174 82 174 126C174 158 142 170 100 170C58 170 26 158 26 126C26 82 48 40 100 40Z\" fill=\"url(#G)\" stroke=\"#9C6B5E\" stroke-width=\"4\"/><path d=\"M44 150q56 14 112 0\" stroke=\"#E8CFC6\" stroke-width=\"5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M100 40q-6-14 6-24q10 8 0 22\" fill=\"#FF9BB8\" stroke=\"#C25A7C\" stroke-width=\"2.5\"/><path d=\"M100 40q8-12 22-8q-4 12-20 10\" fill=\"#FFC2D4\" stroke=\"#C25A7C\" stroke-width=\"2.5\"/><ellipse cx=\"70\" cy=\"66\" rx=\"16\" ry=\"8\" transform=\"rotate(-25 70 66)\" fill=\"#fff\" opacity=\".9\"/><ellipse cx=\"64\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF7FA0\" opacity=\".45\"/><ellipse cx=\"136\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF7FA0\" opacity=\".45\"/><path d=\"M71 98 q9 -10 18 0\" stroke=\"#2B1E16\" stroke-width=\"4.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M111 98 q9 -10 18 0\" stroke=\"#2B1E16\" stroke-width=\"4.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M90 112q10 10 20 0\" stroke=\"#2B1E16\" stroke-width=\"4\" fill=\"none\" stroke-linecap=\"round\"/><ellipse cx=\"38\" cy=\"122\" rx=\"11\" ry=\"15\" transform=\"rotate(25 38 122)\" fill=\"#FFF6F2\" stroke=\"#9C6B5E\" stroke-width=\"3.5\"/><ellipse cx=\"164\" cy=\"84\" rx=\"11\" ry=\"15\" transform=\"rotate(-140 164 84)\" fill=\"#FFF6F2\" stroke=\"#9C6B5E\" stroke-width=\"3.5\"/><circle cx=\"170\" cy=\"66\" r=\"9\" fill=\"#FFF6F2\" stroke=\"#9C6B5E\" stroke-width=\"3.5\"/><circle cx=\"170\" cy=\"66\" r=\"3.5\" fill=\"#fff\" stroke=\"#9C6B5E\" stroke-width=\"2\"/></g><rect x=\"61.5\" y=\"166\" width=\"77\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#9C6B5E\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#3E3550\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">응응!</text></svg>"}, "best": {"name": "최고", "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><linearGradient id=\"G\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#FFFFFF\"/><stop offset=\"1\" stop-color=\"#F6E3DC\"/></linearGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(0) translate(-100 -100)\"><ellipse cx=\"100\" cy=\"192\" rx=\"50\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><rect x=\"24\" y=\"30\" width=\"8\" height=\"14\" rx=\"2\" fill=\"#5AB8FF\" transform=\"rotate(-20 28 37)\"/><rect x=\"168\" y=\"24\" width=\"8\" height=\"14\" rx=\"2\" fill=\"#6DBE45\" transform=\"rotate(25 172 31)\"/><circle cx=\"182\" cy=\"66\" r=\"5\" fill=\"#FF4D6D\"/><circle cx=\"18\" cy=\"76\" r=\"5\" fill=\"#FFD84D\"/><rect x=\"150\" y=\"10\" width=\"7\" height=\"12\" rx=\"2\" fill=\"#FF8FA3\" transform=\"rotate(40 153 16)\"/><path d=\"M100 40C152 40 174 82 174 126C174 158 142 170 100 170C58 170 26 158 26 126C26 82 48 40 100 40Z\" fill=\"url(#G)\" stroke=\"#9C6B5E\" stroke-width=\"4\"/><path d=\"M44 150q56 14 112 0\" stroke=\"#E8CFC6\" stroke-width=\"5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M100 40q-6-14 6-24q10 8 0 22\" fill=\"#FF9BB8\" stroke=\"#C25A7C\" stroke-width=\"2.5\"/><path d=\"M100 40q8-12 22-8q-4 12-20 10\" fill=\"#FFC2D4\" stroke=\"#C25A7C\" stroke-width=\"2.5\"/><ellipse cx=\"70\" cy=\"66\" rx=\"16\" ry=\"8\" transform=\"rotate(-25 70 66)\" fill=\"#fff\" opacity=\".9\"/><ellipse cx=\"64\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF7FA0\" opacity=\".45\"/><ellipse cx=\"136\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF7FA0\" opacity=\".45\"/><path d=\"M80 85l3 8 8 3-8 3-3 8-3-8-8-3 8-3z\" fill=\"#2B1E16\"/><circle cx=\"80\" cy=\"96\" r=\"2\" fill=\"#fff\"/><path d=\"M120 85l3 8 8 3-8 3-3 8-3-8-8-3 8-3z\" fill=\"#2B1E16\"/><circle cx=\"120\" cy=\"96\" r=\"2\" fill=\"#fff\"/><path d=\"M86 110q14 22 28 0z\" fill=\"#2B1E16\" stroke=\"#2B1E16\" stroke-width=\"3\" stroke-linejoin=\"round\"/><path d=\"M93 120q7 6 14 0q-7-5-14 0z\" fill=\"#FF7B7B\"/><ellipse cx=\"30\" cy=\"64\" rx=\"11\" ry=\"15\" transform=\"rotate(160 30 64)\" fill=\"#FFF6F2\" stroke=\"#9C6B5E\" stroke-width=\"3.5\"/><ellipse cx=\"170\" cy=\"64\" rx=\"11\" ry=\"15\" transform=\"rotate(-160 170 64)\" fill=\"#FFF6F2\" stroke=\"#9C6B5E\" stroke-width=\"3.5\"/></g><rect x=\"61.5\" y=\"166\" width=\"77\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#9C6B5E\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#3E3550\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">최고!</text></svg>"}, "sorry": {"name": "미안", "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><linearGradient id=\"G\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#FFFFFF\"/><stop offset=\"1\" stop-color=\"#F6E3DC\"/></linearGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(6) translate(-100 -100)\"><ellipse cx=\"100\" cy=\"192\" rx=\"50\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><path d=\"M156 40q8 12 4 18q-8 2-8-8z\" fill=\"#7CC8FF\" stroke=\"#3B8FD1\" stroke-width=\"2\"/><path d=\"M100 40C152 40 174 82 174 126C174 158 142 170 100 170C58 170 26 158 26 126C26 82 48 40 100 40Z\" fill=\"url(#G)\" stroke=\"#9C6B5E\" stroke-width=\"4\"/><path d=\"M44 150q56 14 112 0\" stroke=\"#E8CFC6\" stroke-width=\"5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M100 40q-6-14 6-24q10 8 0 22\" fill=\"#FF9BB8\" stroke=\"#C25A7C\" stroke-width=\"2.5\"/><path d=\"M100 40q8-12 22-8q-4 12-20 10\" fill=\"#FFC2D4\" stroke=\"#C25A7C\" stroke-width=\"2.5\"/><ellipse cx=\"70\" cy=\"66\" rx=\"16\" ry=\"8\" transform=\"rotate(-25 70 66)\" fill=\"#fff\" opacity=\".9\"/><ellipse cx=\"64\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF7FA0\" opacity=\".45\"/><ellipse cx=\"136\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF7FA0\" opacity=\".45\"/><path d=\"M70 84l18-6M130 84l-18-6\" stroke=\"#2B1E16\" stroke-width=\"4.5\" stroke-linecap=\"round\"/><ellipse cx=\"80\" cy=\"96\" rx=\"7.5\" ry=\"9.0\" fill=\"#2B1E16\"/><circle cx=\"82.5\" cy=\"92.5\" r=\"3.0\" fill=\"#fff\"/><ellipse cx=\"120\" cy=\"96\" rx=\"7.5\" ry=\"9.0\" fill=\"#2B1E16\"/><circle cx=\"122.5\" cy=\"92.5\" r=\"3.0\" fill=\"#fff\"/><path d=\"M86 118q4-5 7 0t7 0 7 0 7 0\" stroke=\"#2B1E16\" stroke-width=\"3.5\" fill=\"none\" stroke-linecap=\"round\"/><ellipse cx=\"88\" cy=\"150\" rx=\"11\" ry=\"15\" transform=\"rotate(40 88 150)\" fill=\"#FFF6F2\" stroke=\"#9C6B5E\" stroke-width=\"3.5\"/><ellipse cx=\"112\" cy=\"150\" rx=\"11\" ry=\"15\" transform=\"rotate(-40 112 150)\" fill=\"#FFF6F2\" stroke=\"#9C6B5E\" stroke-width=\"3.5\"/></g><rect x=\"61.5\" y=\"166\" width=\"77\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#9C6B5E\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#3E3550\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">미안…</text></svg>"}, "cry": {"name": "힝", "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><linearGradient id=\"G\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#FFFFFF\"/><stop offset=\"1\" stop-color=\"#F6E3DC\"/></linearGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(0) translate(-100 -100)\"><ellipse cx=\"100\" cy=\"192\" rx=\"50\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><path d=\"M100 40C152 40 174 82 174 126C174 158 142 170 100 170C58 170 26 158 26 126C26 82 48 40 100 40Z\" fill=\"url(#G)\" stroke=\"#9C6B5E\" stroke-width=\"4\"/><path d=\"M44 150q56 14 112 0\" stroke=\"#E8CFC6\" stroke-width=\"5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M100 40q-6-14 6-24q10 8 0 22\" fill=\"#FF9BB8\" stroke=\"#C25A7C\" stroke-width=\"2.5\"/><path d=\"M100 40q8-12 22-8q-4 12-20 10\" fill=\"#FFC2D4\" stroke=\"#C25A7C\" stroke-width=\"2.5\"/><ellipse cx=\"70\" cy=\"66\" rx=\"16\" ry=\"8\" transform=\"rotate(-25 70 66)\" fill=\"#fff\" opacity=\".9\"/><ellipse cx=\"64\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF7FA0\" opacity=\".45\"/><ellipse cx=\"136\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF7FA0\" opacity=\".45\"/><path d=\"M70 84l18-6M130 84l-18-6\" stroke=\"#2B1E16\" stroke-width=\"4.5\" stroke-linecap=\"round\"/><path d=\"M71 94 q9 8 18 0\" stroke=\"#2B1E16\" stroke-width=\"4.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M111 94 q9 8 18 0\" stroke=\"#2B1E16\" stroke-width=\"4.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M73 100q-2 26 4 40\" stroke=\"#5AB8FF\" stroke-width=\"7\" fill=\"none\" stroke-linecap=\"round\" opacity=\".85\"/><path d=\"M127 100q2 26-4 40\" stroke=\"#5AB8FF\" stroke-width=\"7\" fill=\"none\" stroke-linecap=\"round\" opacity=\".85\"/><path d=\"M90 120q10-10 20 0\" stroke=\"#2B1E16\" stroke-width=\"4\" fill=\"none\" stroke-linecap=\"round\"/><ellipse cx=\"38\" cy=\"122\" rx=\"11\" ry=\"15\" transform=\"rotate(25 38 122)\" fill=\"#FFF6F2\" stroke=\"#9C6B5E\" stroke-width=\"3.5\"/><ellipse cx=\"162\" cy=\"122\" rx=\"11\" ry=\"15\" transform=\"rotate(-25 162 122)\" fill=\"#FFF6F2\" stroke=\"#9C6B5E\" stroke-width=\"3.5\"/></g><rect x=\"80.5\" y=\"166\" width=\"39\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#9C6B5E\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#3E3550\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">힝</text></svg>"}, "wow": {"name": "대박", "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><linearGradient id=\"G\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#FFFFFF\"/><stop offset=\"1\" stop-color=\"#F6E3DC\"/></linearGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(0) translate(-100 -100)\"><ellipse cx=\"100\" cy=\"192\" rx=\"50\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><path d=\"M30 46l14 12M22 74l16 4M178 46l-14 12M186 74l-16 4\" stroke=\"#7A3F12\" stroke-width=\"4\" stroke-linecap=\"round\"/><text x=\"150\" y=\"40\" font-size=\"30\" font-weight=\"900\" fill=\"#E8603C\" font-family=\"sans-serif\">!</text><path d=\"M100 40C152 40 174 82 174 126C174 158 142 170 100 170C58 170 26 158 26 126C26 82 48 40 100 40Z\" fill=\"url(#G)\" stroke=\"#9C6B5E\" stroke-width=\"4\"/><path d=\"M44 150q56 14 112 0\" stroke=\"#E8CFC6\" stroke-width=\"5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M100 40q-6-14 6-24q10 8 0 22\" fill=\"#FF9BB8\" stroke=\"#C25A7C\" stroke-width=\"2.5\"/><path d=\"M100 40q8-12 22-8q-4 12-20 10\" fill=\"#FFC2D4\" stroke=\"#C25A7C\" stroke-width=\"2.5\"/><ellipse cx=\"70\" cy=\"66\" rx=\"16\" ry=\"8\" transform=\"rotate(-25 70 66)\" fill=\"#fff\" opacity=\".9\"/><ellipse cx=\"64\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF7FA0\" opacity=\".45\"/><ellipse cx=\"136\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF7FA0\" opacity=\".45\"/><circle cx=\"80\" cy=\"96\" r=\"12\" fill=\"#fff\" stroke=\"#2B1E16\" stroke-width=\"3\"/><circle cx=\"80\" cy=\"97\" r=\"4.5\" fill=\"#2B1E16\"/><circle cx=\"120\" cy=\"96\" r=\"12\" fill=\"#fff\" stroke=\"#2B1E16\" stroke-width=\"3\"/><circle cx=\"120\" cy=\"97\" r=\"4.5\" fill=\"#2B1E16\"/><ellipse cx=\"100\" cy=\"118\" rx=\"8\" ry=\"10\" fill=\"#2B1E16\"/><ellipse cx=\"30\" cy=\"64\" rx=\"11\" ry=\"15\" transform=\"rotate(160 30 64)\" fill=\"#FFF6F2\" stroke=\"#9C6B5E\" stroke-width=\"3.5\"/><ellipse cx=\"170\" cy=\"64\" rx=\"11\" ry=\"15\" transform=\"rotate(-160 170 64)\" fill=\"#FFF6F2\" stroke=\"#9C6B5E\" stroke-width=\"3.5\"/></g><rect x=\"71.0\" y=\"166\" width=\"58\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#9C6B5E\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#3E3550\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">대박</text></svg>"}, "angry": {"name": "뿌잉", "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><linearGradient id=\"G\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#FFFFFF\"/><stop offset=\"1\" stop-color=\"#F6E3DC\"/></linearGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(-6) translate(-100 -100)\"><ellipse cx=\"100\" cy=\"192\" rx=\"50\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><path d=\"M150 50l6 6m6-12l-6 6m-12-6l6 6m6 6l-6-6\" stroke=\"#E8343C\" stroke-width=\"4\" stroke-linecap=\"round\"/><path d=\"M100 40C152 40 174 82 174 126C174 158 142 170 100 170C58 170 26 158 26 126C26 82 48 40 100 40Z\" fill=\"url(#G)\" stroke=\"#9C6B5E\" stroke-width=\"4\"/><path d=\"M44 150q56 14 112 0\" stroke=\"#E8CFC6\" stroke-width=\"5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M100 40q-6-14 6-24q10 8 0 22\" fill=\"#FF9BB8\" stroke=\"#C25A7C\" stroke-width=\"2.5\"/><path d=\"M100 40q8-12 22-8q-4 12-20 10\" fill=\"#FFC2D4\" stroke=\"#C25A7C\" stroke-width=\"2.5\"/><ellipse cx=\"70\" cy=\"66\" rx=\"16\" ry=\"8\" transform=\"rotate(-25 70 66)\" fill=\"#fff\" opacity=\".9\"/><ellipse cx=\"64\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF7FA0\" opacity=\".45\"/><ellipse cx=\"136\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF7FA0\" opacity=\".45\"/><path d=\"M68 80l20 8M132 80l-20 8\" stroke=\"#2B1E16\" stroke-width=\"5\" stroke-linecap=\"round\"/><ellipse cx=\"80\" cy=\"96\" rx=\"7.5\" ry=\"9.0\" fill=\"#2B1E16\"/><circle cx=\"82.5\" cy=\"92.5\" r=\"3.0\" fill=\"#fff\"/><ellipse cx=\"120\" cy=\"96\" rx=\"7.5\" ry=\"9.0\" fill=\"#2B1E16\"/><circle cx=\"122.5\" cy=\"92.5\" r=\"3.0\" fill=\"#fff\"/><path d=\"M90 120q10-10 20 0\" stroke=\"#2B1E16\" stroke-width=\"4\" fill=\"none\" stroke-linecap=\"round\"/><ellipse cx=\"38\" cy=\"122\" rx=\"11\" ry=\"15\" transform=\"rotate(25 38 122)\" fill=\"#FFF6F2\" stroke=\"#9C6B5E\" stroke-width=\"3.5\"/><ellipse cx=\"162\" cy=\"122\" rx=\"11\" ry=\"15\" transform=\"rotate(-25 162 122)\" fill=\"#FFF6F2\" stroke=\"#9C6B5E\" stroke-width=\"3.5\"/></g><rect x=\"71.0\" y=\"166\" width=\"58\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#9C6B5E\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#3E3550\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">뿌잉</text></svg>"}, "sleepy": {"name": "쿨쿨", "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><linearGradient id=\"G\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#FFFFFF\"/><stop offset=\"1\" stop-color=\"#F6E3DC\"/></linearGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(-10) translate(-100 -100)\"><ellipse cx=\"100\" cy=\"192\" rx=\"50\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><text x=\"140\" y=\"44\" font-size=\"22\" font-weight=\"900\" fill=\"#7A8BD9\" font-family=\"sans-serif\">Z</text><text x=\"160\" y=\"30\" font-size=\"16\" font-weight=\"900\" fill=\"#7A8BD9\" font-family=\"sans-serif\">z</text><text x=\"174\" y=\"18\" font-size=\"12\" font-weight=\"900\" fill=\"#7A8BD9\" font-family=\"sans-serif\">z</text><path d=\"M100 40C152 40 174 82 174 126C174 158 142 170 100 170C58 170 26 158 26 126C26 82 48 40 100 40Z\" fill=\"url(#G)\" stroke=\"#9C6B5E\" stroke-width=\"4\"/><path d=\"M44 150q56 14 112 0\" stroke=\"#E8CFC6\" stroke-width=\"5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M100 40q-6-14 6-24q10 8 0 22\" fill=\"#FF9BB8\" stroke=\"#C25A7C\" stroke-width=\"2.5\"/><path d=\"M100 40q8-12 22-8q-4 12-20 10\" fill=\"#FFC2D4\" stroke=\"#C25A7C\" stroke-width=\"2.5\"/><ellipse cx=\"70\" cy=\"66\" rx=\"16\" ry=\"8\" transform=\"rotate(-25 70 66)\" fill=\"#fff\" opacity=\".9\"/><ellipse cx=\"64\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF7FA0\" opacity=\".45\"/><ellipse cx=\"136\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF7FA0\" opacity=\".45\"/><path d=\"M71 98h18\" stroke=\"#2B1E16\" stroke-width=\"4.5\" stroke-linecap=\"round\"/><path d=\"M111 98h18\" stroke=\"#2B1E16\" stroke-width=\"4.5\" stroke-linecap=\"round\"/><path d=\"M92 114q8 6 16 0\" stroke=\"#2B1E16\" stroke-width=\"3.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M106 117q3 10 0 14q-4-4 0-14z\" fill=\"#9FD8FF\"/><ellipse cx=\"38\" cy=\"122\" rx=\"11\" ry=\"15\" transform=\"rotate(25 38 122)\" fill=\"#FFF6F2\" stroke=\"#9C6B5E\" stroke-width=\"3.5\"/><ellipse cx=\"162\" cy=\"122\" rx=\"11\" ry=\"15\" transform=\"rotate(-25 162 122)\" fill=\"#FFF6F2\" stroke=\"#9C6B5E\" stroke-width=\"3.5\"/></g><rect x=\"71.0\" y=\"166\" width=\"58\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#9C6B5E\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#3E3550\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">쿨쿨</text></svg>"}, "night": {"name": "잘자", "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><linearGradient id=\"G\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#FFFFFF\"/><stop offset=\"1\" stop-color=\"#F6E3DC\"/></linearGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(0) translate(-100 -100)\"><ellipse cx=\"100\" cy=\"192\" rx=\"50\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><path d=\"M180 14a18 18 0 1 0 8 30a14 14 0 1 1 -8 -30z\" fill=\"#FFE27A\" stroke=\"#D9A400\" stroke-width=\"2.5\"/><path d=\"M24 40l2 5 5 2-5 2-2 5-2-5-5-2 5-2z\" fill=\"#FFE27A\"/><path d=\"M100 40C152 40 174 82 174 126C174 158 142 170 100 170C58 170 26 158 26 126C26 82 48 40 100 40Z\" fill=\"url(#G)\" stroke=\"#9C6B5E\" stroke-width=\"4\"/><path d=\"M44 150q56 14 112 0\" stroke=\"#E8CFC6\" stroke-width=\"5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M100 40q-6-14 6-24q10 8 0 22\" fill=\"#FF9BB8\" stroke=\"#C25A7C\" stroke-width=\"2.5\"/><path d=\"M100 40q8-12 22-8q-4 12-20 10\" fill=\"#FFC2D4\" stroke=\"#C25A7C\" stroke-width=\"2.5\"/><ellipse cx=\"70\" cy=\"66\" rx=\"16\" ry=\"8\" transform=\"rotate(-25 70 66)\" fill=\"#fff\" opacity=\".9\"/><ellipse cx=\"64\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF7FA0\" opacity=\".45\"/><ellipse cx=\"136\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF7FA0\" opacity=\".45\"/><path d=\"M71 98 q9 -10 18 0\" stroke=\"#2B1E16\" stroke-width=\"4.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M111 98 q9 -10 18 0\" stroke=\"#2B1E16\" stroke-width=\"4.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M90 112q5 6 10 0q5 6 10 0\" stroke=\"#2B1E16\" stroke-width=\"3.5\" fill=\"none\" stroke-linecap=\"round\"/><ellipse cx=\"88\" cy=\"150\" rx=\"11\" ry=\"15\" transform=\"rotate(40 88 150)\" fill=\"#FFF6F2\" stroke=\"#9C6B5E\" stroke-width=\"3.5\"/><ellipse cx=\"112\" cy=\"150\" rx=\"11\" ry=\"15\" transform=\"rotate(-40 112 150)\" fill=\"#FFF6F2\" stroke=\"#9C6B5E\" stroke-width=\"3.5\"/></g><rect x=\"61.5\" y=\"166\" width=\"77\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#9C6B5E\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#3E3550\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">잘자~</text></svg>"}}},
+  soda: {"name": "소다", "items": {"hi": {"name": "하이", "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><linearGradient id=\"G\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#B8F0FF\"/><stop offset=\"1\" stop-color=\"#3FB2F0\"/></linearGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(-6) translate(-100 -100)\"><ellipse cx=\"100\" cy=\"192\" rx=\"50\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><circle cx=\"34\" cy=\"60\" r=\"6\" fill=\"none\" stroke=\"#3FB2F0\" stroke-width=\"3\"/><circle cx=\"24\" cy=\"36\" r=\"4\" fill=\"none\" stroke=\"#3FB2F0\" stroke-width=\"2.5\"/><circle cx=\"172\" cy=\"48\" r=\"7\" fill=\"none\" stroke=\"#3FB2F0\" stroke-width=\"3\"/><circle cx=\"184\" cy=\"24\" r=\"4\" fill=\"none\" stroke=\"#3FB2F0\" stroke-width=\"2.5\"/><ellipse cx=\"82\" cy=\"178\" rx=\"12\" ry=\"7\" fill=\"#2E9BD8\" stroke=\"#1C5F8A\" stroke-width=\"3\"/><ellipse cx=\"118\" cy=\"178\" rx=\"12\" ry=\"7\" fill=\"#2E9BD8\" stroke=\"#1C5F8A\" stroke-width=\"3\"/><path d=\"M100 20C118 52 166 86 166 124C166 160 136 176 100 176C64 176 34 160 34 124C34 86 82 52 100 20Z\" fill=\"url(#G)\" stroke=\"#1C5F8A\" stroke-width=\"4\" stroke-linejoin=\"round\"/><circle cx=\"140\" cy=\"140\" r=\"6\" fill=\"#fff\" opacity=\".55\"/><circle cx=\"152\" cy=\"122\" r=\"3.5\" fill=\"#fff\" opacity=\".55\"/><circle cx=\"58\" cy=\"146\" r=\"4\" fill=\"#fff\" opacity=\".5\"/><path d=\"M74 70q8-18 20-30\" stroke=\"#fff\" stroke-width=\"8\" fill=\"none\" stroke-linecap=\"round\" opacity=\".75\"/><ellipse cx=\"64\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF6B8B\" opacity=\".45\"/><ellipse cx=\"136\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF6B8B\" opacity=\".45\"/><ellipse cx=\"80\" cy=\"96\" rx=\"7.5\" ry=\"9.0\" fill=\"#2B1E16\"/><circle cx=\"82.5\" cy=\"92.5\" r=\"3.0\" fill=\"#fff\"/><path d=\"M111 98 q9 -10 18 0\" stroke=\"#2B1E16\" stroke-width=\"4.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M86 110q14 22 28 0z\" fill=\"#2B1E16\" stroke=\"#2B1E16\" stroke-width=\"3\" stroke-linejoin=\"round\"/><path d=\"M93 120q7 6 14 0q-7-5-14 0z\" fill=\"#FF7B7B\"/><ellipse cx=\"38\" cy=\"122\" rx=\"11\" ry=\"15\" transform=\"rotate(25 38 122)\" fill=\"#7AD3FA\" stroke=\"#1C5F8A\" stroke-width=\"3.5\"/><ellipse cx=\"166\" cy=\"66\" rx=\"11\" ry=\"15\" transform=\"rotate(-160 166 66)\" fill=\"#7AD3FA\" stroke=\"#1C5F8A\" stroke-width=\"3.5\"/></g><rect x=\"61.5\" y=\"166\" width=\"77\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#1C5F8A\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#3E3550\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">하이!</text></svg>"}, "cool": {"name": "시원", "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><linearGradient id=\"G\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#B8F0FF\"/><stop offset=\"1\" stop-color=\"#3FB2F0\"/></linearGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(0) translate(-100 -100)\"><ellipse cx=\"100\" cy=\"192\" rx=\"50\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><circle cx=\"34\" cy=\"60\" r=\"6\" fill=\"none\" stroke=\"#3FB2F0\" stroke-width=\"3\"/><circle cx=\"24\" cy=\"36\" r=\"4\" fill=\"none\" stroke=\"#3FB2F0\" stroke-width=\"2.5\"/><circle cx=\"172\" cy=\"48\" r=\"7\" fill=\"none\" stroke=\"#3FB2F0\" stroke-width=\"3\"/><circle cx=\"184\" cy=\"24\" r=\"4\" fill=\"none\" stroke=\"#3FB2F0\" stroke-width=\"2.5\"/><ellipse cx=\"82\" cy=\"178\" rx=\"12\" ry=\"7\" fill=\"#2E9BD8\" stroke=\"#1C5F8A\" stroke-width=\"3\"/><ellipse cx=\"118\" cy=\"178\" rx=\"12\" ry=\"7\" fill=\"#2E9BD8\" stroke=\"#1C5F8A\" stroke-width=\"3\"/><path d=\"M100 20C118 52 166 86 166 124C166 160 136 176 100 176C64 176 34 160 34 124C34 86 82 52 100 20Z\" fill=\"url(#G)\" stroke=\"#1C5F8A\" stroke-width=\"4\" stroke-linejoin=\"round\"/><circle cx=\"140\" cy=\"140\" r=\"6\" fill=\"#fff\" opacity=\".55\"/><circle cx=\"152\" cy=\"122\" r=\"3.5\" fill=\"#fff\" opacity=\".55\"/><circle cx=\"58\" cy=\"146\" r=\"4\" fill=\"#fff\" opacity=\".5\"/><path d=\"M74 70q8-18 20-30\" stroke=\"#fff\" stroke-width=\"8\" fill=\"none\" stroke-linecap=\"round\" opacity=\".75\"/><ellipse cx=\"64\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF6B8B\" opacity=\".45\"/><ellipse cx=\"136\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF6B8B\" opacity=\".45\"/><path d=\"M64 88h72v6q0 16-16 16h-6q-12 0-14-12h-0q-2 12-14 12h-6q-16 0-16-16z\" fill=\"#1F2A36\"/><path d=\"M70 92l10 0M110 92l10 0\" stroke=\"#fff\" stroke-width=\"3\" stroke-linecap=\"round\" opacity=\".7\"/><path d=\"M90 112q10 10 20 0\" stroke=\"#2B1E16\" stroke-width=\"4\" fill=\"none\" stroke-linecap=\"round\"/><ellipse cx=\"38\" cy=\"122\" rx=\"11\" ry=\"15\" transform=\"rotate(25 38 122)\" fill=\"#7AD3FA\" stroke=\"#1C5F8A\" stroke-width=\"3.5\"/><ellipse cx=\"164\" cy=\"84\" rx=\"11\" ry=\"15\" transform=\"rotate(-140 164 84)\" fill=\"#7AD3FA\" stroke=\"#1C5F8A\" stroke-width=\"3.5\"/><circle cx=\"170\" cy=\"66\" r=\"9\" fill=\"#7AD3FA\" stroke=\"#1C5F8A\" stroke-width=\"3.5\"/><circle cx=\"170\" cy=\"66\" r=\"3.5\" fill=\"#fff\" stroke=\"#1C5F8A\" stroke-width=\"2\"/></g><rect x=\"61.5\" y=\"166\" width=\"77\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#1C5F8A\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#3E3550\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">시원~</text></svg>"}, "lol": {"name": "ㅋㅋ", "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><linearGradient id=\"G\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#B8F0FF\"/><stop offset=\"1\" stop-color=\"#3FB2F0\"/></linearGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(8) translate(-100 -100)\"><ellipse cx=\"100\" cy=\"192\" rx=\"50\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><path d=\"M60 92q-12 6-10 16q6 4 12-4z\" fill=\"#7CC8FF\"/><path d=\"M140 92q12 6 10 16q-6 4-12-4z\" fill=\"#7CC8FF\"/><text x=\"150\" y=\"34\" font-size=\"22\" font-weight=\"900\" fill=\"#E8603C\" font-family=\"sans-serif\" transform=\"rotate(14 150 34)\">ㅋㅋ</text><text x=\"14\" y=\"44\" font-size=\"18\" font-weight=\"900\" fill=\"#E8603C\" font-family=\"sans-serif\" transform=\"rotate(-14 14 44)\">ㅋ</text><ellipse cx=\"82\" cy=\"178\" rx=\"12\" ry=\"7\" fill=\"#2E9BD8\" stroke=\"#1C5F8A\" stroke-width=\"3\"/><ellipse cx=\"118\" cy=\"178\" rx=\"12\" ry=\"7\" fill=\"#2E9BD8\" stroke=\"#1C5F8A\" stroke-width=\"3\"/><path d=\"M100 20C118 52 166 86 166 124C166 160 136 176 100 176C64 176 34 160 34 124C34 86 82 52 100 20Z\" fill=\"url(#G)\" stroke=\"#1C5F8A\" stroke-width=\"4\" stroke-linejoin=\"round\"/><circle cx=\"140\" cy=\"140\" r=\"6\" fill=\"#fff\" opacity=\".55\"/><circle cx=\"152\" cy=\"122\" r=\"3.5\" fill=\"#fff\" opacity=\".55\"/><circle cx=\"58\" cy=\"146\" r=\"4\" fill=\"#fff\" opacity=\".5\"/><path d=\"M74 70q8-18 20-30\" stroke=\"#fff\" stroke-width=\"8\" fill=\"none\" stroke-linecap=\"round\" opacity=\".75\"/><ellipse cx=\"64\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF6B8B\" opacity=\".45\"/><ellipse cx=\"136\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF6B8B\" opacity=\".45\"/><path d=\"M71 94l10 5-10 5\" stroke=\"#2B1E16\" stroke-width=\"4.5\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M129 94l-10 5 10 5\" stroke=\"#2B1E16\" stroke-width=\"4.5\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M80 108q20 34 40 0z\" fill=\"#2B1E16\" stroke=\"#2B1E16\" stroke-width=\"3\" stroke-linejoin=\"round\"/><path d=\"M90 124q10 8 20 0q-10-7-20 0z\" fill=\"#FF7B7B\"/><ellipse cx=\"62\" cy=\"118\" rx=\"11\" ry=\"15\" transform=\"rotate(-20 62 118)\" fill=\"#7AD3FA\" stroke=\"#1C5F8A\" stroke-width=\"3.5\"/><ellipse cx=\"138\" cy=\"118\" rx=\"11\" ry=\"15\" transform=\"rotate(20 138 118)\" fill=\"#7AD3FA\" stroke=\"#1C5F8A\" stroke-width=\"3.5\"/></g><rect x=\"61.5\" y=\"166\" width=\"77\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#1C5F8A\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#3E3550\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">ㅋㅋㅋ</text></svg>"}, "go": {"name": "가자", "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><linearGradient id=\"G\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#B8F0FF\"/><stop offset=\"1\" stop-color=\"#3FB2F0\"/></linearGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(0) translate(-100 -100)\"><ellipse cx=\"100\" cy=\"192\" rx=\"50\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><path d=\"M184 44q8 10 4 22M190 36q14 16 6 36\" stroke=\"#7A3F12\" stroke-width=\"3\" fill=\"none\" stroke-linecap=\"round\" opacity=\".6\"/><ellipse cx=\"82\" cy=\"178\" rx=\"12\" ry=\"7\" fill=\"#2E9BD8\" stroke=\"#1C5F8A\" stroke-width=\"3\"/><ellipse cx=\"118\" cy=\"178\" rx=\"12\" ry=\"7\" fill=\"#2E9BD8\" stroke=\"#1C5F8A\" stroke-width=\"3\"/><path d=\"M100 20C118 52 166 86 166 124C166 160 136 176 100 176C64 176 34 160 34 124C34 86 82 52 100 20Z\" fill=\"url(#G)\" stroke=\"#1C5F8A\" stroke-width=\"4\" stroke-linejoin=\"round\"/><circle cx=\"140\" cy=\"140\" r=\"6\" fill=\"#fff\" opacity=\".55\"/><circle cx=\"152\" cy=\"122\" r=\"3.5\" fill=\"#fff\" opacity=\".55\"/><circle cx=\"58\" cy=\"146\" r=\"4\" fill=\"#fff\" opacity=\".5\"/><path d=\"M74 70q8-18 20-30\" stroke=\"#fff\" stroke-width=\"8\" fill=\"none\" stroke-linecap=\"round\" opacity=\".75\"/><ellipse cx=\"64\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF6B8B\" opacity=\".45\"/><ellipse cx=\"136\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF6B8B\" opacity=\".45\"/><path d=\"M68 78l20 6M132 78l-20 6\" stroke=\"#2B1E16\" stroke-width=\"5\" stroke-linecap=\"round\"/><ellipse cx=\"80\" cy=\"96\" rx=\"7.5\" ry=\"9.0\" fill=\"#2B1E16\"/><circle cx=\"82.5\" cy=\"92.5\" r=\"3.0\" fill=\"#fff\"/><ellipse cx=\"120\" cy=\"96\" rx=\"7.5\" ry=\"9.0\" fill=\"#2B1E16\"/><circle cx=\"122.5\" cy=\"92.5\" r=\"3.0\" fill=\"#fff\"/><rect x=\"86\" y=\"110\" width=\"28\" height=\"13\" rx=\"5\" fill=\"#fff\" stroke=\"#2B1E16\" stroke-width=\"3.5\"/><path d=\"M95 110v13M105 110v13\" stroke=\"#2B1E16\" stroke-width=\"2.5\"/><ellipse cx=\"38\" cy=\"122\" rx=\"11\" ry=\"15\" transform=\"rotate(25 38 122)\" fill=\"#7AD3FA\" stroke=\"#1C5F8A\" stroke-width=\"3.5\"/><ellipse cx=\"166\" cy=\"66\" rx=\"11\" ry=\"15\" transform=\"rotate(-170 166 66)\" fill=\"#7AD3FA\" stroke=\"#1C5F8A\" stroke-width=\"3.5\"/><circle cx=\"168\" cy=\"48\" r=\"13\" fill=\"#7AD3FA\" stroke=\"#1C5F8A\" stroke-width=\"3.5\"/><path d=\"M160 46h14M161 52h12\" stroke=\"#1C5F8A\" stroke-width=\"2\"/></g><rect x=\"61.5\" y=\"166\" width=\"77\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#1C5F8A\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#3E3550\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">가자!</text></svg>"}, "party": {"name": "축하", "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><linearGradient id=\"G\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#B8F0FF\"/><stop offset=\"1\" stop-color=\"#3FB2F0\"/></linearGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(0) translate(-100 -100)\"><ellipse cx=\"100\" cy=\"192\" rx=\"50\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><rect x=\"24\" y=\"30\" width=\"8\" height=\"14\" rx=\"2\" fill=\"#5AB8FF\" transform=\"rotate(-20 28 37)\"/><rect x=\"168\" y=\"24\" width=\"8\" height=\"14\" rx=\"2\" fill=\"#6DBE45\" transform=\"rotate(25 172 31)\"/><circle cx=\"182\" cy=\"66\" r=\"5\" fill=\"#FF4D6D\"/><circle cx=\"18\" cy=\"76\" r=\"5\" fill=\"#FFD84D\"/><rect x=\"150\" y=\"10\" width=\"7\" height=\"12\" rx=\"2\" fill=\"#FF8FA3\" transform=\"rotate(40 153 16)\"/><ellipse cx=\"82\" cy=\"178\" rx=\"12\" ry=\"7\" fill=\"#2E9BD8\" stroke=\"#1C5F8A\" stroke-width=\"3\"/><ellipse cx=\"118\" cy=\"178\" rx=\"12\" ry=\"7\" fill=\"#2E9BD8\" stroke=\"#1C5F8A\" stroke-width=\"3\"/><path d=\"M100 20C118 52 166 86 166 124C166 160 136 176 100 176C64 176 34 160 34 124C34 86 82 52 100 20Z\" fill=\"url(#G)\" stroke=\"#1C5F8A\" stroke-width=\"4\" stroke-linejoin=\"round\"/><circle cx=\"140\" cy=\"140\" r=\"6\" fill=\"#fff\" opacity=\".55\"/><circle cx=\"152\" cy=\"122\" r=\"3.5\" fill=\"#fff\" opacity=\".55\"/><circle cx=\"58\" cy=\"146\" r=\"4\" fill=\"#fff\" opacity=\".5\"/><path d=\"M74 70q8-18 20-30\" stroke=\"#fff\" stroke-width=\"8\" fill=\"none\" stroke-linecap=\"round\" opacity=\".75\"/><ellipse cx=\"64\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF6B8B\" opacity=\".45\"/><ellipse cx=\"136\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF6B8B\" opacity=\".45\"/><path d=\"M71 98 q9 -10 18 0\" stroke=\"#2B1E16\" stroke-width=\"4.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M111 98 q9 -10 18 0\" stroke=\"#2B1E16\" stroke-width=\"4.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M86 110q14 22 28 0z\" fill=\"#2B1E16\" stroke=\"#2B1E16\" stroke-width=\"3\" stroke-linejoin=\"round\"/><path d=\"M93 120q7 6 14 0q-7-5-14 0z\" fill=\"#FF7B7B\"/><path d=\"M100 2l22 44h-44z\" fill=\"#FF6FA0\" stroke=\"#7A2F4A\" stroke-width=\"3\" stroke-linejoin=\"round\"/><path d=\"M90 26l20 0M84 38l32 0\" stroke=\"#FFE066\" stroke-width=\"4\"/><circle cx=\"100\" cy=\"4\" r=\"6\" fill=\"#FFE066\" stroke=\"#7A2F4A\" stroke-width=\"2.5\"/><ellipse cx=\"30\" cy=\"64\" rx=\"11\" ry=\"15\" transform=\"rotate(160 30 64)\" fill=\"#7AD3FA\" stroke=\"#1C5F8A\" stroke-width=\"3.5\"/><ellipse cx=\"170\" cy=\"64\" rx=\"11\" ry=\"15\" transform=\"rotate(-160 170 64)\" fill=\"#7AD3FA\" stroke=\"#1C5F8A\" stroke-width=\"3.5\"/></g><rect x=\"61.5\" y=\"166\" width=\"77\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#1C5F8A\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#3E3550\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">축하해</text></svg>"}, "thanks": {"name": "땡큐", "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><linearGradient id=\"G\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#B8F0FF\"/><stop offset=\"1\" stop-color=\"#3FB2F0\"/></linearGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(-10) translate(-100 -100)\"><ellipse cx=\"100\" cy=\"192\" rx=\"50\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><path d=\"M172 40c-6-6-16 0-10 8l10 10 10-10c6-8-4-14-10-8z\" fill=\"#FF4D6D\"/><path d=\"M28 60c-4-4-11 0-7 5l7 7 7-7c4-5-3-9-7-5z\" fill=\"#FF8FA3\"/><ellipse cx=\"82\" cy=\"178\" rx=\"12\" ry=\"7\" fill=\"#2E9BD8\" stroke=\"#1C5F8A\" stroke-width=\"3\"/><ellipse cx=\"118\" cy=\"178\" rx=\"12\" ry=\"7\" fill=\"#2E9BD8\" stroke=\"#1C5F8A\" stroke-width=\"3\"/><path d=\"M100 20C118 52 166 86 166 124C166 160 136 176 100 176C64 176 34 160 34 124C34 86 82 52 100 20Z\" fill=\"url(#G)\" stroke=\"#1C5F8A\" stroke-width=\"4\" stroke-linejoin=\"round\"/><circle cx=\"140\" cy=\"140\" r=\"6\" fill=\"#fff\" opacity=\".55\"/><circle cx=\"152\" cy=\"122\" r=\"3.5\" fill=\"#fff\" opacity=\".55\"/><circle cx=\"58\" cy=\"146\" r=\"4\" fill=\"#fff\" opacity=\".5\"/><path d=\"M74 70q8-18 20-30\" stroke=\"#fff\" stroke-width=\"8\" fill=\"none\" stroke-linecap=\"round\" opacity=\".75\"/><ellipse cx=\"64\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF6B8B\" opacity=\".45\"/><ellipse cx=\"136\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF6B8B\" opacity=\".45\"/><path d=\"M71 98 q9 -10 18 0\" stroke=\"#2B1E16\" stroke-width=\"4.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M111 98 q9 -10 18 0\" stroke=\"#2B1E16\" stroke-width=\"4.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M90 112q5 6 10 0q5 6 10 0\" stroke=\"#2B1E16\" stroke-width=\"3.5\" fill=\"none\" stroke-linecap=\"round\"/><ellipse cx=\"88\" cy=\"150\" rx=\"11\" ry=\"15\" transform=\"rotate(40 88 150)\" fill=\"#7AD3FA\" stroke=\"#1C5F8A\" stroke-width=\"3.5\"/><ellipse cx=\"112\" cy=\"150\" rx=\"11\" ry=\"15\" transform=\"rotate(-40 112 150)\" fill=\"#7AD3FA\" stroke=\"#1C5F8A\" stroke-width=\"3.5\"/></g><rect x=\"71.0\" y=\"166\" width=\"58\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#1C5F8A\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#3E3550\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">땡큐</text></svg>"}, "love": {"name": "러브", "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><linearGradient id=\"G\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#B8F0FF\"/><stop offset=\"1\" stop-color=\"#3FB2F0\"/></linearGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(0) translate(-100 -100)\"><ellipse cx=\"100\" cy=\"192\" rx=\"50\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><ellipse cx=\"82\" cy=\"178\" rx=\"12\" ry=\"7\" fill=\"#2E9BD8\" stroke=\"#1C5F8A\" stroke-width=\"3\"/><ellipse cx=\"118\" cy=\"178\" rx=\"12\" ry=\"7\" fill=\"#2E9BD8\" stroke=\"#1C5F8A\" stroke-width=\"3\"/><path d=\"M100 20C118 52 166 86 166 124C166 160 136 176 100 176C64 176 34 160 34 124C34 86 82 52 100 20Z\" fill=\"url(#G)\" stroke=\"#1C5F8A\" stroke-width=\"4\" stroke-linejoin=\"round\"/><circle cx=\"140\" cy=\"140\" r=\"6\" fill=\"#fff\" opacity=\".55\"/><circle cx=\"152\" cy=\"122\" r=\"3.5\" fill=\"#fff\" opacity=\".55\"/><circle cx=\"58\" cy=\"146\" r=\"4\" fill=\"#fff\" opacity=\".5\"/><path d=\"M74 70q8-18 20-30\" stroke=\"#fff\" stroke-width=\"8\" fill=\"none\" stroke-linecap=\"round\" opacity=\".75\"/><ellipse cx=\"64\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF6B8B\" opacity=\".45\"/><ellipse cx=\"136\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF6B8B\" opacity=\".45\"/><path d=\"M80 105 C66 95 71 83 80 91 C89 83 94 95 80 105z\" fill=\"#FF4D6D\" stroke=\"#B3123A\" stroke-width=\"2\"/><path d=\"M120 105 C106 95 111 83 120 91 C129 83 134 95 120 105z\" fill=\"#FF4D6D\" stroke=\"#B3123A\" stroke-width=\"2\"/><path d=\"M86 110q14 22 28 0z\" fill=\"#2B1E16\" stroke=\"#2B1E16\" stroke-width=\"3\" stroke-linejoin=\"round\"/><path d=\"M93 120q7 6 14 0q-7-5-14 0z\" fill=\"#FF7B7B\"/><path d=\"M100 176c-24-14-36-26-36-40 0-11 9-18 19-18 8 0 14 5 17 11 3-6 9-11 17-11 10 0 19 7 19 18 0 14-12 26-36 40z\" fill=\"#FF4D6D\" stroke=\"#B3123A\" stroke-width=\"3.5\"/><ellipse cx=\"84\" cy=\"132\" rx=\"6\" ry=\"4\" fill=\"#fff\" opacity=\".6\" transform=\"rotate(-30 84 132)\"/><ellipse cx=\"58\" cy=\"146\" rx=\"11\" ry=\"15\" transform=\"rotate(50 58 146)\" fill=\"#7AD3FA\" stroke=\"#1C5F8A\" stroke-width=\"3.5\"/><ellipse cx=\"142\" cy=\"146\" rx=\"11\" ry=\"15\" transform=\"rotate(-50 142 146)\" fill=\"#7AD3FA\" stroke=\"#1C5F8A\" stroke-width=\"3.5\"/></g><rect x=\"71.0\" y=\"166\" width=\"58\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#1C5F8A\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#3E3550\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">러브</text></svg>"}, "wow": {"name": "헉", "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><linearGradient id=\"G\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#B8F0FF\"/><stop offset=\"1\" stop-color=\"#3FB2F0\"/></linearGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(0) translate(-100 -100)\"><ellipse cx=\"100\" cy=\"192\" rx=\"50\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><path d=\"M30 46l14 12M22 74l16 4M178 46l-14 12M186 74l-16 4\" stroke=\"#7A3F12\" stroke-width=\"4\" stroke-linecap=\"round\"/><text x=\"150\" y=\"40\" font-size=\"30\" font-weight=\"900\" fill=\"#E8603C\" font-family=\"sans-serif\">!</text><ellipse cx=\"82\" cy=\"178\" rx=\"12\" ry=\"7\" fill=\"#2E9BD8\" stroke=\"#1C5F8A\" stroke-width=\"3\"/><ellipse cx=\"118\" cy=\"178\" rx=\"12\" ry=\"7\" fill=\"#2E9BD8\" stroke=\"#1C5F8A\" stroke-width=\"3\"/><path d=\"M100 20C118 52 166 86 166 124C166 160 136 176 100 176C64 176 34 160 34 124C34 86 82 52 100 20Z\" fill=\"url(#G)\" stroke=\"#1C5F8A\" stroke-width=\"4\" stroke-linejoin=\"round\"/><circle cx=\"140\" cy=\"140\" r=\"6\" fill=\"#fff\" opacity=\".55\"/><circle cx=\"152\" cy=\"122\" r=\"3.5\" fill=\"#fff\" opacity=\".55\"/><circle cx=\"58\" cy=\"146\" r=\"4\" fill=\"#fff\" opacity=\".5\"/><path d=\"M74 70q8-18 20-30\" stroke=\"#fff\" stroke-width=\"8\" fill=\"none\" stroke-linecap=\"round\" opacity=\".75\"/><ellipse cx=\"64\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF6B8B\" opacity=\".45\"/><ellipse cx=\"136\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF6B8B\" opacity=\".45\"/><circle cx=\"80\" cy=\"96\" r=\"12\" fill=\"#fff\" stroke=\"#2B1E16\" stroke-width=\"3\"/><circle cx=\"80\" cy=\"97\" r=\"4.5\" fill=\"#2B1E16\"/><circle cx=\"120\" cy=\"96\" r=\"12\" fill=\"#fff\" stroke=\"#2B1E16\" stroke-width=\"3\"/><circle cx=\"120\" cy=\"97\" r=\"4.5\" fill=\"#2B1E16\"/><ellipse cx=\"100\" cy=\"118\" rx=\"8\" ry=\"10\" fill=\"#2B1E16\"/><ellipse cx=\"30\" cy=\"64\" rx=\"11\" ry=\"15\" transform=\"rotate(160 30 64)\" fill=\"#7AD3FA\" stroke=\"#1C5F8A\" stroke-width=\"3.5\"/><ellipse cx=\"170\" cy=\"64\" rx=\"11\" ry=\"15\" transform=\"rotate(-160 170 64)\" fill=\"#7AD3FA\" stroke=\"#1C5F8A\" stroke-width=\"3.5\"/></g><rect x=\"71.0\" y=\"166\" width=\"58\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#1C5F8A\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#3E3550\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">헉!</text></svg>"}, "angry": {"name": "부글", "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><linearGradient id=\"G\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#B8F0FF\"/><stop offset=\"1\" stop-color=\"#3FB2F0\"/></linearGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(0) translate(-100 -100)\"><ellipse cx=\"100\" cy=\"192\" rx=\"50\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><path d=\"M40 40q-10-8 0-16q10-8 0-16\" stroke=\"#C9C9C9\" stroke-width=\"6\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M160 40q10-8 0-16q-10-8 0-16\" stroke=\"#C9C9C9\" stroke-width=\"6\" fill=\"none\" stroke-linecap=\"round\"/><ellipse cx=\"82\" cy=\"178\" rx=\"12\" ry=\"7\" fill=\"#2E9BD8\" stroke=\"#1C5F8A\" stroke-width=\"3\"/><ellipse cx=\"118\" cy=\"178\" rx=\"12\" ry=\"7\" fill=\"#2E9BD8\" stroke=\"#1C5F8A\" stroke-width=\"3\"/><path d=\"M100 20C118 52 166 86 166 124C166 160 136 176 100 176C64 176 34 160 34 124C34 86 82 52 100 20Z\" fill=\"url(#G)\" stroke=\"#1C5F8A\" stroke-width=\"4\" stroke-linejoin=\"round\"/><circle cx=\"140\" cy=\"140\" r=\"6\" fill=\"#fff\" opacity=\".55\"/><circle cx=\"152\" cy=\"122\" r=\"3.5\" fill=\"#fff\" opacity=\".55\"/><circle cx=\"58\" cy=\"146\" r=\"4\" fill=\"#fff\" opacity=\".5\"/><path d=\"M74 70q8-18 20-30\" stroke=\"#fff\" stroke-width=\"8\" fill=\"none\" stroke-linecap=\"round\" opacity=\".75\"/><ellipse cx=\"64\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF6B8B\" opacity=\".45\"/><ellipse cx=\"136\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF6B8B\" opacity=\".45\"/><path d=\"M68 80l20 8M132 80l-20 8\" stroke=\"#2B1E16\" stroke-width=\"5\" stroke-linecap=\"round\"/><ellipse cx=\"80\" cy=\"96\" rx=\"7.5\" ry=\"9.0\" fill=\"#2B1E16\"/><circle cx=\"82.5\" cy=\"92.5\" r=\"3.0\" fill=\"#fff\"/><ellipse cx=\"120\" cy=\"96\" rx=\"7.5\" ry=\"9.0\" fill=\"#2B1E16\"/><circle cx=\"122.5\" cy=\"92.5\" r=\"3.0\" fill=\"#fff\"/><rect x=\"86\" y=\"110\" width=\"28\" height=\"13\" rx=\"5\" fill=\"#fff\" stroke=\"#2B1E16\" stroke-width=\"3.5\"/><path d=\"M95 110v13M105 110v13\" stroke=\"#2B1E16\" stroke-width=\"2.5\"/><ellipse cx=\"38\" cy=\"122\" rx=\"11\" ry=\"15\" transform=\"rotate(25 38 122)\" fill=\"#7AD3FA\" stroke=\"#1C5F8A\" stroke-width=\"3.5\"/><ellipse cx=\"162\" cy=\"122\" rx=\"11\" ry=\"15\" transform=\"rotate(-25 162 122)\" fill=\"#7AD3FA\" stroke=\"#1C5F8A\" stroke-width=\"3.5\"/></g><rect x=\"52.0\" y=\"166\" width=\"96\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#1C5F8A\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#3E3550\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">부글부글</text></svg>"}, "sad": {"name": "흑흑", "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><linearGradient id=\"G\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#B8F0FF\"/><stop offset=\"1\" stop-color=\"#3FB2F0\"/></linearGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(0) translate(-100 -100)\"><ellipse cx=\"100\" cy=\"192\" rx=\"50\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><ellipse cx=\"100\" cy=\"186\" rx=\"60\" ry=\"8\" fill=\"#7CC8FF\" opacity=\".55\"/><ellipse cx=\"82\" cy=\"178\" rx=\"12\" ry=\"7\" fill=\"#2E9BD8\" stroke=\"#1C5F8A\" stroke-width=\"3\"/><ellipse cx=\"118\" cy=\"178\" rx=\"12\" ry=\"7\" fill=\"#2E9BD8\" stroke=\"#1C5F8A\" stroke-width=\"3\"/><path d=\"M100 20C118 52 166 86 166 124C166 160 136 176 100 176C64 176 34 160 34 124C34 86 82 52 100 20Z\" fill=\"url(#G)\" stroke=\"#1C5F8A\" stroke-width=\"4\" stroke-linejoin=\"round\"/><circle cx=\"140\" cy=\"140\" r=\"6\" fill=\"#fff\" opacity=\".55\"/><circle cx=\"152\" cy=\"122\" r=\"3.5\" fill=\"#fff\" opacity=\".55\"/><circle cx=\"58\" cy=\"146\" r=\"4\" fill=\"#fff\" opacity=\".5\"/><path d=\"M74 70q8-18 20-30\" stroke=\"#fff\" stroke-width=\"8\" fill=\"none\" stroke-linecap=\"round\" opacity=\".75\"/><ellipse cx=\"64\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF6B8B\" opacity=\".45\"/><ellipse cx=\"136\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF6B8B\" opacity=\".45\"/><path d=\"M70 84l18-6M130 84l-18-6\" stroke=\"#2B1E16\" stroke-width=\"4.5\" stroke-linecap=\"round\"/><path d=\"M71 94 q9 8 18 0\" stroke=\"#2B1E16\" stroke-width=\"4.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M111 94 q9 8 18 0\" stroke=\"#2B1E16\" stroke-width=\"4.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M73 100q-2 26 4 40\" stroke=\"#5AB8FF\" stroke-width=\"7\" fill=\"none\" stroke-linecap=\"round\" opacity=\".85\"/><path d=\"M127 100q2 26-4 40\" stroke=\"#5AB8FF\" stroke-width=\"7\" fill=\"none\" stroke-linecap=\"round\" opacity=\".85\"/><path d=\"M86 118q4-5 7 0t7 0 7 0 7 0\" stroke=\"#2B1E16\" stroke-width=\"3.5\" fill=\"none\" stroke-linecap=\"round\"/><ellipse cx=\"38\" cy=\"122\" rx=\"11\" ry=\"15\" transform=\"rotate(25 38 122)\" fill=\"#7AD3FA\" stroke=\"#1C5F8A\" stroke-width=\"3.5\"/><ellipse cx=\"162\" cy=\"122\" rx=\"11\" ry=\"15\" transform=\"rotate(-25 162 122)\" fill=\"#7AD3FA\" stroke=\"#1C5F8A\" stroke-width=\"3.5\"/></g><rect x=\"71.0\" y=\"166\" width=\"58\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#1C5F8A\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#3E3550\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">흑흑</text></svg>"}, "what": {"name": "뭐야", "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><linearGradient id=\"G\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#B8F0FF\"/><stop offset=\"1\" stop-color=\"#3FB2F0\"/></linearGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(10) translate(-100 -100)\"><ellipse cx=\"100\" cy=\"192\" rx=\"50\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><text x=\"150\" y=\"48\" font-size=\"38\" font-weight=\"900\" fill=\"#5A7BD9\" font-family=\"sans-serif\">?</text><ellipse cx=\"82\" cy=\"178\" rx=\"12\" ry=\"7\" fill=\"#2E9BD8\" stroke=\"#1C5F8A\" stroke-width=\"3\"/><ellipse cx=\"118\" cy=\"178\" rx=\"12\" ry=\"7\" fill=\"#2E9BD8\" stroke=\"#1C5F8A\" stroke-width=\"3\"/><path d=\"M100 20C118 52 166 86 166 124C166 160 136 176 100 176C64 176 34 160 34 124C34 86 82 52 100 20Z\" fill=\"url(#G)\" stroke=\"#1C5F8A\" stroke-width=\"4\" stroke-linejoin=\"round\"/><circle cx=\"140\" cy=\"140\" r=\"6\" fill=\"#fff\" opacity=\".55\"/><circle cx=\"152\" cy=\"122\" r=\"3.5\" fill=\"#fff\" opacity=\".55\"/><circle cx=\"58\" cy=\"146\" r=\"4\" fill=\"#fff\" opacity=\".5\"/><path d=\"M74 70q8-18 20-30\" stroke=\"#fff\" stroke-width=\"8\" fill=\"none\" stroke-linecap=\"round\" opacity=\".75\"/><ellipse cx=\"64\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF6B8B\" opacity=\".45\"/><ellipse cx=\"136\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF6B8B\" opacity=\".45\"/><path d=\"M70 82q10-8 20-2\" stroke=\"#2B1E16\" stroke-width=\"4.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M110 84h20\" stroke=\"#2B1E16\" stroke-width=\"4.5\" stroke-linecap=\"round\"/><ellipse cx=\"80\" cy=\"96\" rx=\"7.5\" ry=\"9.0\" fill=\"#2B1E16\"/><circle cx=\"82.5\" cy=\"92.5\" r=\"3.0\" fill=\"#fff\"/><ellipse cx=\"120\" cy=\"96\" rx=\"7.5\" ry=\"9.0\" fill=\"#2B1E16\"/><circle cx=\"122.5\" cy=\"92.5\" r=\"3.0\" fill=\"#fff\"/><path d=\"M93 116h14\" stroke=\"#2B1E16\" stroke-width=\"4\" stroke-linecap=\"round\"/><ellipse cx=\"38\" cy=\"122\" rx=\"11\" ry=\"15\" transform=\"rotate(25 38 122)\" fill=\"#7AD3FA\" stroke=\"#1C5F8A\" stroke-width=\"3.5\"/><ellipse cx=\"132\" cy=\"130\" rx=\"11\" ry=\"15\" transform=\"rotate(-50 132 130)\" fill=\"#7AD3FA\" stroke=\"#1C5F8A\" stroke-width=\"3.5\"/></g><rect x=\"61.5\" y=\"166\" width=\"77\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#1C5F8A\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#3E3550\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">뭐야?</text></svg>"}, "dizzy": {"name": "어질", "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><linearGradient id=\"G\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#B8F0FF\"/><stop offset=\"1\" stop-color=\"#3FB2F0\"/></linearGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(-8) translate(-100 -100)\"><ellipse cx=\"100\" cy=\"192\" rx=\"50\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><path d=\"M156 40q8 12 4 18q-8 2-8-8z\" fill=\"#7CC8FF\" stroke=\"#3B8FD1\" stroke-width=\"2\"/><ellipse cx=\"82\" cy=\"178\" rx=\"12\" ry=\"7\" fill=\"#2E9BD8\" stroke=\"#1C5F8A\" stroke-width=\"3\"/><ellipse cx=\"118\" cy=\"178\" rx=\"12\" ry=\"7\" fill=\"#2E9BD8\" stroke=\"#1C5F8A\" stroke-width=\"3\"/><path d=\"M100 20C118 52 166 86 166 124C166 160 136 176 100 176C64 176 34 160 34 124C34 86 82 52 100 20Z\" fill=\"url(#G)\" stroke=\"#1C5F8A\" stroke-width=\"4\" stroke-linejoin=\"round\"/><circle cx=\"140\" cy=\"140\" r=\"6\" fill=\"#fff\" opacity=\".55\"/><circle cx=\"152\" cy=\"122\" r=\"3.5\" fill=\"#fff\" opacity=\".55\"/><circle cx=\"58\" cy=\"146\" r=\"4\" fill=\"#fff\" opacity=\".5\"/><path d=\"M74 70q8-18 20-30\" stroke=\"#fff\" stroke-width=\"8\" fill=\"none\" stroke-linecap=\"round\" opacity=\".75\"/><ellipse cx=\"64\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF6B8B\" opacity=\".45\"/><ellipse cx=\"136\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF6B8B\" opacity=\".45\"/><path d=\"M80 96m-8 0a8 8 0 1 1 8 8a5 5 0 1 1 -5 -5\" stroke=\"#2B1E16\" stroke-width=\"3.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M120 96m-8 0a8 8 0 1 1 8 8a5 5 0 1 1 -5 -5\" stroke=\"#2B1E16\" stroke-width=\"3.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M86 118q4-5 7 0t7 0 7 0 7 0\" stroke=\"#2B1E16\" stroke-width=\"3.5\" fill=\"none\" stroke-linecap=\"round\"/><ellipse cx=\"38\" cy=\"122\" rx=\"11\" ry=\"15\" transform=\"rotate(25 38 122)\" fill=\"#7AD3FA\" stroke=\"#1C5F8A\" stroke-width=\"3.5\"/><ellipse cx=\"162\" cy=\"122\" rx=\"11\" ry=\"15\" transform=\"rotate(-25 162 122)\" fill=\"#7AD3FA\" stroke=\"#1C5F8A\" stroke-width=\"3.5\"/></g><rect x=\"61.5\" y=\"166\" width=\"77\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#1C5F8A\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#3E3550\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">어질…</text></svg>"}}},
+  mungge: {"name": "뭉게", "items": {"hi": {"name": "안뇽", "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><linearGradient id=\"G\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#FFFFFF\"/><stop offset=\"1\" stop-color=\"#D9D2F7\"/></linearGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(-6) translate(-100 -100)\"><ellipse cx=\"100\" cy=\"192\" rx=\"50\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><path d=\"M176 30l4 10 10 4-10 4-4 10-4-10-10-4 10-4z\" fill=\"#FFD84D\"/><path d=\"M22 52l3 7 7 3-7 3-3 7-3-7-7-3 7-3z\" fill=\"#FFD84D\"/><circle cx=\"58\" cy=\"112\" r=\"34\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"100\" cy=\"78\" r=\"42\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"144\" cy=\"110\" r=\"34\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"78\" cy=\"142\" r=\"30\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"124\" cy=\"142\" r=\"30\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"100\" cy=\"122\" r=\"44\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"70\" cy=\"82\" r=\"24\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"132\" cy=\"84\" r=\"24\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"58\" cy=\"112\" r=\"34\" fill=\"url(#G)\"/><circle cx=\"100\" cy=\"78\" r=\"42\" fill=\"url(#G)\"/><circle cx=\"144\" cy=\"110\" r=\"34\" fill=\"url(#G)\"/><circle cx=\"78\" cy=\"142\" r=\"30\" fill=\"url(#G)\"/><circle cx=\"124\" cy=\"142\" r=\"30\" fill=\"url(#G)\"/><circle cx=\"100\" cy=\"122\" r=\"44\" fill=\"url(#G)\"/><circle cx=\"70\" cy=\"82\" r=\"24\" fill=\"url(#G)\"/><circle cx=\"132\" cy=\"84\" r=\"24\" fill=\"url(#G)\"/><ellipse cx=\"78\" cy=\"62\" rx=\"14\" ry=\"7\" transform=\"rotate(-20 78 62)\" fill=\"#fff\" opacity=\".9\"/><ellipse cx=\"64\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF8FB0\" opacity=\".45\"/><ellipse cx=\"136\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF8FB0\" opacity=\".45\"/><path d=\"M71 98 q9 -10 18 0\" stroke=\"#2B1E16\" stroke-width=\"4.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M111 98 q9 -10 18 0\" stroke=\"#2B1E16\" stroke-width=\"4.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M86 110q14 22 28 0z\" fill=\"#2B1E16\" stroke=\"#2B1E16\" stroke-width=\"3\" stroke-linejoin=\"round\"/><path d=\"M93 120q7 6 14 0q-7-5-14 0z\" fill=\"#FF7B7B\"/><ellipse cx=\"38\" cy=\"122\" rx=\"11\" ry=\"15\" transform=\"rotate(25 38 122)\" fill=\"#EEEAFE\" stroke=\"#6A5BA8\" stroke-width=\"3.5\"/><ellipse cx=\"166\" cy=\"66\" rx=\"11\" ry=\"15\" transform=\"rotate(-160 166 66)\" fill=\"#EEEAFE\" stroke=\"#6A5BA8\" stroke-width=\"3.5\"/></g><rect x=\"71.0\" y=\"166\" width=\"58\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#6A5BA8\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#3E3550\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">안뇽</text></svg>"}, "cozy": {"name": "포근", "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><linearGradient id=\"G\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#FFFFFF\"/><stop offset=\"1\" stop-color=\"#D9D2F7\"/></linearGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(0) translate(-100 -100)\"><ellipse cx=\"100\" cy=\"192\" rx=\"50\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><circle cx=\"58\" cy=\"112\" r=\"34\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"100\" cy=\"78\" r=\"42\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"144\" cy=\"110\" r=\"34\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"78\" cy=\"142\" r=\"30\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"124\" cy=\"142\" r=\"30\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"100\" cy=\"122\" r=\"44\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"70\" cy=\"82\" r=\"24\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"132\" cy=\"84\" r=\"24\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"58\" cy=\"112\" r=\"34\" fill=\"url(#G)\"/><circle cx=\"100\" cy=\"78\" r=\"42\" fill=\"url(#G)\"/><circle cx=\"144\" cy=\"110\" r=\"34\" fill=\"url(#G)\"/><circle cx=\"78\" cy=\"142\" r=\"30\" fill=\"url(#G)\"/><circle cx=\"124\" cy=\"142\" r=\"30\" fill=\"url(#G)\"/><circle cx=\"100\" cy=\"122\" r=\"44\" fill=\"url(#G)\"/><circle cx=\"70\" cy=\"82\" r=\"24\" fill=\"url(#G)\"/><circle cx=\"132\" cy=\"84\" r=\"24\" fill=\"url(#G)\"/><ellipse cx=\"78\" cy=\"62\" rx=\"14\" ry=\"7\" transform=\"rotate(-20 78 62)\" fill=\"#fff\" opacity=\".9\"/><ellipse cx=\"64\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF8FB0\" opacity=\".45\"/><ellipse cx=\"136\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF8FB0\" opacity=\".45\"/><path d=\"M71 98 q9 -10 18 0\" stroke=\"#2B1E16\" stroke-width=\"4.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M111 98 q9 -10 18 0\" stroke=\"#2B1E16\" stroke-width=\"4.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M90 112q5 6 10 0q5 6 10 0\" stroke=\"#2B1E16\" stroke-width=\"3.5\" fill=\"none\" stroke-linecap=\"round\"/><ellipse cx=\"66\" cy=\"114\" rx=\"14\" ry=\"8\" fill=\"#FF5E7E\" opacity=\".55\"/><ellipse cx=\"134\" cy=\"114\" rx=\"14\" ry=\"8\" fill=\"#FF5E7E\" opacity=\".55\"/><path d=\"M58 112l6-4M64 116l6-4M136 112l6-4M142 116l6-4\" stroke=\"#E0436A\" stroke-width=\"2\" stroke-linecap=\"round\"/><ellipse cx=\"58\" cy=\"146\" rx=\"11\" ry=\"15\" transform=\"rotate(50 58 146)\" fill=\"#EEEAFE\" stroke=\"#6A5BA8\" stroke-width=\"3.5\"/><ellipse cx=\"142\" cy=\"146\" rx=\"11\" ry=\"15\" transform=\"rotate(-50 142 146)\" fill=\"#EEEAFE\" stroke=\"#6A5BA8\" stroke-width=\"3.5\"/></g><rect x=\"61.5\" y=\"166\" width=\"77\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#6A5BA8\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#3E3550\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">포근~</text></svg>"}, "sunny": {"name": "맑음", "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><linearGradient id=\"G\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#FFFFFF\"/><stop offset=\"1\" stop-color=\"#D9D2F7\"/></linearGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(0) translate(-100 -100)\"><ellipse cx=\"100\" cy=\"192\" rx=\"50\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><path d=\"M176 30m0 -24v8\" stroke=\"#FFB800\" stroke-width=\"4\" stroke-linecap=\"round\" transform=\"rotate(0 176 30)\"/><path d=\"M176 30m0 -24v8\" stroke=\"#FFB800\" stroke-width=\"4\" stroke-linecap=\"round\" transform=\"rotate(45 176 30)\"/><path d=\"M176 30m0 -24v8\" stroke=\"#FFB800\" stroke-width=\"4\" stroke-linecap=\"round\" transform=\"rotate(90 176 30)\"/><path d=\"M176 30m0 -24v8\" stroke=\"#FFB800\" stroke-width=\"4\" stroke-linecap=\"round\" transform=\"rotate(135 176 30)\"/><path d=\"M176 30m0 -24v8\" stroke=\"#FFB800\" stroke-width=\"4\" stroke-linecap=\"round\" transform=\"rotate(180 176 30)\"/><path d=\"M176 30m0 -24v8\" stroke=\"#FFB800\" stroke-width=\"4\" stroke-linecap=\"round\" transform=\"rotate(225 176 30)\"/><path d=\"M176 30m0 -24v8\" stroke=\"#FFB800\" stroke-width=\"4\" stroke-linecap=\"round\" transform=\"rotate(270 176 30)\"/><path d=\"M176 30m0 -24v8\" stroke=\"#FFB800\" stroke-width=\"4\" stroke-linecap=\"round\" transform=\"rotate(315 176 30)\"/><circle cx=\"176\" cy=\"30\" r=\"12\" fill=\"#FFD84D\" stroke=\"#E89B00\" stroke-width=\"3\"/><circle cx=\"58\" cy=\"112\" r=\"34\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"100\" cy=\"78\" r=\"42\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"144\" cy=\"110\" r=\"34\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"78\" cy=\"142\" r=\"30\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"124\" cy=\"142\" r=\"30\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"100\" cy=\"122\" r=\"44\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"70\" cy=\"82\" r=\"24\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"132\" cy=\"84\" r=\"24\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"58\" cy=\"112\" r=\"34\" fill=\"url(#G)\"/><circle cx=\"100\" cy=\"78\" r=\"42\" fill=\"url(#G)\"/><circle cx=\"144\" cy=\"110\" r=\"34\" fill=\"url(#G)\"/><circle cx=\"78\" cy=\"142\" r=\"30\" fill=\"url(#G)\"/><circle cx=\"124\" cy=\"142\" r=\"30\" fill=\"url(#G)\"/><circle cx=\"100\" cy=\"122\" r=\"44\" fill=\"url(#G)\"/><circle cx=\"70\" cy=\"82\" r=\"24\" fill=\"url(#G)\"/><circle cx=\"132\" cy=\"84\" r=\"24\" fill=\"url(#G)\"/><ellipse cx=\"78\" cy=\"62\" rx=\"14\" ry=\"7\" transform=\"rotate(-20 78 62)\" fill=\"#fff\" opacity=\".9\"/><ellipse cx=\"64\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF8FB0\" opacity=\".45\"/><ellipse cx=\"136\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF8FB0\" opacity=\".45\"/><path d=\"M80 85l3 8 8 3-8 3-3 8-3-8-8-3 8-3z\" fill=\"#2B1E16\"/><circle cx=\"80\" cy=\"96\" r=\"2\" fill=\"#fff\"/><path d=\"M120 85l3 8 8 3-8 3-3 8-3-8-8-3 8-3z\" fill=\"#2B1E16\"/><circle cx=\"120\" cy=\"96\" r=\"2\" fill=\"#fff\"/><path d=\"M80 108q20 34 40 0z\" fill=\"#2B1E16\" stroke=\"#2B1E16\" stroke-width=\"3\" stroke-linejoin=\"round\"/><path d=\"M90 124q10 8 20 0q-10-7-20 0z\" fill=\"#FF7B7B\"/><ellipse cx=\"30\" cy=\"64\" rx=\"11\" ry=\"15\" transform=\"rotate(160 30 64)\" fill=\"#EEEAFE\" stroke=\"#6A5BA8\" stroke-width=\"3.5\"/><ellipse cx=\"170\" cy=\"64\" rx=\"11\" ry=\"15\" transform=\"rotate(-160 170 64)\" fill=\"#EEEAFE\" stroke=\"#6A5BA8\" stroke-width=\"3.5\"/></g><rect x=\"61.5\" y=\"166\" width=\"77\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#6A5BA8\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#3E3550\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">맑음!</text></svg>"}, "rain": {"name": "우울", "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><linearGradient id=\"G\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#FFFFFF\"/><stop offset=\"1\" stop-color=\"#D9D2F7\"/></linearGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(0) translate(-100 -100)\"><ellipse cx=\"100\" cy=\"192\" rx=\"50\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><g transform=\"translate(104 2) scale(0.5)\"><path d=\"M40 30h120q16 0 16 -14q0-14-16-14q-6-14-24-12q-10-12-28-6q-16-8-30 4q-20-4-26 10q-16 0-16 14q0 18 4 18z\" fill=\"#B9C3D6\" opacity=\".95\"/><path d=\"M60 44l-4 12M90 46l-4 12M120 44l-4 12M150 46l-4 12\" stroke=\"#5AB8FF\" stroke-width=\"5\" stroke-linecap=\"round\"/></g><circle cx=\"58\" cy=\"112\" r=\"34\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"100\" cy=\"78\" r=\"42\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"144\" cy=\"110\" r=\"34\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"78\" cy=\"142\" r=\"30\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"124\" cy=\"142\" r=\"30\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"100\" cy=\"122\" r=\"44\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"70\" cy=\"82\" r=\"24\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"132\" cy=\"84\" r=\"24\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"58\" cy=\"112\" r=\"34\" fill=\"url(#G)\"/><circle cx=\"100\" cy=\"78\" r=\"42\" fill=\"url(#G)\"/><circle cx=\"144\" cy=\"110\" r=\"34\" fill=\"url(#G)\"/><circle cx=\"78\" cy=\"142\" r=\"30\" fill=\"url(#G)\"/><circle cx=\"124\" cy=\"142\" r=\"30\" fill=\"url(#G)\"/><circle cx=\"100\" cy=\"122\" r=\"44\" fill=\"url(#G)\"/><circle cx=\"70\" cy=\"82\" r=\"24\" fill=\"url(#G)\"/><circle cx=\"132\" cy=\"84\" r=\"24\" fill=\"url(#G)\"/><ellipse cx=\"78\" cy=\"62\" rx=\"14\" ry=\"7\" transform=\"rotate(-20 78 62)\" fill=\"#fff\" opacity=\".9\"/><ellipse cx=\"64\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF8FB0\" opacity=\".45\"/><ellipse cx=\"136\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF8FB0\" opacity=\".45\"/><path d=\"M70 84l18-6M130 84l-18-6\" stroke=\"#2B1E16\" stroke-width=\"4.5\" stroke-linecap=\"round\"/><path d=\"M71 94 q9 8 18 0\" stroke=\"#2B1E16\" stroke-width=\"4.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M111 94 q9 8 18 0\" stroke=\"#2B1E16\" stroke-width=\"4.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M73 100q-2 26 4 40\" stroke=\"#5AB8FF\" stroke-width=\"7\" fill=\"none\" stroke-linecap=\"round\" opacity=\".85\"/><path d=\"M127 100q2 26-4 40\" stroke=\"#5AB8FF\" stroke-width=\"7\" fill=\"none\" stroke-linecap=\"round\" opacity=\".85\"/><path d=\"M90 120q10-10 20 0\" stroke=\"#2B1E16\" stroke-width=\"4\" fill=\"none\" stroke-linecap=\"round\"/><ellipse cx=\"38\" cy=\"122\" rx=\"11\" ry=\"15\" transform=\"rotate(25 38 122)\" fill=\"#EEEAFE\" stroke=\"#6A5BA8\" stroke-width=\"3.5\"/><ellipse cx=\"162\" cy=\"122\" rx=\"11\" ry=\"15\" transform=\"rotate(-25 162 122)\" fill=\"#EEEAFE\" stroke=\"#6A5BA8\" stroke-width=\"3.5\"/></g><rect x=\"61.5\" y=\"166\" width=\"77\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#6A5BA8\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#3E3550\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">비와…</text></svg>"}, "love": {"name": "몽글", "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><linearGradient id=\"G\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#FFFFFF\"/><stop offset=\"1\" stop-color=\"#D9D2F7\"/></linearGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(0) translate(-100 -100)\"><ellipse cx=\"100\" cy=\"192\" rx=\"50\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><circle cx=\"58\" cy=\"112\" r=\"34\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"100\" cy=\"78\" r=\"42\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"144\" cy=\"110\" r=\"34\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"78\" cy=\"142\" r=\"30\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"124\" cy=\"142\" r=\"30\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"100\" cy=\"122\" r=\"44\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"70\" cy=\"82\" r=\"24\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"132\" cy=\"84\" r=\"24\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"58\" cy=\"112\" r=\"34\" fill=\"url(#G)\"/><circle cx=\"100\" cy=\"78\" r=\"42\" fill=\"url(#G)\"/><circle cx=\"144\" cy=\"110\" r=\"34\" fill=\"url(#G)\"/><circle cx=\"78\" cy=\"142\" r=\"30\" fill=\"url(#G)\"/><circle cx=\"124\" cy=\"142\" r=\"30\" fill=\"url(#G)\"/><circle cx=\"100\" cy=\"122\" r=\"44\" fill=\"url(#G)\"/><circle cx=\"70\" cy=\"82\" r=\"24\" fill=\"url(#G)\"/><circle cx=\"132\" cy=\"84\" r=\"24\" fill=\"url(#G)\"/><ellipse cx=\"78\" cy=\"62\" rx=\"14\" ry=\"7\" transform=\"rotate(-20 78 62)\" fill=\"#fff\" opacity=\".9\"/><ellipse cx=\"64\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF8FB0\" opacity=\".45\"/><ellipse cx=\"136\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF8FB0\" opacity=\".45\"/><path d=\"M80 105 C66 95 71 83 80 91 C89 83 94 95 80 105z\" fill=\"#FF4D6D\" stroke=\"#B3123A\" stroke-width=\"2\"/><path d=\"M120 105 C106 95 111 83 120 91 C129 83 134 95 120 105z\" fill=\"#FF4D6D\" stroke=\"#B3123A\" stroke-width=\"2\"/><path d=\"M90 112q10 10 20 0\" stroke=\"#2B1E16\" stroke-width=\"4\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M100 176c-24-14-36-26-36-40 0-11 9-18 19-18 8 0 14 5 17 11 3-6 9-11 17-11 10 0 19 7 19 18 0 14-12 26-36 40z\" fill=\"#FF4D6D\" stroke=\"#B3123A\" stroke-width=\"3.5\"/><ellipse cx=\"84\" cy=\"132\" rx=\"6\" ry=\"4\" fill=\"#fff\" opacity=\".6\" transform=\"rotate(-30 84 132)\"/><ellipse cx=\"58\" cy=\"146\" rx=\"11\" ry=\"15\" transform=\"rotate(50 58 146)\" fill=\"#EEEAFE\" stroke=\"#6A5BA8\" stroke-width=\"3.5\"/><ellipse cx=\"142\" cy=\"146\" rx=\"11\" ry=\"15\" transform=\"rotate(-50 142 146)\" fill=\"#EEEAFE\" stroke=\"#6A5BA8\" stroke-width=\"3.5\"/></g><rect x=\"52.0\" y=\"166\" width=\"96\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#6A5BA8\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#3E3550\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">몽글몽글</text></svg>"}, "thanks": {"name": "고마워", "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><linearGradient id=\"G\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#FFFFFF\"/><stop offset=\"1\" stop-color=\"#D9D2F7\"/></linearGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(-10) translate(-100 -100)\"><ellipse cx=\"100\" cy=\"192\" rx=\"50\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><path d=\"M172 40c-6-6-16 0-10 8l10 10 10-10c6-8-4-14-10-8z\" fill=\"#FF4D6D\"/><path d=\"M28 60c-4-4-11 0-7 5l7 7 7-7c4-5-3-9-7-5z\" fill=\"#FF8FA3\"/><circle cx=\"58\" cy=\"112\" r=\"34\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"100\" cy=\"78\" r=\"42\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"144\" cy=\"110\" r=\"34\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"78\" cy=\"142\" r=\"30\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"124\" cy=\"142\" r=\"30\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"100\" cy=\"122\" r=\"44\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"70\" cy=\"82\" r=\"24\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"132\" cy=\"84\" r=\"24\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"58\" cy=\"112\" r=\"34\" fill=\"url(#G)\"/><circle cx=\"100\" cy=\"78\" r=\"42\" fill=\"url(#G)\"/><circle cx=\"144\" cy=\"110\" r=\"34\" fill=\"url(#G)\"/><circle cx=\"78\" cy=\"142\" r=\"30\" fill=\"url(#G)\"/><circle cx=\"124\" cy=\"142\" r=\"30\" fill=\"url(#G)\"/><circle cx=\"100\" cy=\"122\" r=\"44\" fill=\"url(#G)\"/><circle cx=\"70\" cy=\"82\" r=\"24\" fill=\"url(#G)\"/><circle cx=\"132\" cy=\"84\" r=\"24\" fill=\"url(#G)\"/><ellipse cx=\"78\" cy=\"62\" rx=\"14\" ry=\"7\" transform=\"rotate(-20 78 62)\" fill=\"#fff\" opacity=\".9\"/><ellipse cx=\"64\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF8FB0\" opacity=\".45\"/><ellipse cx=\"136\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF8FB0\" opacity=\".45\"/><path d=\"M71 98 q9 -10 18 0\" stroke=\"#2B1E16\" stroke-width=\"4.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M111 98 q9 -10 18 0\" stroke=\"#2B1E16\" stroke-width=\"4.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M90 112q5 6 10 0q5 6 10 0\" stroke=\"#2B1E16\" stroke-width=\"3.5\" fill=\"none\" stroke-linecap=\"round\"/><ellipse cx=\"88\" cy=\"150\" rx=\"11\" ry=\"15\" transform=\"rotate(40 88 150)\" fill=\"#EEEAFE\" stroke=\"#6A5BA8\" stroke-width=\"3.5\"/><ellipse cx=\"112\" cy=\"150\" rx=\"11\" ry=\"15\" transform=\"rotate(-40 112 150)\" fill=\"#EEEAFE\" stroke=\"#6A5BA8\" stroke-width=\"3.5\"/></g><rect x=\"61.5\" y=\"166\" width=\"77\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#6A5BA8\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#3E3550\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">고마워</text></svg>"}, "sorry": {"name": "미안", "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><linearGradient id=\"G\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#FFFFFF\"/><stop offset=\"1\" stop-color=\"#D9D2F7\"/></linearGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(6) translate(-100 -100)\"><ellipse cx=\"100\" cy=\"192\" rx=\"50\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><path d=\"M156 40q8 12 4 18q-8 2-8-8z\" fill=\"#7CC8FF\" stroke=\"#3B8FD1\" stroke-width=\"2\"/><circle cx=\"58\" cy=\"112\" r=\"34\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"100\" cy=\"78\" r=\"42\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"144\" cy=\"110\" r=\"34\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"78\" cy=\"142\" r=\"30\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"124\" cy=\"142\" r=\"30\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"100\" cy=\"122\" r=\"44\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"70\" cy=\"82\" r=\"24\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"132\" cy=\"84\" r=\"24\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"58\" cy=\"112\" r=\"34\" fill=\"url(#G)\"/><circle cx=\"100\" cy=\"78\" r=\"42\" fill=\"url(#G)\"/><circle cx=\"144\" cy=\"110\" r=\"34\" fill=\"url(#G)\"/><circle cx=\"78\" cy=\"142\" r=\"30\" fill=\"url(#G)\"/><circle cx=\"124\" cy=\"142\" r=\"30\" fill=\"url(#G)\"/><circle cx=\"100\" cy=\"122\" r=\"44\" fill=\"url(#G)\"/><circle cx=\"70\" cy=\"82\" r=\"24\" fill=\"url(#G)\"/><circle cx=\"132\" cy=\"84\" r=\"24\" fill=\"url(#G)\"/><ellipse cx=\"78\" cy=\"62\" rx=\"14\" ry=\"7\" transform=\"rotate(-20 78 62)\" fill=\"#fff\" opacity=\".9\"/><ellipse cx=\"64\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF8FB0\" opacity=\".45\"/><ellipse cx=\"136\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF8FB0\" opacity=\".45\"/><path d=\"M70 84l18-6M130 84l-18-6\" stroke=\"#2B1E16\" stroke-width=\"4.5\" stroke-linecap=\"round\"/><ellipse cx=\"80\" cy=\"96\" rx=\"7.5\" ry=\"9.0\" fill=\"#2B1E16\"/><circle cx=\"82.5\" cy=\"92.5\" r=\"3.0\" fill=\"#fff\"/><ellipse cx=\"120\" cy=\"96\" rx=\"7.5\" ry=\"9.0\" fill=\"#2B1E16\"/><circle cx=\"122.5\" cy=\"92.5\" r=\"3.0\" fill=\"#fff\"/><path d=\"M86 118q4-5 7 0t7 0 7 0 7 0\" stroke=\"#2B1E16\" stroke-width=\"3.5\" fill=\"none\" stroke-linecap=\"round\"/><ellipse cx=\"88\" cy=\"150\" rx=\"11\" ry=\"15\" transform=\"rotate(40 88 150)\" fill=\"#EEEAFE\" stroke=\"#6A5BA8\" stroke-width=\"3.5\"/><ellipse cx=\"112\" cy=\"150\" rx=\"11\" ry=\"15\" transform=\"rotate(-40 112 150)\" fill=\"#EEEAFE\" stroke=\"#6A5BA8\" stroke-width=\"3.5\"/></g><rect x=\"61.5\" y=\"166\" width=\"77\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#6A5BA8\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#3E3550\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">미안해</text></svg>"}, "blank": {"name": "멍", "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><linearGradient id=\"G\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#FFFFFF\"/><stop offset=\"1\" stop-color=\"#D9D2F7\"/></linearGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(0) translate(-100 -100)\"><ellipse cx=\"100\" cy=\"192\" rx=\"50\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><circle cx=\"58\" cy=\"112\" r=\"34\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"100\" cy=\"78\" r=\"42\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"144\" cy=\"110\" r=\"34\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"78\" cy=\"142\" r=\"30\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"124\" cy=\"142\" r=\"30\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"100\" cy=\"122\" r=\"44\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"70\" cy=\"82\" r=\"24\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"132\" cy=\"84\" r=\"24\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"58\" cy=\"112\" r=\"34\" fill=\"url(#G)\"/><circle cx=\"100\" cy=\"78\" r=\"42\" fill=\"url(#G)\"/><circle cx=\"144\" cy=\"110\" r=\"34\" fill=\"url(#G)\"/><circle cx=\"78\" cy=\"142\" r=\"30\" fill=\"url(#G)\"/><circle cx=\"124\" cy=\"142\" r=\"30\" fill=\"url(#G)\"/><circle cx=\"100\" cy=\"122\" r=\"44\" fill=\"url(#G)\"/><circle cx=\"70\" cy=\"82\" r=\"24\" fill=\"url(#G)\"/><circle cx=\"132\" cy=\"84\" r=\"24\" fill=\"url(#G)\"/><ellipse cx=\"78\" cy=\"62\" rx=\"14\" ry=\"7\" transform=\"rotate(-20 78 62)\" fill=\"#fff\" opacity=\".9\"/><ellipse cx=\"64\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF8FB0\" opacity=\".45\"/><ellipse cx=\"136\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF8FB0\" opacity=\".45\"/><circle cx=\"80\" cy=\"96\" r=\"4.5\" fill=\"#2B1E16\"/><circle cx=\"120\" cy=\"96\" r=\"4.5\" fill=\"#2B1E16\"/><path d=\"M93 116h14\" stroke=\"#2B1E16\" stroke-width=\"4\" stroke-linecap=\"round\"/><text x=\"146\" y=\"50\" font-size=\"26\" font-weight=\"900\" fill=\"#8A7FC9\" font-family=\"sans-serif\">…</text><ellipse cx=\"38\" cy=\"122\" rx=\"11\" ry=\"15\" transform=\"rotate(25 38 122)\" fill=\"#EEEAFE\" stroke=\"#6A5BA8\" stroke-width=\"3.5\"/><ellipse cx=\"162\" cy=\"122\" rx=\"11\" ry=\"15\" transform=\"rotate(-25 162 122)\" fill=\"#EEEAFE\" stroke=\"#6A5BA8\" stroke-width=\"3.5\"/></g><rect x=\"71.0\" y=\"166\" width=\"58\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#6A5BA8\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#3E3550\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">멍…</text></svg>"}, "lol": {"name": "히히", "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><linearGradient id=\"G\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#FFFFFF\"/><stop offset=\"1\" stop-color=\"#D9D2F7\"/></linearGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(8) translate(-100 -100)\"><ellipse cx=\"100\" cy=\"192\" rx=\"50\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><path d=\"M60 92q-12 6-10 16q6 4 12-4z\" fill=\"#7CC8FF\"/><path d=\"M140 92q12 6 10 16q-6 4-12-4z\" fill=\"#7CC8FF\"/><circle cx=\"58\" cy=\"112\" r=\"34\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"100\" cy=\"78\" r=\"42\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"144\" cy=\"110\" r=\"34\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"78\" cy=\"142\" r=\"30\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"124\" cy=\"142\" r=\"30\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"100\" cy=\"122\" r=\"44\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"70\" cy=\"82\" r=\"24\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"132\" cy=\"84\" r=\"24\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"58\" cy=\"112\" r=\"34\" fill=\"url(#G)\"/><circle cx=\"100\" cy=\"78\" r=\"42\" fill=\"url(#G)\"/><circle cx=\"144\" cy=\"110\" r=\"34\" fill=\"url(#G)\"/><circle cx=\"78\" cy=\"142\" r=\"30\" fill=\"url(#G)\"/><circle cx=\"124\" cy=\"142\" r=\"30\" fill=\"url(#G)\"/><circle cx=\"100\" cy=\"122\" r=\"44\" fill=\"url(#G)\"/><circle cx=\"70\" cy=\"82\" r=\"24\" fill=\"url(#G)\"/><circle cx=\"132\" cy=\"84\" r=\"24\" fill=\"url(#G)\"/><ellipse cx=\"78\" cy=\"62\" rx=\"14\" ry=\"7\" transform=\"rotate(-20 78 62)\" fill=\"#fff\" opacity=\".9\"/><ellipse cx=\"64\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF8FB0\" opacity=\".45\"/><ellipse cx=\"136\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF8FB0\" opacity=\".45\"/><path d=\"M71 94l10 5-10 5\" stroke=\"#2B1E16\" stroke-width=\"4.5\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M129 94l-10 5 10 5\" stroke=\"#2B1E16\" stroke-width=\"4.5\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M80 108q20 34 40 0z\" fill=\"#2B1E16\" stroke=\"#2B1E16\" stroke-width=\"3\" stroke-linejoin=\"round\"/><path d=\"M90 124q10 8 20 0q-10-7-20 0z\" fill=\"#FF7B7B\"/><ellipse cx=\"62\" cy=\"118\" rx=\"11\" ry=\"15\" transform=\"rotate(-20 62 118)\" fill=\"#EEEAFE\" stroke=\"#6A5BA8\" stroke-width=\"3.5\"/><ellipse cx=\"138\" cy=\"118\" rx=\"11\" ry=\"15\" transform=\"rotate(20 138 118)\" fill=\"#EEEAFE\" stroke=\"#6A5BA8\" stroke-width=\"3.5\"/></g><rect x=\"71.0\" y=\"166\" width=\"58\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#6A5BA8\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#3E3550\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">히히</text></svg>"}, "ok": {"name": "좋아", "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><linearGradient id=\"G\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#FFFFFF\"/><stop offset=\"1\" stop-color=\"#D9D2F7\"/></linearGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(0) translate(-100 -100)\"><ellipse cx=\"100\" cy=\"192\" rx=\"50\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><path d=\"M176 30l4 10 10 4-10 4-4 10-4-10-10-4 10-4z\" fill=\"#FFD84D\"/><path d=\"M22 52l3 7 7 3-7 3-3 7-3-7-7-3 7-3z\" fill=\"#FFD84D\"/><circle cx=\"58\" cy=\"112\" r=\"34\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"100\" cy=\"78\" r=\"42\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"144\" cy=\"110\" r=\"34\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"78\" cy=\"142\" r=\"30\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"124\" cy=\"142\" r=\"30\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"100\" cy=\"122\" r=\"44\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"70\" cy=\"82\" r=\"24\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"132\" cy=\"84\" r=\"24\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"58\" cy=\"112\" r=\"34\" fill=\"url(#G)\"/><circle cx=\"100\" cy=\"78\" r=\"42\" fill=\"url(#G)\"/><circle cx=\"144\" cy=\"110\" r=\"34\" fill=\"url(#G)\"/><circle cx=\"78\" cy=\"142\" r=\"30\" fill=\"url(#G)\"/><circle cx=\"124\" cy=\"142\" r=\"30\" fill=\"url(#G)\"/><circle cx=\"100\" cy=\"122\" r=\"44\" fill=\"url(#G)\"/><circle cx=\"70\" cy=\"82\" r=\"24\" fill=\"url(#G)\"/><circle cx=\"132\" cy=\"84\" r=\"24\" fill=\"url(#G)\"/><ellipse cx=\"78\" cy=\"62\" rx=\"14\" ry=\"7\" transform=\"rotate(-20 78 62)\" fill=\"#fff\" opacity=\".9\"/><ellipse cx=\"64\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF8FB0\" opacity=\".45\"/><ellipse cx=\"136\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF8FB0\" opacity=\".45\"/><ellipse cx=\"80\" cy=\"96\" rx=\"7.5\" ry=\"9.0\" fill=\"#2B1E16\"/><circle cx=\"82.5\" cy=\"92.5\" r=\"3.0\" fill=\"#fff\"/><path d=\"M111 98 q9 -10 18 0\" stroke=\"#2B1E16\" stroke-width=\"4.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M90 112q10 10 20 0\" stroke=\"#2B1E16\" stroke-width=\"4\" fill=\"none\" stroke-linecap=\"round\"/><ellipse cx=\"38\" cy=\"122\" rx=\"11\" ry=\"15\" transform=\"rotate(25 38 122)\" fill=\"#EEEAFE\" stroke=\"#6A5BA8\" stroke-width=\"3.5\"/><ellipse cx=\"164\" cy=\"84\" rx=\"11\" ry=\"15\" transform=\"rotate(-140 164 84)\" fill=\"#EEEAFE\" stroke=\"#6A5BA8\" stroke-width=\"3.5\"/><circle cx=\"170\" cy=\"66\" r=\"9\" fill=\"#EEEAFE\" stroke=\"#6A5BA8\" stroke-width=\"3.5\"/><circle cx=\"170\" cy=\"66\" r=\"3.5\" fill=\"#fff\" stroke=\"#6A5BA8\" stroke-width=\"2\"/></g><rect x=\"61.5\" y=\"166\" width=\"77\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#6A5BA8\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#3E3550\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">좋아!</text></svg>"}, "song": {"name": "룰루", "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><linearGradient id=\"G\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#FFFFFF\"/><stop offset=\"1\" stop-color=\"#D9D2F7\"/></linearGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(-8) translate(-100 -100)\"><ellipse cx=\"100\" cy=\"192\" rx=\"50\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><circle cx=\"58\" cy=\"112\" r=\"34\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"100\" cy=\"78\" r=\"42\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"144\" cy=\"110\" r=\"34\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"78\" cy=\"142\" r=\"30\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"124\" cy=\"142\" r=\"30\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"100\" cy=\"122\" r=\"44\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"70\" cy=\"82\" r=\"24\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"132\" cy=\"84\" r=\"24\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"58\" cy=\"112\" r=\"34\" fill=\"url(#G)\"/><circle cx=\"100\" cy=\"78\" r=\"42\" fill=\"url(#G)\"/><circle cx=\"144\" cy=\"110\" r=\"34\" fill=\"url(#G)\"/><circle cx=\"78\" cy=\"142\" r=\"30\" fill=\"url(#G)\"/><circle cx=\"124\" cy=\"142\" r=\"30\" fill=\"url(#G)\"/><circle cx=\"100\" cy=\"122\" r=\"44\" fill=\"url(#G)\"/><circle cx=\"70\" cy=\"82\" r=\"24\" fill=\"url(#G)\"/><circle cx=\"132\" cy=\"84\" r=\"24\" fill=\"url(#G)\"/><ellipse cx=\"78\" cy=\"62\" rx=\"14\" ry=\"7\" transform=\"rotate(-20 78 62)\" fill=\"#fff\" opacity=\".9\"/><ellipse cx=\"64\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF8FB0\" opacity=\".45\"/><ellipse cx=\"136\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF8FB0\" opacity=\".45\"/><path d=\"M71 98 q9 -10 18 0\" stroke=\"#2B1E16\" stroke-width=\"4.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M111 98 q9 -10 18 0\" stroke=\"#2B1E16\" stroke-width=\"4.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M86 110q14 22 28 0z\" fill=\"#2B1E16\" stroke=\"#2B1E16\" stroke-width=\"3\" stroke-linejoin=\"round\"/><path d=\"M93 120q7 6 14 0q-7-5-14 0z\" fill=\"#FF7B7B\"/><path d=\"M168 26v26a7 6 0 1 1 -4 -5v-21l16-4v22a7 6 0 1 1 -4 -5v-15z\" fill=\"#7A6BD9\"/><ellipse cx=\"62\" cy=\"118\" rx=\"11\" ry=\"15\" transform=\"rotate(-20 62 118)\" fill=\"#EEEAFE\" stroke=\"#6A5BA8\" stroke-width=\"3.5\"/><ellipse cx=\"138\" cy=\"118\" rx=\"11\" ry=\"15\" transform=\"rotate(20 138 118)\" fill=\"#EEEAFE\" stroke=\"#6A5BA8\" stroke-width=\"3.5\"/></g><rect x=\"61.5\" y=\"166\" width=\"77\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#6A5BA8\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#3E3550\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">룰루~</text></svg>"}, "night": {"name": "잘자", "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><linearGradient id=\"G\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#FFFFFF\"/><stop offset=\"1\" stop-color=\"#D9D2F7\"/></linearGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(0) translate(-100 -100)\"><ellipse cx=\"100\" cy=\"192\" rx=\"50\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><text x=\"140\" y=\"44\" font-size=\"22\" font-weight=\"900\" fill=\"#7A8BD9\" font-family=\"sans-serif\">Z</text><text x=\"160\" y=\"30\" font-size=\"16\" font-weight=\"900\" fill=\"#7A8BD9\" font-family=\"sans-serif\">z</text><text x=\"174\" y=\"18\" font-size=\"12\" font-weight=\"900\" fill=\"#7A8BD9\" font-family=\"sans-serif\">z</text><path d=\"M180 14a18 18 0 1 0 8 30a14 14 0 1 1 -8 -30z\" fill=\"#FFE27A\" stroke=\"#D9A400\" stroke-width=\"2.5\"/><path d=\"M24 40l2 5 5 2-5 2-2 5-2-5-5-2 5-2z\" fill=\"#FFE27A\"/><circle cx=\"58\" cy=\"112\" r=\"34\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"100\" cy=\"78\" r=\"42\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"144\" cy=\"110\" r=\"34\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"78\" cy=\"142\" r=\"30\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"124\" cy=\"142\" r=\"30\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"100\" cy=\"122\" r=\"44\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"70\" cy=\"82\" r=\"24\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"132\" cy=\"84\" r=\"24\" fill=\"#6A5BA8\" stroke=\"#6A5BA8\" stroke-width=\"8\"/><circle cx=\"58\" cy=\"112\" r=\"34\" fill=\"url(#G)\"/><circle cx=\"100\" cy=\"78\" r=\"42\" fill=\"url(#G)\"/><circle cx=\"144\" cy=\"110\" r=\"34\" fill=\"url(#G)\"/><circle cx=\"78\" cy=\"142\" r=\"30\" fill=\"url(#G)\"/><circle cx=\"124\" cy=\"142\" r=\"30\" fill=\"url(#G)\"/><circle cx=\"100\" cy=\"122\" r=\"44\" fill=\"url(#G)\"/><circle cx=\"70\" cy=\"82\" r=\"24\" fill=\"url(#G)\"/><circle cx=\"132\" cy=\"84\" r=\"24\" fill=\"url(#G)\"/><ellipse cx=\"78\" cy=\"62\" rx=\"14\" ry=\"7\" transform=\"rotate(-20 78 62)\" fill=\"#fff\" opacity=\".9\"/><ellipse cx=\"64\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF8FB0\" opacity=\".45\"/><ellipse cx=\"136\" cy=\"116\" rx=\"10\" ry=\"6\" fill=\"#FF8FB0\" opacity=\".45\"/><path d=\"M71 98h18\" stroke=\"#2B1E16\" stroke-width=\"4.5\" stroke-linecap=\"round\"/><path d=\"M111 98h18\" stroke=\"#2B1E16\" stroke-width=\"4.5\" stroke-linecap=\"round\"/><path d=\"M90 112q5 6 10 0q5 6 10 0\" stroke=\"#2B1E16\" stroke-width=\"3.5\" fill=\"none\" stroke-linecap=\"round\"/><ellipse cx=\"88\" cy=\"150\" rx=\"11\" ry=\"15\" transform=\"rotate(40 88 150)\" fill=\"#EEEAFE\" stroke=\"#6A5BA8\" stroke-width=\"3.5\"/><ellipse cx=\"112\" cy=\"150\" rx=\"11\" ry=\"15\" transform=\"rotate(-40 112 150)\" fill=\"#EEEAFE\" stroke=\"#6A5BA8\" stroke-width=\"3.5\"/></g><rect x=\"71.0\" y=\"166\" width=\"58\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#6A5BA8\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#3E3550\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">잘자</text></svg>"}}},
+});
 const EMOJI_LIST = ["😀", "😄", "😂", "🤣", "😊", "😍", "🥰", "😘", "😎", "🤩", "🥳", "😇", "🙂", "😉", "😋", "😜", "🤔", "🤗", "🤭", "😴", "😪", "😮", "😲", "😱", "😭", "😢", "🥲", "😤", "😡", "🤬", "😳", "🥺", "🙄", "😏", "😬", "🤐", "🤒", "🤧", "😷", "🥶", "🥵", "👍", "👎", "👏", "🙌", "🙏", "💪", "👋", "✌️", "🤞", "👌", "🤙", "❤️", "🧡", "💛", "💚", "💙", "💜", "🖤", "💔", "💕", "💯", "🔥", "✨", "🎉", "🎂", "🎁", "⭐", "🌙", "☀️", "🌈", "☔", "🍕", "🍔", "🍜", "🍰", "☕", "🍺", "⚽", "🎮", "🎵", "📚", "💤", "✅", "❌", "❓", "❗"];
 
 function emoticonOf(id) {
@@ -4156,7 +4406,10 @@ function insertEmoji(e) {
 
 async function sendEmoticon(id) {
   if (!currentRoom || !currentRoom.loaded || $("chat-text").disabled) return;
-  await sendItems([{ type: "emoticon", emo: id, text: "" }], "이모티콘");
+  const reply = takeReply();
+  const item = { type: "emoticon", emo: id, text: "" };
+  if (reply) item.reply = reply;
+  await sendItems([item], "이모티콘");
 }
 
 $("emo-btn").addEventListener("click", () => toggleEmoPanel());
@@ -4274,7 +4527,7 @@ function showSearchResult() {
 }
 
 /* ================= 메시지 길게 누르기 / 오른쪽 클릭 메뉴 ================= */
-const UNSEND_LIMIT = 5 * 60 * 1000; // 모두에게서 삭제는 보낸 뒤 5분까지 (카톡처럼)
+const UNSEND_LIMIT = 24 * 3600 * 1000; // 모두에게서 삭제 / 수정은 보낸 뒤 24시간까지
 let menuMsg = null;
 let longPressed = false;
 
@@ -4301,12 +4554,14 @@ function attachMessageMenu(node, m) {
 
 function openMessageMenu(m) {
   menuMsg = m;
+  $("mm-reply").classList.toggle("hidden", !!m.deleted || !!(currentRoom && $("chat-text").disabled));
+  $("mm-edit").classList.toggle("hidden", !canEdit(m));
   const mine = m.sender === myPhone;
   const isImage = m.type === "image";
   const isEmo = m.type === "emoticon";
   $("msg-menu-preview").textContent = isImage ? "사진" : isEmo ? "이모티콘" : m.text;
   $("mm-copy").classList.toggle("hidden", isImage || isEmo);
-  $("mm-save").classList.toggle("hidden", !isImage);
+  $("mm-save").classList.toggle("hidden", !isImage || !safeImage(m.image));
   $("mm-unsend").classList.toggle("hidden", !(mine && Date.now() - m.clientAt < UNSEND_LIMIT));
   openModal("msg-menu");
 }
@@ -4325,6 +4580,146 @@ async function copyText(text) {
     document.execCommand("copy");
     ta.remove();
   }
+}
+
+/* ---------- 답장 ---------- */
+let replyTo = null; // { roomId, id, sender, text }
+
+function replyPreview(m) {
+  if (m.deleted) return "삭제된 메시지";
+  if (m.type === "image") return m.expired ? "사진 (기간 지남)" : "사진";
+  if (m.type === "emoticon") {
+    const emo = emoticonOf(m.emo);
+    return emo ? `이모티콘 (${emo.name})` : "이모티콘";
+  }
+  return String(m.text || "").replace(/\s+/g, " ").slice(0, 80);
+}
+
+function setReply(m) {
+  replyTo = m && currentRoom ? { roomId: currentRoom.id, id: m.id, sender: m.sender, text: replyPreview(m) } : null;
+  if (replyTo && editing) cancelEdit(false);
+  renderComposeBar();
+  if (replyTo) $("chat-text").focus();
+}
+
+// 입력창 위 막대: 답장 중 / 수정 중
+function renderComposeBar() {
+  const bar = $("reply-bar");
+  if (editing) {
+    bar.classList.remove("hidden");
+    $("reply-name").textContent = "메시지 수정 중";
+    $("reply-text").textContent = editing.original;
+    return;
+  }
+  bar.classList.toggle("hidden", !replyTo);
+  if (!replyTo) return;
+  $("reply-name").textContent = replyTo.sender === myPhone ? "나에게 답장" : `${nameOf(replyTo.sender)}에게 답장`;
+  $("reply-text").textContent = replyTo.text;
+}
+
+/* ---------- 메시지 수정 (내 글, 24시간 안) ---------- */
+let editing = null; // { roomId, id, clientAt, original }
+
+function canEdit(m) {
+  return !!m && m.sender === myPhone && m.type === "text" && !m.deleted && Date.now() - m.clientAt < UNSEND_LIMIT
+    && !!currentRoom && !$("chat-text").disabled;
+}
+
+function startEdit(m) {
+  replyTo = null;
+  editing = { roomId: currentRoom.id, id: m.id, clientAt: m.clientAt, original: m.text || "" };
+  chatText.value = m.text || "";
+  autoGrow();
+  $("send-btn").disabled = !chatText.value.trim();
+  renderComposeBar();
+  chatText.focus();
+  chatText.setSelectionRange(chatText.value.length, chatText.value.length);
+}
+
+function cancelEdit(clearInput = true) {
+  if (!editing) return;
+  editing = null;
+  if (clearInput) {
+    chatText.value = "";
+    autoGrow();
+    $("send-btn").disabled = true;
+  }
+  renderComposeBar();
+}
+
+async function saveEdit(text) {
+  const ed = editing;
+  const room = currentRoom;
+  if (!ed || !room || room.id !== ed.roomId) return cancelEdit();
+  if (text === ed.original) return cancelEdit();
+  if (Date.now() - ed.clientAt >= UNSEND_LIMIT) {
+    cancelEdit();
+    toast("보낸 지 24시간이 지나서 수정할 수 없어요");
+    return;
+  }
+  const batch = writeBatch(db);
+  batch.update(doc(db, "rooms", room.id, "messages", ed.id), { text, edited: true, editedAt: Date.now() });
+  // 마지막 메시지면 채팅 목록 미리보기도 바꿈
+  if (room.lastAt === ed.clientAt) batch.update(doc(db, "rooms", room.id), { lastMessage: text.slice(0, 200) });
+  cancelEdit();
+  try {
+    await batch.commit();
+    patchLocalMessage(ed.id, { text, edited: true });
+  } catch (err) {
+    console.error(err);
+    toast("수정하지 못했어요");
+  }
+}
+
+$("mm-edit").addEventListener("click", () => {
+  const m = menuMsg;
+  closeModal("msg-menu");
+  if (!canEdit(m)) {
+    toast("보낸 지 24시간이 지나서 수정할 수 없어요");
+    return;
+  }
+  startEdit(m);
+});
+
+// 보낼 때 붙일 답장 정보 (다른 방이면 안 붙임)
+function takeReply() {
+  if (!replyTo || !currentRoom || replyTo.roomId !== currentRoom.id) return null;
+  const r = { id: replyTo.id, sender: replyTo.sender, text: replyTo.text };
+  setReply(null);
+  return r;
+}
+
+$("mm-reply").addEventListener("click", () => {
+  if (!menuMsg) return;
+  closeModal("msg-menu");
+  setReply(menuMsg);
+});
+$("reply-cancel").addEventListener("click", () => {
+  if (editing) cancelEdit();
+  else setReply(null);
+});
+
+// 답장 인용 박스
+function makeReplyQuote(reply) {
+  const q = el("div", "reply-quote");
+  const original = roomMessages.find((x) => x.id === reply.id);
+  const who = reply.sender === myPhone ? "나" : nameOf(reply.sender);
+  q.appendChild(el("div", "rq-name", `${who}에게 답장`));
+  q.appendChild(el("div", "rq-text", original && original.deleted ? "삭제된 메시지" : String(reply.text || "")));
+  q.addEventListener("click", () => jumpToMessage(reply.id));
+  return q;
+}
+
+function jumpToMessage(id) {
+  const row = [...$("msg-list").querySelectorAll(".msg")].find((r) => r.dataset.id === id || (r.dataset.ids || "").split(",").includes(id));
+  if (!row) {
+    toast("예전 메시지라 위에서 '이전 대화 더 보기'를 눌러 주세요");
+    return;
+  }
+  row.scrollIntoView({ block: "center", behavior: "smooth" });
+  row.classList.remove("flash");
+  void row.offsetWidth;
+  row.classList.add("flash");
 }
 
 $("mm-copy").addEventListener("click", async () => {
@@ -4353,7 +4748,7 @@ $("mm-unsend").addEventListener("click", async () => {
   const room = currentRoom;
   if (!m || !room) return;
   if (Date.now() - m.clientAt >= UNSEND_LIMIT) {
-    toast("보낸 지 5분이 지나서 모두에게서 삭제할 수 없어요");
+    toast("보낸 지 24시간이 지나서 모두에게서 삭제할 수 없어요");
     closeModal("msg-menu");
     return;
   }
@@ -4371,6 +4766,7 @@ $("mm-unsend").addEventListener("click", async () => {
     await batch.commit();
     closeModal("msg-menu");
     patchLocalMessage(m.id, { deleted: true, text: "", image: "" });
+    if (editing && editing.id === m.id) cancelEdit();
   } catch (err) {
     console.error(err);
     toast("삭제하지 못했어요");
@@ -4428,7 +4824,12 @@ async function sendText() {
   autoGrow();
   chatText.focus();
   clearTyping();
-  await sendItems([{ type: "text", text }], text);
+  if (editing) {
+    await saveEdit(text);
+    return;
+  }
+  const reply = takeReply();
+  await sendItems([reply ? { type: "text", text, reply } : { type: "text", text }], text);
 }
 
 // 사진 보내기 (한 번에 최대 10장)
@@ -4552,6 +4953,112 @@ $("fm-delete").addEventListener("click", () => {
   if (entry && currentRoom) dropFailed(currentRoom.id, entry.id);
 });
 
+/* ================= 오래된 사진 정리 ================= */
+// 무료 저장 공간(1GB)이 차지 않게, 내가 보낸 사진 중 30일 지난 건 사진만 지움 ("기간이 지난 사진이에요")
+// 하루에 한 번, 이어서 정리한 위치를 기억해서 같은 메시지를 또 읽지 않음
+const PHOTO_KEEP_DAYS = 30;
+let cleanupScheduled = false;
+
+async function cleanupOldPhotos(mySession) {
+  if (mySession !== session || !myPhone) return;
+  const key = "onchat-cleanup:" + myPhone;
+  let state = {};
+  try { state = JSON.parse(localStorage.getItem(key) || "{}"); } catch (e) { state = {}; }
+  if (Date.now() - (state.at || 0) < 24 * 3600 * 1000) return;
+  const cutoff = Date.now() - PHOTO_KEEP_DAYS * 24 * 3600 * 1000;
+  const done = state.done || {};
+  let cleaned = 0;
+
+  for (const room of allRooms) {
+    if (mySession !== session) return;
+    const join = myJoinOf(room);
+    if ((done[room.id] || 0) >= cutoff || (room.lastAt || 0) < join) continue;
+    let after = Math.max(done[room.id] || 0, join - 1);
+    // 한 방에 최대 300개씩 읽음 (나머지는 다음 날)
+    const snap = await getDocs(
+      query(
+        collection(db, "rooms", room.id, "messages"),
+        where("clientAt", ">=", join),
+        where("clientAt", "<", cutoff),
+        orderBy("clientAt"),
+        startAfter(after),
+        limit(300)
+      )
+    );
+    if (mySession !== session) return;
+    const batch = writeBatch(db);
+    let n = 0;
+    for (const d of snap.docs) {
+      const m = d.data();
+      if (m.sender === myPhone && m.type === "image" && m.image) {
+        batch.update(doc(db, "rooms", room.id, "messages", d.id), { image: "", expired: true });
+        n++;
+      }
+      after = Math.max(after, m.clientAt || 0);
+    }
+    if (n) await batch.commit();
+    cleaned += n;
+    done[room.id] = snap.docs.length === 300 ? after : cutoff;
+  }
+  try { localStorage.setItem(key, JSON.stringify({ at: Date.now(), done })); } catch (e) { /* 괜찮음 */ }
+  if (cleaned) console.log(`오래된 사진 ${cleaned}장 정리`);
+}
+
+/* ================= 프로필 실시간 반영 ================= */
+const userWatch = new Map(); // 번호 → 감시 끄기
+const changedUsers = new Set();
+let userFlushTimer = null;
+
+function watchUser(phone) {
+  if (!phone || phone === myPhone || userWatch.has(phone)) return;
+  const mySession = session;
+  const stop = onSnapshot(
+    doc(db, "users", phone),
+    (snap) => {
+      if (mySession !== session || !snap.exists()) return;
+      cacheUser(snap.data());
+      changedUsers.add(phone);
+      clearTimeout(userFlushTimer);
+      userFlushTimer = setTimeout(flushUserChanges, 60); // 여러 명 한꺼번에 바뀌면 한 번만 다시 그림
+    },
+    (e) => console.warn(e)
+  );
+  userWatch.set(phone, stop);
+}
+
+function stopUserWatch() {
+  userWatch.forEach((s) => s());
+  userWatch.clear();
+  changedUsers.clear();
+  clearTimeout(userFlushTimer);
+}
+
+function rebuildFriends() {
+  friends = [...friendSet]
+    .map((p) => userInfo.get(p))
+    .filter(Boolean)
+    .map(withAlias)
+    .sort((a, b) => a.nickname.localeCompare(b.nickname, "ko"));
+  friends.forEach((f) => watchPresence(f.phone));
+  renderFriends();
+}
+
+function flushUserChanges() {
+  const changed = new Set(changedUsers);
+  changedUsers.clear();
+  if (!myPhone) return;
+  rebuildFriends();
+  applyRoomFilter();
+  if (currentRoom && currentRoom.loaded && currentRoom.members.some((p) => changed.has(p))) {
+    fillTitle($("chat-title"), currentRoom);
+    renderMessages(false);
+  }
+  // 보고 있는 프로필이 바뀌었으면 다시 그림
+  if (profileShown && changed.has(profileShown.phone) && !$("profile-modal").classList.contains("hidden")) {
+    refreshProfileView();
+  }
+}
+
 /* ================= 접속 중 / 입력 중 (Realtime Database) ================= */
 // Firestore엔 "창 닫히면 자동으로 지우기" 기능이 없어서, 이것만 Realtime Database를 씀
 const presence = new Map();      // 번호 → { online, lastSeen }
@@ -4641,7 +5148,9 @@ function lastSeenText(ms) {
   const days = Math.floor(hours / 24);
   return days < 7 ? `${days}일 전 접속` : "접속한 지 오래됨";
 }
-setInterval(renderChatSub, 60000);
+setInterval(() => {
+  if (!document.hidden) renderChatSub();
+}, 60000);
 
 // 입력 중: 글자 칠 때 3초에 한 번만 저장, 6초 넘게 소식 없으면 안 보이게
 let typingState = {};
@@ -4659,7 +5168,10 @@ function listenTyping(roomId) {
     (e) => console.warn(e)
   );
 }
-setInterval(renderTyping, 2000);
+setInterval(() => {
+  // 채팅방 안에서 누가 입력 중일 때만 (입력 표시 지우기용)
+  if (!document.hidden && currentRoom && Object.keys(typingState).length) renderTyping();
+}, 2000);
 
 function renderTyping() {
   const line = $("typing-line");
@@ -4699,6 +5211,59 @@ function clearTyping(roomId) {
   }
   lastTypingSent = 0;
 }
+
+/* ================= 배터리 아끼기: 앱이 안 보일 때 ================= */
+let sleepTimer = null;
+let sleeping = false;
+document.addEventListener("visibilitychange", () => {
+  clearTimeout(sleepTimer);
+  if (document.hidden) {
+    sleepTimer = setTimeout(() => {
+      if (!document.hidden) return;
+      sleeping = true;
+      try { goOffline(rtdb); } catch (e) { /* 괜찮음 */ }
+      // 앱 꺼져도 오는 알림을 켰으면 채팅 실시간 연결도 잠깐 끊음 (알림은 서버가 보내 줌)
+      if (pushOn() && PUSH_URL) disableNetwork(db).catch(() => {});
+    }, 30000);
+  } else if (sleeping) {
+    sleeping = false;
+    try { goOnline(rtdb); } catch (e) { /* 괜찮음 */ }
+    enableNetwork(db).catch(() => {});
+  }
+});
+
+/* ================= 키보드가 올라와도 위쪽(상단바)이 보이게 ================= */
+// 아이폰은 키보드가 올라오면 화면 전체를 위로 밀어 올려서 상단바가 가려짐
+// → 앱 높이를 "키보드 빼고 보이는 높이"로 맞추고, 밀려 올라간 화면은 제자리로
+(function fitToKeyboard() {
+  const vv = window.visualViewport;
+  if (!vv) return;
+  const appEl = $("app");
+  let frame = 0;
+  const fit = () => {
+    cancelAnimationFrame(frame);
+    frame = requestAnimationFrame(() => {
+      if (vv.scale > 1.05) {
+        appEl.style.height = ""; // 손가락으로 확대 중이면 건드리지 않음
+        return;
+      }
+      const box = $("msg-list");
+      const stick = box && box.scrollHeight - box.scrollTop - box.clientHeight < 80;
+      appEl.style.height = Math.round(vv.height) + "px";
+      if (window.scrollY || document.documentElement.scrollTop || document.body.scrollTop) {
+        window.scrollTo(0, 0);
+        document.body.scrollTop = 0;
+      }
+      if (stick && box) box.scrollTop = box.scrollHeight; // 맨 아래 보고 있었으면 계속 맨 아래
+    });
+  };
+  vv.addEventListener("resize", fit);
+  vv.addEventListener("scroll", fit);
+  window.addEventListener("scroll", () => {
+    if (window.scrollY) fit();
+  });
+  fit();
+})();
 
 /* ================= 홈 화면에 앱 추가 (PWA) ================= */
 const canUseSW = "serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost" || location.hostname === "127.0.0.1");
@@ -4762,6 +5327,9 @@ function cleanupSession() {
   $("notice").classList.add("hidden");
   updateTitle(0);
   stopPresence();
+  stopUserWatch();
+  aliases = new Map();
+  setReply(null);
   failedSends.clear();
   blockRanges = new Map();
   olderMessages = [];
