@@ -2752,9 +2752,13 @@ $("push-row").addEventListener("click", async () => {
 setTimeout(renderPushSettings, 0); // 아래쪽 설정(서비스 워커)이 준비된 뒤에 그림
 
 // 메시지 보낸 뒤: 받는 사람들 폰으로 알림 보내 달라고 서버에 부탁 (실패해도 채팅엔 영향 없음)
-function requestPush(roomId) {
+function requestPush(roomId, room) {
   if (!PUSH_URL) return;
-  pushApi("/notify", { roomId, appUrl: location.origin + location.pathname }).catch(() => {});
+  const skip = ((room && room.members) || []).filter((p) => {
+    const pr = p !== myPhone && presence.get(p);
+    return pr && pr.online && pr.watching;
+  });
+  pushApi("/notify", { roomId, skip, appUrl: location.origin + location.pathname }).catch(() => {});
 }
 
 /* ================= 차단 ================= */
@@ -3812,6 +3816,7 @@ function openRoom(id) {
       currentRoom = { id, ...data, loaded: true };
       fillTitle($("chat-title"), currentRoom);
       if (!isGroup(currentRoom)) watchPresence(dmPartner(currentRoom));
+      else currentRoom.members.forEach(watchPresence);
       renderChatSub();
       renderDmBanner();
 
@@ -4914,7 +4919,7 @@ async function sendItems(items, preview, retryId = null, room = currentRoom) {
   try {
     await batch.commit();
     if (retryId) dropFailed(room.id, retryId);
-    requestPush(room.id);
+    requestPush(room.id, room);
     return true;
   } catch (err) {
     console.warn(err);
@@ -5066,6 +5071,12 @@ const presenceWatch = new Map(); // 번호 → 감시 끄기 함수
 let presenceStops = [];
 
 // 접속 정보는 계정 ID(uid)로 저장 (Realtime Database 규칙이 전화번호를 모르기 때문)
+let myConnRef = null;
+// 앱을 보는지/내렸는지 바뀔 때마다 알려 줌
+document.addEventListener("visibilitychange", () => {
+  if (myConnRef) dbSet(myConnRef, document.visibilityState === "visible" ? 1 : 0).catch(() => {});
+});
+
 function startPresence() {
   const uid = auth.currentUser && auth.currentUser.uid;
   if (!uid) return;
@@ -5077,13 +5088,16 @@ function startPresence() {
       myConn = dbPush(dbRef(rtdb, `presence/${uid}/conns`)); // 기기(창)마다 하나
       await onDisconnect(myConn).remove();
       await onDisconnect(lastSeenRef).set(rtdbNow());
-      await dbSet(myConn, true);
+      // 값: 1 = 앱을 보고 있음, 0 = 켜져만 있음 (보고 있으면 서버 알림을 안 받음)
+      await dbSet(myConn, document.visibilityState === "visible" ? 1 : 0);
+      myConnRef = myConn;
     } catch (e) {
       console.warn("접속 표시를 저장하지 못했어요 (Realtime Database 규칙 확인)", e);
     }
   });
   presenceStops.push(() => {
     stop();
+    myConnRef = null;
     if (myConn) {
       dbRemove(myConn).catch(() => {});
       dbSet(lastSeenRef, Date.now()).catch(() => {});
@@ -5107,7 +5121,12 @@ function watchPresence(phone) {
     dbRef(rtdb, `presence/${uid}`),
     (snap) => {
       const v = snap.val() || {};
-      presence.set(phone, { online: !!(v.conns && Object.keys(v.conns).length), lastSeen: v.lastSeen || 0 });
+      const conns = v.conns ? Object.values(v.conns) : [];
+      presence.set(phone, {
+        online: conns.length > 0,
+        watching: conns.some((c) => c === 1), // 앱 화면을 보고 있는 기기가 있음
+        lastSeen: v.lastSeen || 0,
+      });
       onPresenceChange(phone);
     },
     (e) => console.warn(e)
