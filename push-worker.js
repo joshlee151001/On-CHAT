@@ -9,6 +9,7 @@
 const PROJECT_ID = "onchat-fc78e";
 const FIRESTORE = `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents`;
 const CONTACT = "mailto:onchat@example.com"; // 푸시 서비스에 알려주는 연락처 (형식만 맞으면 됨)
+const RTDB = "https://onchat-fc78e-default-rtdb.asia-southeast1.firebasedatabase.app";
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
@@ -38,6 +39,7 @@ export default {
       if (url.pathname === "/subscribe") return await subscribe(env, me, body);
       if (url.pathname === "/unsubscribe") return await unsubscribe(env, me, body);
       if (url.pathname === "/notify") return await notify(env, me, token, body, request);
+      if (url.pathname === "/ice") return await ice(env);
       return text("없는 주소예요", 404);
     } catch (err) {
       return text("서버 오류: " + (err && err.message), 500);
@@ -122,8 +124,9 @@ async function notify(env, me, token, body, request) {
   const senderDoc = await fsGet(`users/${me.phone}`, token);
   const nick = (senderDoc && str(senderDoc.fields && senderDoc.fields.nickname)) || "친구";
   const roomName = str(f.name) || "단톡방";
-  const title = isGroup ? roomName : nick;
-  const msgText = isGroup ? `${nick}: ${preview}` : preview;
+  const isCall = body.kind === "call";
+  const title = isCall ? nick : isGroup ? roomName : nick;
+  const msgText = isCall ? `📞 ${nick}님이 톡챗을 걸었어요` : isGroup ? `${nick}: ${preview}` : preview;
   // 알림 누르면 열 주소 (앱이 알려준 주소, https만)
   let appUrl = typeof body.appUrl === "string" && /^https:\/\/[^\s]+$/.test(body.appUrl) ? body.appUrl.split("?")[0] : "";
   if (!appUrl) appUrl = (request.headers.get("Origin") || "https://github.io") + "/";
@@ -138,6 +141,7 @@ async function notify(env, me, token, body, request) {
     if (phone === me.phone || skip.has(phone)) continue;
     const list = await readSubs(env, phone);
     if (!list.length) continue;
+    if (!isCall && (await isWatching(phone, token))) continue; // 앱 화면을 보고 있으면 안 보냄
     const alive = [];
     for (const sub of list) {
       const status = await sendPush(sub, payload, vapid).catch(() => 0);
@@ -148,6 +152,41 @@ async function notify(env, me, token, body, request) {
     if (alive.length !== list.length) await env.SUBS.put("subs:" + phone, JSON.stringify(alive));
   }
   return json({ ok: true, sent });
+}
+
+// 받는 사람이 지금 온챗 화면을 보고 있나? (접속 정보에서 1 = 보는 중)
+async function isWatching(phone, token) {
+  try {
+    const u = await fsGet(`users/${phone}`, token);
+    const uid = u && str(u.fields && u.fields.uid);
+    if (!uid) return false;
+    const res = await fetch(`${RTDB}/presence/${encodeURIComponent(uid)}/conns.json?auth=${encodeURIComponent(token)}`);
+    if (!res.ok) return false;
+    const conns = await res.json();
+    return !!conns && Object.values(conns).some((v) => v === 1);
+  } catch (e) {
+    return false;
+  }
+}
+
+/* ---------------- 톡챗 연결 도우미 (TURN) ---------------- */
+// Cloudflare Realtime TURN 키를 설정해 두면(TURN_KEY_ID, TURN_KEY_TOKEN) 중계 서버 정보를 만들어 줌
+// 설정 안 했으면 무료 STUN 만 (대부분 와이파이에선 이걸로 충분)
+async function ice(env) {
+  const stun = [{ urls: ["stun:stun.cloudflare.com:3478", "stun:stun.l.google.com:19302"] }];
+  if (!env.TURN_KEY_ID || !env.TURN_KEY_TOKEN) return json({ iceServers: stun });
+  try {
+    const res = await fetch(`https://rtc.live.cloudflare.com/v1/turn/keys/${env.TURN_KEY_ID}/credentials/generate-ice-servers`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${env.TURN_KEY_TOKEN}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ ttl: 86400 }),
+    });
+    if (!res.ok) return json({ iceServers: stun });
+    const j = await res.json();
+    return json({ iceServers: j.iceServers || stun });
+  } catch (e) {
+    return json({ iceServers: stun });
+  }
 }
 
 /* ---------------- VAPID 키 (처음 한 번 자동 생성) ---------------- */
