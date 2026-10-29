@@ -1622,7 +1622,7 @@ const firebaseConfig = {
 };
 
 // 👉 Cloudflare 알림 서버 주소 (예: "https://onchat-push.아이디.workers.dev"). 비어 있으면 앱 꺼진 알림은 꺼짐
-const APP_VERSION = "2026.10.29"; // 설정 맨 아래에 보임 (새 버전 받았는지 확인용)
+const APP_VERSION = "2026.10.29b"; // 설정 맨 아래에 보임 (새 버전 받았는지 확인용)
 setTimeout(() => { const v = document.getElementById("app-version"); if (v) v.textContent = "OnChat 버전 " + APP_VERSION; }, 0);
 const PUSH_URL = "https://onchat.joshlee151001.workers.dev".replace(/\/$/, "");
 
@@ -2798,7 +2798,7 @@ setTimeout(renderPushSettings, 0); // 아래쪽 설정(서비스 워커)이 준�
 // 메시지 보낸 뒤: 받는 사람들 폰으로 알림 보내 달라고 서버에 부탁 (실패해도 채팅엔 영향 없음)
 function requestPush(roomId, room, kind) {
   if (!PUSH_URL) return;
-  const skip = ((room && room.members) || []).filter((p) => {
+  const skip = kind === "call" ? [] : ((room && room.members) || []).filter((p) => {
     const pr = p !== myPhone && presence.get(p);
     return pr && pr.online && pr.watching;
   });
@@ -5128,7 +5128,8 @@ let presenceStops = [];
 let myConnRef = null;
 // 앱을 보는지/내렸는지 바뀔 때마다 알려 줌
 document.addEventListener("visibilitychange", () => {
-  if (myConnRef) dbSet(myConnRef, document.visibilityState === "visible" ? 1 : 0).catch(() => {});
+  // 연결을 끊었다가 다시 켜는 중이면 새 접속 정보가 따로 만들어짐 (예전 것에 쓰면 안 지워진 채 남음)
+  if (myConnRef && !rtdbOff) dbSet(myConnRef, document.visibilityState === "visible" ? 1 : 0).catch(() => {});
 });
 
 function startPresence() {
@@ -5748,20 +5749,32 @@ window.addEventListener("pagehide", () => {
 /* ================= 배터리 아끼기: 앱이 안 보일 때 ================= */
 let sleepTimer = null;
 let sleeping = false;
+let rtdbOff = false;
 document.addEventListener("visibilitychange", () => {
   clearTimeout(sleepTimer);
   if (document.hidden) {
+    // 앱을 내리거나 화면을 잠그면 바로 "안 보는 중"으로 (접속 연결을 바로 끊어서 확실하게)
+    // → 아이폰이 앱을 멈춰도 "보는 중"으로 남아서 알림이 안 오는 일이 없게
+    if (!call) {
+      rtdbOff = true;
+      myConnRef = null;
+      try { goOffline(rtdb); } catch (e) { /* 괜찮음 */ }
+    }
     sleepTimer = setTimeout(() => {
       if (!document.hidden || call) return;
       sleeping = true;
-      try { goOffline(rtdb); } catch (e) { /* 괜찮음 */ }
       // 앱 꺼져도 오는 알림을 켰으면 채팅 실시간 연결도 잠깐 끊음 (알림은 서버가 보내 줌)
       if (pushOn() && PUSH_URL) disableNetwork(db).catch(() => {});
     }, 30000);
-  } else if (sleeping) {
-    sleeping = false;
-    try { goOnline(rtdb); } catch (e) { /* 괜찮음 */ }
-    enableNetwork(db).catch(() => {});
+  } else {
+    if (rtdbOff) {
+      rtdbOff = false;
+      try { goOnline(rtdb); } catch (e) { /* 괜찮음 */ }
+    }
+    if (sleeping) {
+      sleeping = false;
+      enableNetwork(db).catch(() => {});
+    }
   }
 });
 
