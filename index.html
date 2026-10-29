@@ -82,6 +82,7 @@ button { font-family: inherit; }
 }
 
 .hidden { display: none !important; }
+.app-version { text-align: center; font-size: 11px; color: var(--text-sub); padding: 14px 0 24px; }
 
 /* ===== 처음 로딩 (온이) ===== */
 #splash {
@@ -1227,6 +1228,7 @@ mark.hl { background: #FFE066; color: #222; border-radius: 3px; padding: 0 1px; 
         </button>
         <div class="section-title">계정</div>
         <button id="logout-btn" class="setting-row danger">로그아웃</button>
+        <p id="app-version" class="app-version"></p>
       </div>
 
       <!-- 하단 탭바 -->
@@ -1620,6 +1622,8 @@ const firebaseConfig = {
 };
 
 // 👉 Cloudflare 알림 서버 주소 (예: "https://onchat-push.아이디.workers.dev"). 비어 있으면 앱 꺼진 알림은 꺼짐
+const APP_VERSION = "2026.10.29"; // 설정 맨 아래에 보임 (새 버전 받았는지 확인용)
+setTimeout(() => { const v = document.getElementById("app-version"); if (v) v.textContent = "OnChat 버전 " + APP_VERSION; }, 0);
 const PUSH_URL = "https://onchat.joshlee151001.workers.dev".replace(/\/$/, "");
 
 const app = initializeApp(firebaseConfig);
@@ -5325,7 +5329,7 @@ function renderCallScreen() {
   $("call-mute").classList.toggle("hidden", incoming);
   $("call-mute").classList.toggle("on", !!call.muted);
   $("call-speaker").classList.toggle("hidden", incoming);
-  $("call-speaker").classList.toggle("on", !!call.speaker);
+  $("call-speaker").classList.toggle("on", !!call.speaker && !call.autoFix);
   let status = "";
   if (call.state === "ringing") status = call.role === "caller" ? "톡챗 거는 중..." : "톡챗이 왔어요";
   else if (call.state === "connecting") status = "연결 중...";
@@ -5449,6 +5453,22 @@ function markConnected() {
   clearTimeout(call.ringTimer);
   call.tick = setInterval(renderCallScreen, 1000);
   renderCallScreen();
+  // 아이폰은 처음에 소리를 큰 스피커로 내보내는 경우가 있음
+  // → 신호음이 꺼진 뒤, 스피커 켰다 끄기를 한 번 자동으로 해서 수화기로 돌려놓음
+  const c = call;
+  setTimeout(() => {
+    if (call !== c || c.speaker) return;
+    c.speaker = true;
+    c.autoFix = true;
+    applySpeaker();
+    setTimeout(() => {
+      c.autoFix = false;
+      if (call !== c || !c.speaker || c.userSpeaker) return;
+      c.speaker = false;
+      applySpeaker();
+      renderCallScreen();
+    }, 400);
+  }, 1300);
 }
 
 // 스피커: 끄면 귀에 대는 수화기, 켜면 큰 스피커
@@ -5710,6 +5730,7 @@ $("call-decline").addEventListener("click", declineCall);
 $("call-hang").addEventListener("click", () => hangUp("ended"));
 $("call-speaker").addEventListener("click", () => {
   if (!call) return;
+  call.userSpeaker = true;
   call.speaker = !call.speaker;
   applySpeaker();
   renderCallScreen();
