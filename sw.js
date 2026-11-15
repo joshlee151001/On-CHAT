@@ -1,5 +1,6 @@
 // OnChat 서비스 워커: 홈 화면 앱으로 열리게 하고, 알림을 누르면 그 채팅방을 열어 줌
-const CACHE = "onchat-v6"; // 아이폰 새 알림 방식
+const CACHE = "onchat-v8"; // 빨리 열리게
+const LIB = "onchat-lib-13.1.0"; // Firebase 프로그램 (버전이 주소에 있어서 안 바뀜)
 const SHELL = ["./", "./index.html", "./manifest.json", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", (e) => {
@@ -9,28 +10,44 @@ self.addEventListener("install", (e) => {
 self.addEventListener("activate", (e) => {
   e.waitUntil(
     caches.keys()
-      .then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))))
+      .then((keys) => Promise.all(keys.filter((k) => k !== CACHE && k !== LIB && k !== "onchat-badge").map((k) => caches.delete(k))))
       .then(() => self.clients.claim())
   );
 });
 
-// 온챗 파일만: 인터넷 되면 최신 걸 받고, 안 되면 저장해 둔 걸로 열기
-// (Firebase 같은 바깥 주소는 건드리지 않음)
 self.addEventListener("fetch", (e) => {
   const url = new URL(e.request.url);
-  if (e.request.method !== "GET" || url.origin !== location.origin) return;
-  e.respondWith(
-    fetch(e.request)
-      .then((res) => {
-        const copy = res.clone();
-        caches.open(CACHE).then((c) => c.put(e.request, copy));
+  if (e.request.method !== "GET") return;
+  if (url.href.startsWith("https://www.gstatic.com/firebasejs/13.1.0/")) {
+    e.respondWith(
+      caches.open(LIB).then(async (c) => {
+        const hit = await c.match(e.request);
+        if (hit) return hit;
+        const res = await fetch(e.request);
+        if (res.ok) c.put(e.request, res.clone());
         return res;
       })
-      .catch(() => caches.match(e.request).then((hit) => hit || caches.match("./index.html")))
+    );
+    return;
+  }
+  if (url.origin !== location.origin) return;
+  e.respondWith(
+    (async () => {
+      const net = fetch(e.request).then((res) => {
+        if (res.ok) {
+          const copy = res.clone();
+          caches.open(CACHE).then((c) => c.put(e.request, copy));
+        }
+        return res;
+      });
+      const cached = await caches.match(e.request);
+      if (!cached) return net.catch(() => caches.match("./index.html"));
+      const slow = new Promise((r) => setTimeout(() => r(cached), 3000));
+      return Promise.race([net.catch(() => cached), slow]);
+    })()
   );
 });
 
-// 앱이 꺼져 있을 때 서버에서 온 새 메시지 알림 띄우기
 self.addEventListener("push", (e) => {
   let data = {};
   try {
@@ -40,16 +57,21 @@ self.addEventListener("push", (e) => {
   }
   e.waitUntil(
     (async () => {
-      // 온챗을 보고 있는 중이면 앱 안 배너가 뜨니까 안 띄움 (아이폰은 꼭 띄워야 해서 예외)
       const list = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
       const watching = list.some((c) => c.visibilityState === "visible" && c.focused);
       const ios = /iPhone|iPad|iPod/.test(self.navigator.userAgent);
       if (watching && !ios) return;
-      // 아이폰이 새 방식(web_push 8030) 알림을 직접 띄워 주는 경우 → 우리가 따로 안 띄움 (소리/진동은 폰이 처리)
       if (ios && data.web_push === 8030 && e.notification) return;
+      // 홈 화면 아이콘 숫자 +1 (앱을 열면 정확한 숫자로 다시 맞춰요)
+      try {
+        const bc = await caches.open("onchat-badge");
+        const old = await bc.match("/badge");
+        const n = (old ? parseInt(await old.text(), 10) || 0 : 0) + 1;
+        await bc.put("/badge", new Response(String(n)));
+        if (self.navigator.setAppBadge) await self.navigator.setAppBadge(n);
+      } catch (err) { /* 지원 안 하는 기기 */ }
       await self.registration.showNotification(data.title || "OnChat", {
         body: data.body || "새 메시지가 왔어요",
-        // 아이폰은 같은 tag면 조용히 바꿔치기만 해서 소리가 안 남 → 알림마다 다른 tag
         tag: (data.roomId || "onchat") + "-" + Date.now(),
         renotify: true,
         silent: false,
@@ -63,7 +85,6 @@ self.addEventListener("push", (e) => {
   );
 });
 
-// 알림 누르면: 열린 온챗 창이 있으면 그 창에서 방 열기, 없으면 새로 열기
 self.addEventListener("notificationclick", (e) => {
   e.notification.close();
   const roomId = e.notification.data && e.notification.data.roomId;
