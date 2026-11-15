@@ -1002,6 +1002,14 @@ mark.hl { background: #FFE066; color: #222; border-radius: 3px; padding: 0 1px; 
 .reply-quote .rq-text { color: var(--text-sub); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .reply-quote { background: rgba(255,255,255,0.08); } }
 :root[data-theme="dark"] .reply-quote { background: rgba(255,255,255,0.08); }
+.swipe-reply-icon { position: absolute; left: -38px; top: 50%; transform: translateY(-50%) scale(0.6); width: 30px; height: 30px; border-radius: 50%; background: var(--sheet); color: var(--text-sub); display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 900; box-shadow: 0 2px 8px rgba(0,0,0,0.15); opacity: 0; pointer-events: none; transition: background 0.15s, color 0.15s; }
+.swipe-reply-icon.hit { background: var(--primary); color: #fff; }
+.ptr { height: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--text-sub); font-size: 13px; font-weight: 700; }
+.ptr .ptr-spin { font-size: 20px; font-weight: 900; transition: color 0.15s; }
+.ptr.ready .ptr-spin, .ptr.busy .ptr-spin { color: var(--primary); }
+.ptr.busy .ptr-spin { animation: ptrspin 0.7s linear infinite; }
+@keyframes ptrspin { to { transform: rotate(360deg); } }
+#msg-list { overflow-x: hidden; }
 .msg.flash .bubble, .msg.flash .photo, .msg.flash .sticker { animation: flash 1.2s ease-out; }
 @keyframes flash { 0%, 40% { box-shadow: 0 0 0 3px #FFD43B; } 100% { box-shadow: 0 0 0 0 transparent; } }
 
@@ -1220,7 +1228,7 @@ mark.hl { background: #FFE066; color: #222; border-radius: 3px; padding: 0 1px; 
         </button>
         <div class="section-title">화면</div>
         <button id="theme-row" class="setting-row">
-          다크모드 <span id="theme-switch" class="switch"></span>
+          화면 모드<small class="setting-sub" id="theme-sub">아이폰 설정 따라가기</small> <span id="theme-value" class="setting-value">자동 ›</span>
         </button>
         <div class="section-title">친구</div>
         <button id="blocked-row" class="setting-row">
@@ -1622,7 +1630,7 @@ const firebaseConfig = {
 };
 
 // 👉 Cloudflare 알림 서버 주소 (예: "https://onchat-push.아이디.workers.dev"). 비어 있으면 앱 꺼진 알림은 꺼짐
-const APP_VERSION = "2026.10.29b"; // 설정 맨 아래에 보임 (새 버전 받았는지 확인용)
+const APP_VERSION = "2026.11.15a"; // 설정 맨 아래에 보임 (새 버전 받았는지 확인용)
 setTimeout(() => { const v = document.getElementById("app-version"); if (v) v.textContent = "OnChat 버전 " + APP_VERSION; }, 0);
 const PUSH_URL = "https://onchat.joshlee151001.workers.dev".replace(/\/$/, "");
 
@@ -1814,16 +1822,28 @@ function isDark() {
   return window.matchMedia("(prefers-color-scheme: dark)").matches;
 }
 
+// 자동(아이폰 설정 따라가기) → 밝게 → 어둡게 → 자동…
 function updateThemeSwitch() {
-  $("theme-switch").classList.toggle("on", isDark());
+  const t = document.documentElement.dataset.theme || "auto";
+  $("theme-value").textContent = { auto: "자동", light: "밝게", dark: "어둡게" }[t] + " ›";
+  $("theme-sub").textContent = { auto: "아이폰 설정 따라가기 (밤엔 자동으로 어둡게)", light: "항상 밝은 화면", dark: "항상 어두운 화면" }[t];
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute("content", isDark() ? "#1E1A16" : meta.dataset.light || meta.getAttribute("content"));
 }
 
 $("theme-row").addEventListener("click", () => {
-  const next = isDark() ? "light" : "dark";
-  document.documentElement.dataset.theme = next;
-  localStorage.setItem("onchat-theme", next);
+  const cur = document.documentElement.dataset.theme || "auto";
+  const next = { auto: "light", light: "dark", dark: "auto" }[cur];
+  if (next === "auto") { delete document.documentElement.dataset.theme; localStorage.removeItem("onchat-theme"); }
+  else { document.documentElement.dataset.theme = next; localStorage.setItem("onchat-theme", next); }
   updateThemeSwitch();
+  toast({ auto: "🌗 자동: 아이폰 설정을 따라가요", light: "☀️ 항상 밝은 화면", dark: "🌙 항상 어두운 화면" }[next]);
 });
+(() => {
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.dataset.light = meta.getAttribute("content");
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", updateThemeSwitch);
+})();
 updateThemeSwitch();
 
 /* ================= 하단 탭 ================= */
@@ -2605,8 +2625,26 @@ function playDing() {
   });
 }
 
+// 홈 화면 아이콘 숫자 (안 읽은 메시지 수)
+let lastBadge = -1;
+function updateAppBadge() {
+  let total = 0;
+  for (const room of allRooms) {
+    if (room.type === "dm" && blocked.has(dmPartner(room))) continue;
+    total += myUnread(room);
+  }
+  if (total === lastBadge) return;
+  lastBadge = total;
+  try {
+    if ("setAppBadge" in navigator) total > 0 ? navigator.setAppBadge(total).catch(() => {}) : navigator.clearAppBadge().catch(() => {});
+  } catch (e) { /* 지원 안 하는 기기 */ }
+  // 앱이 꺼져 있을 때 알림이 오면 서비스 워커가 이 숫자에서 +1 해요
+  try { caches.open("onchat-badge").then((c) => c.put("/badge", new Response(String(total)))); } catch (e) { /* 괜찮음 */ }
+}
+
 // 방 목록이 바뀔 때마다: 내 안 읽음 수가 늘어난 방 = 새 메시지 도착
 function checkNewMessages() {
+  updateAppBadge();
   const firstTime = !roomsLoaded;
   roomsLoaded = true;
   for (const room of allRooms) {
@@ -4018,6 +4056,77 @@ function closeRoom() {
 
 $("chat-back").addEventListener("click", closeRoom);
 
+// 화면 왼쪽 끝에서 오른쪽으로 밀면 채팅방 → 목록 (아이폰 앱처럼)
+(() => {
+  const scr = $("chat-screen");
+  let sx = 0, sy = 0, on = false, mode = null, dx = 0;
+  scr.addEventListener("touchstart", (e) => {
+    if (e.touches.length !== 1) return;
+    sx = e.touches[0].clientX; sy = e.touches[0].clientY;
+    on = sx < 28 && !document.querySelector(".overlay:not(.hidden)");
+    mode = null; dx = 0;
+  }, { passive: true });
+  scr.addEventListener("touchmove", (e) => {
+    if (!on) return;
+    const x = e.touches[0].clientX - sx, y = e.touches[0].clientY - sy;
+    if (!mode) { if (Math.abs(x) < 6 && Math.abs(y) < 6) return; mode = x > Math.abs(y) ? "back" : "none"; }
+    if (mode !== "back") return;
+    dx = Math.max(0, x);
+    scr.style.transition = "none";
+    scr.style.transform = `translateX(${dx}px)`;
+    scr.style.boxShadow = "-8px 0 24px rgba(0,0,0,0.15)";
+  }, { passive: true });
+  const end = () => {
+    if (!on || mode !== "back") { on = false; return; }
+    on = false;
+    const go = dx > Math.min(120, innerWidth * 0.3);
+    scr.style.transition = "transform 0.22s ease-out";
+    scr.style.transform = go ? "translateX(100%)" : "";
+    setTimeout(() => {
+      scr.style.transition = ""; scr.style.transform = ""; scr.style.boxShadow = "";
+      if (go) closeRoom();
+    }, 230);
+  };
+  scr.addEventListener("touchend", end);
+  scr.addEventListener("touchcancel", end);
+})();
+
+// 채팅 목록을 맨 위에서 아래로 당기면 새로고침
+(() => {
+  const page = $("tab-chats");
+  const ptr = el("div", "ptr");
+  ptr.innerHTML = '<div class="ptr-spin">↻</div><span>당겨서 새로고침</span>';
+  page.prepend(ptr);
+  let sy = 0, on = false, dy = 0, busy = false;
+  page.addEventListener("touchstart", (e) => {
+    on = page.scrollTop <= 0 && !busy && e.touches.length === 1;
+    sy = e.touches[0].clientY; dy = 0;
+  }, { passive: true });
+  page.addEventListener("touchmove", (e) => {
+    if (!on) return;
+    dy = e.touches[0].clientY - sy;
+    if (dy <= 0) { ptr.style.height = "0px"; return; }
+    const h = Math.min(90, dy * 0.5);
+    ptr.style.transition = "none";
+    ptr.style.height = h + "px";
+    ptr.querySelector(".ptr-spin").style.transform = `rotate(${dy * 2}deg)`;
+    ptr.querySelector("span").textContent = h >= 60 ? "놓으면 새로고침" : "당겨서 새로고침";
+    ptr.classList.toggle("ready", h >= 60);
+  }, { passive: true });
+  page.addEventListener("touchend", () => {
+    if (!on) return;
+    on = false;
+    ptr.style.transition = "height 0.2s";
+    if (Math.min(90, dy * 0.5) >= 60) {
+      busy = true;
+      ptr.style.height = "60px";
+      ptr.classList.add("busy");
+      ptr.querySelector("span").textContent = "새로고침 중…";
+      setTimeout(() => location.reload(), 500);
+    } else ptr.style.height = "0px";
+  });
+})();
+
 /* ================= 친구 아닌 사용자 / 차단 배너 (1:1 방) ================= */
 function renderDmBanner() {
   const banner = $("dm-banner");
@@ -4609,6 +4718,50 @@ function attachMessageMenu(node, m) {
   node.addEventListener("touchend", cancel);
   node.addEventListener("touchmove", cancel);
   node.addEventListener("touchcancel", cancel);
+  attachSwipeReply(node, m);
+}
+
+// 말풍선을 오른쪽으로 밀면 답장 (카톡처럼)
+function attachSwipeReply(node, m) {
+  let sx = 0, sy = 0, dx = 0, mode = null, row = null, icon = null, hit = false;
+  node.addEventListener("touchstart", (e) => {
+    if (e.touches.length !== 1) return;
+    sx = e.touches[0].clientX; sy = e.touches[0].clientY; dx = 0; mode = null; hit = false;
+    row = node.closest(".msg");
+  }, { passive: true });
+  node.addEventListener("touchmove", (e) => {
+    if (!row || e.touches.length !== 1) return;
+    const x = e.touches[0].clientX - sx, y = e.touches[0].clientY - sy;
+    if (!mode) {
+      if (Math.abs(x) < 8 && Math.abs(y) < 8) return;
+      mode = x > 0 && Math.abs(x) > Math.abs(y) * 1.4 && !m.deleted && !$("chat-text").disabled ? "swipe" : "scroll";
+      if (mode === "swipe") {
+        icon = el("div", "swipe-reply-icon", "↩");
+        row.style.position = "relative";
+        row.appendChild(icon);
+      }
+    }
+    if (mode !== "swipe") return;
+    dx = Math.max(0, Math.min(90, x));
+    const pull = dx < 60 ? dx : 60 + (dx - 60) * 0.3;
+    row.style.transform = `translateX(${pull}px)`;
+    icon.style.opacity = Math.min(1, dx / 60);
+    icon.style.transform = `translateY(-50%) scale(${0.6 + Math.min(1, dx / 60) * 0.5})`;
+    if (dx >= 60 && !hit) { hit = true; icon.classList.add("hit"); try { navigator.vibrate && navigator.vibrate(10); } catch (er) { /* 괜찮음 */ } }
+    if (dx < 60 && hit) { hit = false; icon.classList.remove("hit"); }
+  }, { passive: true });
+  const end = () => {
+    if (mode === "swipe" && row) {
+      row.style.transition = "transform 0.2s ease-out";
+      row.style.transform = "";
+      const r = row, ic = icon;
+      setTimeout(() => { r.style.transition = ""; if (ic) ic.remove(); }, 220);
+      if (hit) { longPressed = true; setReply(m); }
+    }
+    mode = null; row = null; icon = null;
+  };
+  node.addEventListener("touchend", end);
+  node.addEventListener("touchcancel", end);
 }
 
 function openMessageMenu(m) {
@@ -5885,6 +6038,8 @@ function cleanupSession() {
 }
 
 $("logout-btn").addEventListener("click", async () => {
+  try { if ("clearAppBadge" in navigator) navigator.clearAppBadge(); } catch (e) { /* 괜찮음 */ }
+  lastBadge = -1;
   if (!confirm("로그아웃할까요?")) return;
   // 이 기기로 내 알림이 계속 오지 않게
   if (pushOn()) {
