@@ -1075,6 +1075,9 @@ mark.hl { background: #FFE066; color: #222; border-radius: 3px; padding: 0 1px; 
 .hint { font-size: 11px; color: var(--text-sub); font-weight: 400; }
 #auth-submit { margin-top: 12px; }
 #forgot-btn, #gmail-toggle { margin: 6px auto 0; }
+.pw-desc { margin: 0 4px 12px; padding: 12px 14px; border-radius: 14px; background: color-mix(in srgb, var(--primary) 12%, transparent); color: var(--text); font-size: 14px; line-height: 1.5; }
+.pw-msg { min-height: 18px; margin: 4px 2px 0; color: #e5484d; font-size: 13px; }
+#pw-forgot { display: block; margin: 10px auto 4px; }
 .verify-box { text-align: center; display: flex; flex-direction: column; gap: 10px; }
 .verify-box .mail-icon { font-size: 44px; }
 .verify-to { font-size: 15px; line-height: 1.6; }
@@ -1267,6 +1270,9 @@ mark.hl { background: #FFE066; color: #222; border-radius: 3px; padding: 0 1px; 
           <span>잠그는 시간<small class="setting-sub">앱을 나갔다가 다시 올 때</small></span> <span id="lock-time" class="setting-value">바로 ›</span>
         </button>
         <div class="section-title">계정</div>
+        <button id="pw-row" class="setting-row">
+          <span><span id="pw-row-title">비밀번호 변경</span><small class="setting-sub" id="pw-row-sub">로그인할 때 쓰는 비밀번호</small></span> <span class="setting-value">›</span>
+        </button>
         <button id="logout-btn" class="setting-row danger">로그아웃</button>
         <p id="app-version" class="app-version"></p>
       </div>
@@ -1567,6 +1573,30 @@ mark.hl { background: #FFE066; color: #222; border-radius: 3px; padding: 0 1px; 
       </div>
     </div>
 
+    <!-- ========== 비밀번호 만들기 / 변경 ========== -->
+    <div id="pw-modal" class="overlay hidden">
+      <div class="sheet scroll">
+        <div class="sheet-head">
+          <h3 id="pw-title">비밀번호 변경</h3>
+          <button class="icon-btn" data-close aria-label="닫기">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+          </button>
+        </div>
+        <p id="pw-desc" class="pw-desc hidden"></p>
+        <form id="pw-form" class="form">
+          <label class="field-label" for="pw-cur" id="pw-cur-label">지금 비밀번호</label>
+          <input id="pw-cur" class="input" type="password" autocomplete="current-password" required>
+          <label class="field-label" for="pw-new">새 비밀번호 (6자 이상)</label>
+          <input id="pw-new" class="input" type="password" autocomplete="new-password" minlength="6" required>
+          <label class="field-label" for="pw-new2">새 비밀번호 한 번 더</label>
+          <input id="pw-new2" class="input" type="password" autocomplete="new-password" minlength="6" required>
+          <p id="pw-msg" class="pw-msg"></p>
+          <button id="pw-save" class="btn" type="submit">바꾸기</button>
+        </form>
+        <button id="pw-forgot" class="link-btn hidden" type="button">Gmail 비밀번호를 잊었어요</button>
+      </div>
+    </div>
+
     <!-- ========== 차단 친구 관리 ========== -->
     <div id="blocked-modal" class="overlay hidden">
       <div class="sheet tall">
@@ -1610,6 +1640,10 @@ import {
   sendEmailVerification,
   sendPasswordResetEmail,
   deleteUser,
+  EmailAuthProvider,
+  reauthenticateWithCredential,
+  updatePassword,
+  updateEmail,
 } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
 import {
   getFirestore,
@@ -1662,7 +1696,7 @@ const firebaseConfig = {
 };
 
 // 👉 Cloudflare 알림 서버 주소 (예: "https://onchat-push.아이디.workers.dev"). 비어 있으면 앱 꺼진 알림은 꺼짐
-const APP_VERSION = "2026.11.15b"; // 설정 맨 아래에 보임 (새 버전 받았는지 확인용)
+const APP_VERSION = "2026.11.15c"; // 설정 맨 아래에 보임 (새 버전 받았는지 확인용)
 setTimeout(() => { const v = document.getElementById("app-version"); if (v) v.textContent = "OnChat 버전 " + APP_VERSION; }, 0);
 const PUSH_URL = "https://onchat.joshlee151001.workers.dev".replace(/\/$/, "");
 
@@ -1996,6 +2030,111 @@ updateLockRows();
 if (lockInfo()) { showLock(); setTimeout(tryFaceUnlock, 400); }
 // 테스트·문제 확인용
 window.__onchat = { get failedSends() { return failedSends; }, loadOutbox: () => loadOutbox(), flushOutbox: () => flushOutbox(), keepAwake: (on) => keepAwake(on), showLock: () => showLock() };
+
+
+/* ================= 비밀번호 만들기 / 변경 ================= */
+// 예전에 Gmail로 가입한 사람 → 전화번호 로그인용 비밀번호 만들기 (계정 주소를 전화번호 주소로 옮김)
+// 전화번호로 가입한 사람 → 비밀번호 변경
+const PHONE_DOMAIN = "@onchat-fc78e.firebaseapp.com";
+function isGmailAccount() {
+  const u = auth.currentUser;
+  return !!(u && u.email && !u.email.endsWith(PHONE_DOMAIN));
+}
+function renderPwRow() {
+  const g = isGmailAccount();
+  $("pw-row-title").textContent = g ? "비밀번호 만들기" : "비밀번호 변경";
+  $("pw-row-sub").textContent = g ? "Gmail 없이 전화번호로 로그인할 수 있어요" : "로그인할 때 쓰는 비밀번호";
+}
+function openPwModal() {
+  const g = isGmailAccount();
+  $("pw-form").reset();
+  $("pw-msg").textContent = "";
+  $("pw-title").textContent = g ? "비밀번호 만들기" : "비밀번호 변경";
+  $("pw-desc").textContent = g
+    ? "이제 Gmail 대신 전화번호 + 비밀번호로 로그인해요. 새 비밀번호를 만들면 다음부터는 전화번호로 들어오면 돼요. (친구·채팅은 그대로예요)"
+    : "";
+  $("pw-desc").classList.toggle("hidden", !g);
+  $("pw-cur-label").textContent = g ? "지금 Gmail 로그인 비밀번호" : "지금 비밀번호";
+  $("pw-save").textContent = g ? "비밀번호 만들기" : "바꾸기";
+  $("pw-forgot").classList.toggle("hidden", !g);
+  openModal("pw-modal");
+  setTimeout(() => $("pw-cur").focus(), 100);
+}
+$("pw-row").addEventListener("click", openPwModal);
+
+function pwError(err) {
+  const code = err && err.code;
+  if (["auth/invalid-credential", "auth/invalid-login-credentials", "auth/wrong-password"].includes(code)) return "지금 비밀번호가 맞지 않아요.";
+  if (code === "auth/too-many-requests") return "너무 많이 시도했어요. 잠시 뒤에 다시 해 주세요.";
+  if (code === "auth/weak-password") return "비밀번호를 6자 이상으로 해 주세요.";
+  if (code === "auth/email-already-in-use") return "이 전화번호로 만든 계정이 따로 있어요. 그 계정으로 로그인해 주세요.";
+  if (code === "auth/operation-not-allowed") return "관리자 설정이 필요해요. (Firebase → Authentication → 설정 → 이메일 열거 보호 끄기)";
+  if (code === "auth/network-request-failed") return "인터넷 연결을 확인해 주세요.";
+  return "바꾸지 못했어요. (" + (code || (err && err.message) || "오류") + ")";
+}
+
+$("pw-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const user = auth.currentUser;
+  if (!user || !myPhone) return;
+  const cur = $("pw-cur").value;
+  const pw1 = $("pw-new").value;
+  const pw2 = $("pw-new2").value;
+  const msg = $("pw-msg");
+  if (pw1.length < 6) { msg.textContent = "새 비밀번호는 6자 이상으로 해 주세요."; return $("pw-new").focus(); }
+  if (pw1 !== pw2) { msg.textContent = "새 비밀번호가 서로 달라요."; return $("pw-new2").focus(); }
+  const gmail = isGmailAccount();
+  if (!gmail && pw1 === cur) { msg.textContent = "지금 비밀번호와 다르게 해 주세요."; return; }
+  const btn = $("pw-save");
+  const label = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = "잠시만요...";
+  msg.textContent = "";
+  try {
+    await reauthenticateWithCredential(user, EmailAuthProvider.credential(user.email, cur));
+    if (gmail) await updateEmail(user, phoneEmail(myPhone));
+    await updatePassword(user, pw1);
+    closeModal("pw-modal");
+    renderPwRow();
+    if (gmail) {
+      alert("비밀번호를 만들었어요!\n\n다음부터는 '기존 프로필로 로그인'에서\n전화번호 " + formatPhone(myPhone) + " + 새 비밀번호로 들어오면 돼요.");
+    } else {
+      toast("🔑 비밀번호를 바꿨어요");
+    }
+  } catch (err) {
+    console.warn(err);
+    msg.textContent = pwError(err);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = label;
+  }
+});
+
+$("pw-forgot").addEventListener("click", async () => {
+  const user = auth.currentUser;
+  if (!user || !isGmailAccount()) return;
+  try {
+    await sendPasswordResetEmail(auth, user.email, verifyUrl());
+    $("pw-msg").textContent = "";
+    toast("📧 " + user.email + "(으)로 비밀번호 재설정 메일을 보냈어요");
+  } catch (err) {
+    console.warn(err);
+    $("pw-msg").textContent = pwError(err);
+  }
+});
+
+// Gmail 계정이면 하루에 한 번 비밀번호 만들기 안내
+function nudgeGmailPassword() {
+  renderPwRow();
+  if (!isGmailAccount()) return;
+  const key = "onchat-pwnudge-" + auth.currentUser.uid;
+  const today = new Date().toDateString();
+  try { if (localStorage.getItem(key) === today) return; localStorage.setItem(key, today); } catch (e) { /* 괜찮음 */ }
+  setTimeout(() => {
+    if (!myPhone || document.querySelector(".overlay:not(.hidden)")) return;
+    openPwModal();
+  }, 1500);
+}
 
 /* ================= 하단 탭 ================= */
 document.querySelectorAll(".tabbar button").forEach((btn) => {
@@ -2572,6 +2711,7 @@ function enterMain(phone) {
   $("login-screen").classList.add("hidden");
   $("main-screen").classList.remove("hidden");
   showTab("friends");
+  nudgeGmailPassword();
 
   // 1) 내 정보 실시간 감시
   const stopMe = onSnapshot(doc(db, "users", phone), (snap) => {
