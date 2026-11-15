@@ -1002,6 +1002,17 @@ mark.hl { background: #FFE066; color: #222; border-radius: 3px; padding: 0 1px; 
 .reply-quote .rq-text { color: var(--text-sub); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .reply-quote { background: rgba(255,255,255,0.08); } }
 :root[data-theme="dark"] .reply-quote { background: rgba(255,255,255,0.08); }
+#lock-screen { position: fixed; inset: 0; z-index: 99999; background: var(--bg); color: var(--text); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 24px; text-align: center; }
+#lock-screen .lock-ic { font-size: 64px; }
+#lock-screen .lock-title { font-size: 22px; font-weight: 800; }
+#lock-screen .lock-sub { font-size: 14px; color: var(--text-sub); margin-bottom: 10px; }
+#lock-screen .lock-btn { height: 52px; min-width: 220px; padding: 0 22px; border: none; border-radius: 16px; background: var(--primary); color: #fff; font-size: 17px; font-weight: 800; cursor: pointer; }
+#lock-screen .lock-link { border: none; background: none; color: var(--text-sub); font-size: 14px; text-decoration: underline; padding: 8px; cursor: pointer; }
+#lock-screen form { display: flex; flex-direction: column; gap: 10px; align-items: center; }
+#lock-screen input { width: 240px; height: 50px; border-radius: 14px; border: 2px solid var(--border); background: var(--input-bg); color: var(--text); font-size: 16px; padding: 0 14px; outline: none; }
+#lock-screen .lock-msg { color: var(--danger); font-size: 13px; min-height: 18px; }
+#offline-pill { position: fixed; left: 50%; top: calc(8px + env(safe-area-inset-top)); transform: translateX(-50%); z-index: 9000; background: rgba(40,40,40,0.92); color: #fff; font-size: 12px; font-weight: 700; padding: 8px 14px; border-radius: 16px; white-space: nowrap; max-width: 94vw; overflow: hidden; text-overflow: ellipsis; pointer-events: none; }
+.fail-btn.wait { background: var(--text-sub); font-size: 12px; }
 .swipe-reply-icon { position: absolute; left: -38px; top: 50%; transform: translateY(-50%) scale(0.6); width: 30px; height: 30px; border-radius: 50%; background: var(--sheet); color: var(--text-sub); display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 900; box-shadow: 0 2px 8px rgba(0,0,0,0.15); opacity: 0; pointer-events: none; transition: background 0.15s, color 0.15s; }
 .swipe-reply-icon.hit { background: var(--primary); color: #fff; }
 .ptr { height: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--text-sub); font-size: 13px; font-weight: 700; }
@@ -1093,6 +1104,20 @@ mark.hl { background: #FFE066; color: #222; border-radius: 3px; padding: 0 1px; 
   </style>
 </head>
 <body>
+  <div id="lock-screen" class="hidden">
+    <div class="lock-ic">🔒</div>
+    <div class="lock-title">온챗이 잠겨 있어요</div>
+    <div class="lock-sub">Face ID로 확인하면 열려요</div>
+    <button id="lock-face" class="lock-btn" type="button">🙂 Face ID로 열기</button>
+    <button id="lock-pw-btn" class="lock-link" type="button">비밀번호로 열기</button>
+    <form id="lock-pw-form" class="hidden">
+      <input id="lock-pw" type="password" placeholder="온챗 비밀번호" autocomplete="current-password">
+      <button class="lock-btn" type="submit">열기</button>
+    </form>
+    <div id="lock-msg" class="lock-msg"></div>
+  </div>
+  <script>try { if (localStorage.getItem("onchat-lock")) document.getElementById("lock-screen").classList.remove("hidden"); } catch (e) {}</script>
+  <div id="offline-pill" class="hidden">📶 인터넷 연결 없음 · 메시지는 연결되면 자동으로 보내요</div>
   <div id="splash">
     <img src="data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20200%20200%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22g190%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%220%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%23FFBE6E%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23FF8A2A%22%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Cg%20transform%3D%22translate%28100%2096%29%20scale%280.8%29%20rotate%28-4%29%20translate%28-100%20-100%29%22%3E%3Cellipse%20cx%3D%22100%22%20cy%3D%22190%22%20rx%3D%2246%22%20ry%3D%227%22%20fill%3D%22%23000%22%20opacity%3D%22.1%22%2F%3E%3Cpath%20d%3D%22M184%2044q8%2010%204%2022M190%2036q14%2016%206%2036%22%20stroke%3D%22%237A3F12%22%20stroke-width%3D%223%22%20fill%3D%22none%22%20stroke-linecap%3D%22round%22%20opacity%3D%22.6%22%2F%3E%3Cpath%20d%3D%22M176%2030l4%2010%2010%204-10%204-4%2010-4-10-10-4%2010-4z%22%20fill%3D%22%23FFD84D%22%2F%3E%3Cpath%20d%3D%22M22%2052l3%207%207%203-7%203-3%207-3-7-7-3%207-3z%22%20fill%3D%22%23FFD84D%22%2F%3E%3Crect%20x%3D%2276%22%20y%3D%22156%22%20width%3D%2218%22%20height%3D%2228%22%20rx%3D%229%22%20fill%3D%22%23F07F1E%22%20stroke%3D%22%237A3F12%22%20stroke-width%3D%223.5%22%2F%3E%3Crect%20x%3D%22106%22%20y%3D%22156%22%20width%3D%2218%22%20height%3D%2228%22%20rx%3D%229%22%20fill%3D%22%23F07F1E%22%20stroke%3D%22%237A3F12%22%20stroke-width%3D%223.5%22%2F%3E%3Cpath%20d%3D%22M100%2034q-4-16%208-22%22%20stroke%3D%22%237A3F12%22%20stroke-width%3D%223.5%22%20fill%3D%22none%22%20stroke-linecap%3D%22round%22%2F%3E%3Ccircle%20cx%3D%22110%22%20cy%3D%2212%22%20r%3D%226%22%20fill%3D%22%23FFD84D%22%20stroke%3D%22%237A3F12%22%20stroke-width%3D%223%22%2F%3E%3Cpath%20d%3D%22M84%2034h32q46%200%2046%2046v34q0%2046-46%2046H86l-24%2020v-24q-24-10-24-42V80q0-46%2046-46z%22%20fill%3D%22url%28%23g190%29%22%20stroke%3D%22%237A3F12%22%20stroke-width%3D%224%22%20stroke-linejoin%3D%22round%22%2F%3E%3Cellipse%20cx%3D%2274%22%20cy%3D%2260%22%20rx%3D%2216%22%20ry%3D%229%22%20transform%3D%22rotate%28-25%2074%2060%29%22%20fill%3D%22%23fff%22%20opacity%3D%22.45%22%2F%3E%3Cellipse%20cx%3D%2266%22%20cy%3D%22114%22%20rx%3D%229%22%20ry%3D%225.5%22%20fill%3D%22%23FF5E5E%22%20opacity%3D%22.35%22%2F%3E%3Cellipse%20cx%3D%22134%22%20cy%3D%22114%22%20rx%3D%229%22%20ry%3D%225.5%22%20fill%3D%22%23FF5E5E%22%20opacity%3D%22.35%22%2F%3E%3Cpath%20d%3D%22M71%2098%20q9%20-10%2018%200%22%20stroke%3D%22%232B1E16%22%20stroke-width%3D%224.5%22%20fill%3D%22none%22%20stroke-linecap%3D%22round%22%2F%3E%3Cpath%20d%3D%22M111%2098%20q9%20-10%2018%200%22%20stroke%3D%22%232B1E16%22%20stroke-width%3D%224.5%22%20fill%3D%22none%22%20stroke-linecap%3D%22round%22%2F%3E%3Cpath%20d%3D%22M86%20110q14%2022%2028%200z%22%20fill%3D%22%232B1E16%22%20stroke%3D%22%232B1E16%22%20stroke-width%3D%223%22%20stroke-linejoin%3D%22round%22%2F%3E%3Cpath%20d%3D%22M93%20120q7%206%2014%200q-7-5-14%200z%22%20fill%3D%22%23FF7B7B%22%2F%3E%3Cellipse%20cx%3D%2240%22%20cy%3D%22118%22%20rx%3D%2211%22%20ry%3D%2216%22%20transform%3D%22rotate%2825%2040%20118%29%22%20fill%3D%22%23FF9A3C%22%20stroke%3D%22%237A3F12%22%20stroke-width%3D%223.5%22%2F%3E%3Cellipse%20cx%3D%22168%22%20cy%3D%2262%22%20rx%3D%2211%22%20ry%3D%2216%22%20transform%3D%22rotate%28-160%20168%2062%29%22%20fill%3D%22%23FF9A3C%22%20stroke%3D%22%237A3F12%22%20stroke-width%3D%223.5%22%2F%3E%3C%2Fg%3E%3Crect%20x%3D%2261.5%22%20y%3D%22166%22%20width%3D%2277%22%20height%3D%2230%22%20rx%3D%2215%22%20fill%3D%22%23fff%22%20stroke%3D%22%237A3F12%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%22100%22%20y%3D%22187%22%20text-anchor%3D%22middle%22%20font-size%3D%2218%22%20font-weight%3D%22800%22%20fill%3D%22%234A3426%22%20font-family%3D%22Apple%20SD%20Gothic%20Neo%2C%20Malgun%20Gothic%2C%20Noto%20Sans%20KR%2C%20sans-serif%22%3E%EC%95%88%EB%85%95%21%3C%2Ftext%3E%3C%2Fsvg%3E" alt="온이">
     <div>온이가 불러오는 중이에요<span class="dots"></span></div>
@@ -1233,6 +1258,13 @@ mark.hl { background: #FFE066; color: #222; border-radius: 3px; padding: 0 1px; 
         <div class="section-title">친구</div>
         <button id="blocked-row" class="setting-row">
           차단 친구 관리 <span id="blocked-count" class="setting-value"></span>
+        </button>
+        <div class="section-title">보안</div>
+        <button id="lock-row" class="setting-row">
+          <span>Face ID 잠금<small class="setting-sub">온챗을 열 때 얼굴(지문)로 확인해요</small></span> <span id="lock-switch" class="switch"></span>
+        </button>
+        <button id="lock-time-row" class="setting-row hidden">
+          <span>잠그는 시간<small class="setting-sub">앱을 나갔다가 다시 올 때</small></span> <span id="lock-time" class="setting-value">바로 ›</span>
         </button>
         <div class="section-title">계정</div>
         <button id="logout-btn" class="setting-row danger">로그아웃</button>
@@ -1630,7 +1662,7 @@ const firebaseConfig = {
 };
 
 // 👉 Cloudflare 알림 서버 주소 (예: "https://onchat-push.아이디.workers.dev"). 비어 있으면 앱 꺼진 알림은 꺼짐
-const APP_VERSION = "2026.11.15a"; // 설정 맨 아래에 보임 (새 버전 받았는지 확인용)
+const APP_VERSION = "2026.11.15b"; // 설정 맨 아래에 보임 (새 버전 받았는지 확인용)
 setTimeout(() => { const v = document.getElementById("app-version"); if (v) v.textContent = "OnChat 버전 " + APP_VERSION; }, 0);
 const PUSH_URL = "https://onchat.joshlee151001.workers.dev".replace(/\/$/, "");
 
@@ -1845,6 +1877,125 @@ $("theme-row").addEventListener("click", () => {
   window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", updateThemeSwitch);
 })();
 updateThemeSwitch();
+
+
+/* ================= Face ID 잠금 (WebAuthn: 얼굴/지문은 폰 밖으로 안 나가요) ================= */
+const LOCK_KEY = "onchat-lock";
+const LOCK_DELAYS = [[0, "바로"], [60000, "1분 뒤"], [300000, "5분 뒤"], [1800000, "30분 뒤"]];
+const b64u = (buf) => btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+const unb64u = (s) => Uint8Array.from(atob(s.replace(/-/g, "+").replace(/_/g, "/") + "===".slice((s.length + 3) % 4)), (c) => c.charCodeAt(0));
+function lockInfo() { try { return JSON.parse(localStorage.getItem(LOCK_KEY) || "null"); } catch (e) { return null; } }
+let lockHiddenAt = 0;
+let lockBusy = false;
+function updateLockRows() {
+  const info = lockInfo();
+  $("lock-switch").classList.toggle("on", !!info);
+  $("lock-time-row").classList.toggle("hidden", !info);
+  if (info) $("lock-time").textContent = (LOCK_DELAYS.find((d) => d[0] === (info.delay || 0)) || LOCK_DELAYS[0])[1] + " ›";
+}
+async function faceCheck(info) {
+  const cred = await navigator.credentials.get({
+    publicKey: {
+      challenge: crypto.getRandomValues(new Uint8Array(32)),
+      allowCredentials: [{ type: "public-key", id: unb64u(info.id) }],
+      userVerification: "required",
+      timeout: 60000,
+    },
+  });
+  return !!cred;
+}
+function showLock() {
+  if (!lockInfo()) return;
+  $("lock-screen").classList.remove("hidden");
+  $("lock-pw-form").classList.add("hidden");
+  $("lock-pw-btn").classList.remove("hidden");
+  $("lock-msg").textContent = "";
+}
+function hideLock() {
+  $("lock-screen").classList.add("hidden");
+  $("lock-pw").value = "";
+}
+async function tryFaceUnlock() {
+  const info = lockInfo();
+  if (!info) return hideLock();
+  if (lockBusy) return;
+  lockBusy = true;
+  $("lock-msg").textContent = "";
+  try {
+    if (await faceCheck(info)) hideLock();
+  } catch (e) {
+    $("lock-msg").textContent = e && e.name === "NotAllowedError" ? "확인하지 못했어요. 다시 눌러 주세요" : "Face ID를 쓸 수 없어요. 비밀번호로 열어 주세요";
+  } finally { lockBusy = false; }
+}
+$("lock-face").addEventListener("click", tryFaceUnlock);
+$("lock-pw-btn").addEventListener("click", () => {
+  $("lock-pw-form").classList.remove("hidden");
+  $("lock-pw-btn").classList.add("hidden");
+  setTimeout(() => $("lock-pw").focus(), 100);
+});
+$("lock-pw-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const user = auth.currentUser;
+  const pw = $("lock-pw").value;
+  if (!user || !user.email) { hideLock(); return; }
+  try {
+    await signInWithEmailAndPassword(auth, user.email, pw);
+    hideLock();
+  } catch (err) {
+    $("lock-msg").textContent = "비밀번호가 맞지 않아요";
+    $("lock-pw").value = "";
+  }
+});
+$("lock-row").addEventListener("click", async () => {
+  const info = lockInfo();
+  if (info) {
+    // 끌 때도 본인 확인 (동생이 몰래 못 끄게)
+    try { if (!(await faceCheck(info))) return; } catch (e) { return toast("본인 확인을 하지 못했어요"); }
+    localStorage.removeItem(LOCK_KEY);
+    updateLockRows();
+    return toast("🔓 Face ID 잠금을 껐어요");
+  }
+  try {
+    if (!window.PublicKeyCredential || !(await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable())) {
+      return toast("이 기기에서는 Face ID 잠금을 쓸 수 없어요");
+    }
+    const cred = await navigator.credentials.create({
+      publicKey: {
+        challenge: crypto.getRandomValues(new Uint8Array(32)),
+        rp: { name: "OnChat" },
+        user: { id: crypto.getRandomValues(new Uint8Array(16)), name: myPhone || "onchat", displayName: ((typeof userOf === "function" && userOf(myPhone)) || {}).nickname || "온챗" },
+        pubKeyCredParams: [{ type: "public-key", alg: -7 }, { type: "public-key", alg: -257 }],
+        authenticatorSelection: { authenticatorAttachment: "platform", userVerification: "required", residentKey: "discouraged" },
+        timeout: 60000,
+        attestation: "none",
+      },
+    });
+    if (!cred) return;
+    localStorage.setItem(LOCK_KEY, JSON.stringify({ id: b64u(cred.rawId), delay: 0, phone: myPhone }));
+    updateLockRows();
+    toast("🔒 Face ID 잠금을 켰어요. 다음에 열 때부터 확인해요");
+  } catch (e) {
+    toast(e && e.name === "NotAllowedError" ? "Face ID 등록을 취소했어요" : "Face ID를 켜지 못했어요");
+  }
+});
+$("lock-time-row").addEventListener("click", () => {
+  const info = lockInfo();
+  if (!info) return;
+  const i = LOCK_DELAYS.findIndex((d) => d[0] === (info.delay || 0));
+  info.delay = LOCK_DELAYS[(i + 1) % LOCK_DELAYS.length][0];
+  localStorage.setItem(LOCK_KEY, JSON.stringify(info));
+  updateLockRows();
+});
+document.addEventListener("visibilitychange", () => {
+  const info = lockInfo();
+  if (!info) return;
+  if (document.visibilityState === "hidden") lockHiddenAt = Date.now();
+  else if (lockHiddenAt && Date.now() - lockHiddenAt >= (info.delay || 0) && !call) showLock();
+});
+updateLockRows();
+if (lockInfo()) { showLock(); setTimeout(tryFaceUnlock, 400); }
+// 테스트·문제 확인용
+window.__onchat = { get failedSends() { return failedSends; }, loadOutbox: () => loadOutbox(), flushOutbox: () => flushOutbox(), keepAwake: (on) => keepAwake(on), showLock: () => showLock() };
 
 /* ================= 하단 탭 ================= */
 document.querySelectorAll(".tabbar button").forEach((btn) => {
@@ -2645,6 +2796,7 @@ function updateAppBadge() {
 // 방 목록이 바뀔 때마다: 내 안 읽음 수가 늘어난 방 = 새 메시지 도착
 function checkNewMessages() {
   updateAppBadge();
+  if (!roomsLoaded) { loadOutbox(); updateOffline(); setTimeout(flushOutbox, 1500); }
   const firstTime = !roomsLoaded;
   roomsLoaded = true;
   for (const room of allRooms) {
@@ -4465,9 +4617,10 @@ function makeFailedRow(f) {
     content.src = safeImage(first.image);
     content.alt = "사진";
   }
-  const btn = el("button", "fail-btn", "!");
+  const auto = (f.tries || 0) < 5;
+  const btn = el("button", "fail-btn" + (auto ? " wait" : ""), auto ? "⏳" : "!");
   btn.type = "button";
-  btn.title = "전송 실패 - 눌러서 재전송";
+  btn.title = auto ? "연결되면 자동으로 보내요 (눌러서 지금 다시 보내기)" : "전송 실패 - 눌러서 재전송";
   btn.setAttribute("aria-label", "전송 실패, 재전송 또는 삭제");
   btn.addEventListener("click", () => openFailMenu(f));
   line.append(content, btn);
@@ -4577,7 +4730,7 @@ async function sendEmoticon(id) {
   const reply = takeReply();
   const item = { type: "emoticon", emo: id, text: "" };
   if (reply) item.reply = reply;
-  await sendItems([item], "이모티콘");
+  await sendItems([item], "😊 이모티콘");
 }
 
 $("emo-btn").addEventListener("click", () => toggleEmoPanel());
@@ -5041,7 +5194,9 @@ async function sendText() {
     return;
   }
   const reply = takeReply();
-  await sendItems([reply ? { type: "text", text, reply } : { type: "text", text }], text);
+  // 알림(애플워치)에는 짧게: 줄바꿈은 한 칸으로, 60자 넘으면 …
+  const short = text.replace(/\s+/g, " ").trim();
+  await sendItems([reply ? { type: "text", text, reply } : { type: "text", text }], (reply ? "↩ " : "") + (short.length > 60 ? short.slice(0, 60) + "…" : short));
 }
 
 // 사진 보내기 (한 번에 최대 10장)
@@ -5071,7 +5226,7 @@ $("photo-input").addEventListener("change", async (e) => {
     const items = images.map((image) =>
       groupId ? { type: "image", image, text: "", groupId } : { type: "image", image, text: "" }
     );
-    await sendItems(items, images.length > 1 ? `사진 ${images.length}장` : "사진", null, room);
+    await sendItems(items, images.length > 1 ? `📷 사진 ${images.length}장` : "📷 사진", null, room);
   } catch (err) {
     toast(err.message || "사진을 보내지 못했어요");
   } finally {
@@ -5089,10 +5244,10 @@ function failedOf(roomId) {
 async function sendItems(items, preview, retryId = null, room = currentRoom) {
   if (!room) return false;
 
-  // 인터넷이 끊겨 있으면 보내지 않고 바로 "실패"로 (나중에 재전송)
+  // 인터넷이 끊겨 있으면 저장해 뒀다가 연결되면 자동으로 보내요
   if (!navigator.onLine) {
     keepFailed(room.id, items, preview, retryId);
-    toast("인터넷 연결이 없어서 보내지 못했어요");
+    if (!retryId) toast("📶 인터넷이 없어요. 연결되면 자동으로 보낼게요");
     return false;
   }
 
@@ -5131,7 +5286,7 @@ async function sendItems(items, preview, retryId = null, room = currentRoom) {
   } catch (err) {
     console.warn(err);
     keepFailed(room.id, items, preview, retryId);
-    toast("메시지를 보내지 못했어요");
+    if (!retryId) toast("메시지를 보내지 못했어요. 연결이 좋아지면 다시 보낼게요");
     return false;
   }
 }
@@ -5140,14 +5295,64 @@ function keepFailed(roomId, items, preview, retryId) {
   if (!retryId) {
     const entry = { id: "f" + Date.now() + Math.random().toString(36).slice(2, 6), items, preview, at: Date.now() };
     failedSends.set(roomId, [...failedOf(roomId), entry]);
+  } else {
+    const e = failedOf(roomId).find((f) => f.id === retryId);
+    if (e) e.tries = (e.tries || 0) + 1;
   }
+  saveOutbox();
   if (currentRoom && currentRoom.id === roomId) renderMessages(true);
 }
 
 function dropFailed(roomId, id) {
   failedSends.set(roomId, failedOf(roomId).filter((f) => f.id !== id));
+  saveOutbox();
   if (currentRoom && currentRoom.id === roomId) renderMessages(false);
 }
+
+// 못 보낸 메시지는 폰에 저장 (앱을 껐다 켜도 남아 있어요)
+const outboxKey = () => "onchat-outbox-" + myPhone;
+function saveOutbox() {
+  if (!myPhone) return;
+  const obj = {};
+  for (const [rid, list] of failedSends) if (list.length) obj[rid] = list;
+  try {
+    const json = JSON.stringify(obj);
+    if (json === "{}") localStorage.removeItem(outboxKey());
+    else if (json.length < 3000000) localStorage.setItem(outboxKey(), json);
+  } catch (e) { /* 저장 공간이 꽉 차면 이번 실행에서만 기억 */ }
+}
+function loadOutbox() {
+  try {
+    const obj = JSON.parse(localStorage.getItem(outboxKey()) || "{}");
+    for (const rid of Object.keys(obj)) if (Array.isArray(obj[rid]) && !failedSends.has(rid)) failedSends.set(rid, obj[rid]);
+  } catch (e) { /* 괜찮음 */ }
+}
+let flushing = false;
+async function flushOutbox() {
+  if (flushing || !navigator.onLine || !myPhone || !roomsLoaded) return;
+  flushing = true;
+  let sent = 0;
+  try {
+    for (const [rid, list] of [...failedSends]) {
+      const room = allRooms.find((r) => r.id === rid);
+      if (!room) continue;
+      for (const entry of [...list]) {
+        if ((entry.tries || 0) >= 5) continue; // 5번 넘게 실패하면 직접 다시 보내기
+        if (await sendItems(entry.items, entry.preview, entry.id, room)) sent++;
+        else if (!navigator.onLine) return;
+      }
+    }
+  } finally {
+    flushing = false;
+    if (sent) toast(`📶 못 보낸 메시지 ${sent}개를 보냈어요`);
+  }
+}
+function updateOffline() {
+  $("offline-pill").classList.toggle("hidden", navigator.onLine || !myPhone);
+}
+window.addEventListener("offline", updateOffline);
+window.addEventListener("online", () => { updateOffline(); setTimeout(flushOutbox, 800); });
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") setTimeout(flushOutbox, 1200); });
 
 let failMenuEntry = null;
 function openFailMenu(entry) {
@@ -5672,12 +5877,28 @@ async function getMic() {
 }
 
 /* ---------- 걸기 ---------- */
+// 톡챗 중에는 화면이 저절로 꺼지지 않게 (아이폰 iOS 18.4 이상)
+let wakeLockObj = null;
+async function keepAwake(on) {
+  try {
+    if (on) {
+      if (!("wakeLock" in navigator) || wakeLockObj) return;
+      wakeLockObj = await navigator.wakeLock.request("screen");
+      wakeLockObj.addEventListener("release", () => { wakeLockObj = null; });
+    } else if (wakeLockObj) {
+      const w = wakeLockObj; wakeLockObj = null; await w.release();
+    }
+  } catch (e) { /* 지원 안 하면 그냥 넘어가요 */ }
+}
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && call) keepAwake(true); });
+
 async function startCall(partner) {
   if (!talkSupported()) return toast("이 브라우저는 톡챗을 지원하지 않아요");
   if (call) return toast("이미 톡챗 중이에요");
   if (!partner || partner === myPhone) return;
   if (blocked.has(partner)) return toast("차단한 사람에게는 톡챗을 걸 수 없어요");
   unlockAudio();
+  keepAwake(true);
   const stream = await getMic();
   if (!stream) return;
   const ref = doc(collection(db, "calls"));
@@ -5782,6 +6003,7 @@ async function acceptCall() {
   const c = call;
   if (!c || c.role !== "callee" || c.state !== "ringing") return;
   stopTones();
+  keepAwake(true);
   c.state = "connecting";
   renderCallScreen();
   const stream = await getMic();
@@ -5830,6 +6052,7 @@ function finishCall(reason, byMe = false) {
   const c = call;
   if (!c) return;
   call = null;
+  keepAwake(false);
   stopTones();
   clearTimeout(c.ringTimer);
   clearTimeout(c.dropTimer);
@@ -6031,6 +6254,7 @@ function cleanupSession() {
   aliases = new Map();
   setReply(null);
   failedSends.clear();
+  $("offline-pill").classList.add("hidden");
   blockRanges = new Map();
   olderMessages = [];
   liveMessages = [];
@@ -6038,6 +6262,7 @@ function cleanupSession() {
 }
 
 $("logout-btn").addEventListener("click", async () => {
+  try { localStorage.removeItem("onchat-lock"); updateLockRows(); } catch (e) { /* 괜찮음 */ }
   try { if ("clearAppBadge" in navigator) navigator.clearAppBadge(); } catch (e) { /* 괜찮음 */ }
   lastBadge = -1;
   if (!confirm("로그아웃할까요?")) return;
