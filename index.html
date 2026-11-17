@@ -1083,13 +1083,23 @@ mark.hl { background: #FFE066; color: #222; border-radius: 3px; padding: 0 1px; 
 .pv-react { display: flex; justify-content: center; gap: 8px; margin-top: 16px; }
 .pv-react button { position: relative; width: 48px; height: 48px; border: none; border-radius: 50%; background: rgba(0,0,0,0.3); font-size: 24px; cursor: pointer; backdrop-filter: blur(6px); transition: transform 0.15s, background 0.15s; }
 .pv-react button:active { transform: scale(0.85); }
+.pv-react { position: relative; flex-direction: column; align-items: center; gap: 6px; }
+.pv-react .like-main { width: 64px; height: 64px; font-size: 32px; }
+.pv-react .like-main b { right: -8px; bottom: -2px; min-width: 22px; height: 20px; line-height: 20px; font-size: 12px; border-radius: 10px; }
+.pv-react .like-change { width: auto; height: auto; padding: 5px 12px; border-radius: 14px; font-size: 13px; font-weight: 700; color: #fff; }
+.like-picker { position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); z-index: 4; display: grid; grid-template-columns: repeat(5, 44px); gap: 6px; padding: 10px; border-radius: 18px; background: rgba(20,20,28,0.88); backdrop-filter: blur(10px); box-shadow: 0 8px 24px rgba(0,0,0,0.35); }
+.like-picker.hidden { display: none; }
+.pv-react .like-picker button { width: 44px; height: 44px; font-size: 24px; background: rgba(255,255,255,0.08); }
+.pv-react .like-picker button.on { background: rgba(255,255,255,0.9); box-shadow: 0 0 0 2px var(--primary); }
 .pv-react button.pop { animation: likepop 0.18s ease-out; }
 @keyframes likepop { 50% { transform: scale(1.25); } }
-.pv-likestk { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
-.pv-likestk span { position: absolute; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.25)); }
 .pv-react button b { position: absolute; right: -6px; bottom: -4px; min-width: 18px; height: 18px; padding: 0 4px; border-radius: 9px; background: var(--primary); color: #fff; font-size: 11px; line-height: 18px; }
 .pv-react button b:empty { display: none; }
-.likes-e { font-size: 14px; white-space: nowrap; }
+.likes-total { font-size: 16px; font-weight: 800; color: var(--primary); white-space: nowrap; }
+.like-mine { font-size: 13px; font-weight: 700; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.4); }
+.pv-mine { display: block; margin: 14px auto 0; padding: 9px 16px; border: none; border-radius: 18px; background: rgba(0,0,0,0.35); color: #fff; font-size: 14px; font-weight: 700; backdrop-filter: blur(6px); cursor: pointer; }
+.pv-mine b { margin-left: 8px; color: #FFD9A8; }
+.pv-mine.hidden { display: none; }
 /* 온챗 공식 채팅 */
 .oc-row .name { display: flex; align-items: center; gap: 4px; }
 .oc-check { display: inline-flex; width: 16px; height: 16px; border-radius: 50%; background: var(--primary); color: #fff; font-size: 10px; font-weight: 900; align-items: center; justify-content: center; flex-shrink: 0; }
@@ -1126,7 +1136,7 @@ mark.hl { background: #FFE066; color: #222; border-radius: 3px; padding: 0 1px; 
 .oce-bgs button { width: 54px; height: 54px; border-radius: 14px; border: 2px solid var(--border); cursor: pointer; font-size: 11px; color: var(--text); background-size: cover; }
 .oce-bgs button.on { border-color: var(--primary); box-shadow: 0 0 0 2px var(--primary); }
 /* 오토클리커 */
-#ac-panel { position: fixed; z-index: 100000; right: 12px; bottom: 96px; width: 210px; padding: 12px; border-radius: 18px; background: rgba(30,31,46,0.94); color: #fff; font-size: 13px; box-shadow: 0 8px 28px rgba(0,0,0,0.35); touch-action: none; user-select: none; -webkit-user-select: none; }
+#ac-panel { position: fixed; z-index: 100000; right: 12px; top: 60px; width: 210px; padding: 12px; border-radius: 18px; background: rgba(30,31,46,0.94); color: #fff; font-size: 13px; box-shadow: 0 8px 28px rgba(0,0,0,0.35); touch-action: none; user-select: none; -webkit-user-select: none; }
 #ac-panel .ac-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; font-weight: 800; cursor: move; }
 #ac-panel .ac-x { border: none; background: none; color: #fff; font-size: 18px; cursor: pointer; padding: 0 2px; }
 #ac-panel .ac-line { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin: 6px 0; }
@@ -1467,7 +1477,6 @@ mark.hl { background: #FFE066; color: #222; border-radius: 3px; padding: 0 1px; 
         <div id="pv-bg" class="pv-bg"></div>
         <div class="pv-shade"></div>
         <div id="pv-stickers" class="sticker-layer"></div>
-        <div id="pv-likestk" class="pv-likestk"></div>
         <div id="pv-float" class="pv-float"></div>
         <button id="pv-likes" class="pv-likes hidden" type="button"></button>
         <button class="icon-btn pv-close" data-close aria-label="닫기">
@@ -1485,6 +1494,7 @@ mark.hl { background: #FFE066; color: #222; border-radius: 3px; padding: 0 1px; 
           <div id="pf-status" class="status"></div>
           <div id="pf-phone" class="phone"></div>
           <div id="pv-react" class="pv-react hidden"></div>
+          <button id="pv-mine" class="pv-mine hidden" type="button"></button>
         </div>
         <div id="pf-actions" class="pv-actions"></div>
       </div>
@@ -1886,7 +1896,7 @@ const firebaseConfig = {
 };
 
 // 👉 Cloudflare 알림 서버 주소 (예: "https://onchat-push.아이디.workers.dev"). 비어 있으면 앱 꺼진 알림은 꺼짐
-const APP_VERSION = "2026.11.17c"; // 설정 맨 아래에 보임 (새 버전 받았는지 확인용)
+const APP_VERSION = "2026.11.17e"; // 설정 맨 아래에 보임 (새 버전 받았는지 확인용)
 setTimeout(() => { const v = document.getElementById("app-version"); if (v) v.textContent = "OnChat 버전 " + APP_VERSION; }, 0);
 const PUSH_URL = "https://onchat.joshlee151001.workers.dev".replace(/\/$/, "");
 
@@ -2357,9 +2367,20 @@ async function checkCreator(phone) {
 /* ================= 프로필 배경 공감 (스티커처럼 계속 쌓임) ================= */
 // 누를 때마다 +1 → 친구 배경에 이모지 스티커가 쌓임 (무한)
 // 많이 눌러도 저장은 잠깐 모았다가 한 번에 (Firestore 무료 쓰기 횟수 아끼기)
-const LIKE_KINDS = [["heart", "❤️"], ["like", "👍"], ["haha", "😆"], ["wow", "😮"], ["sad", "😢"]];
+// 공감 이모지: 버튼은 하나 (기본 ❤️), 누르는 사람이 아래 중에서 골라 바꿀 수 있음
+const LIKE_KINDS = [
+  ["heart", "❤️"], ["like", "👍"], ["haha", "😆"], ["wow", "😮"], ["sad", "😢"],
+  ["fire", "🔥"], ["star", "⭐"], ["clap", "👏"], ["party", "🎉"], ["ball", "⚾"],
+  ["cool", "😎"], ["kiss", "😘"], ["crown", "👑"], ["flower", "🌸"], ["rainbow", "🌈"],
+  ["hundred", "💯"], ["sparkle", "✨"], ["ghost", "👻"], ["cat", "🐱"], ["poop", "💩"],
+];
+const LIKE_KEY = "onchat-like-emo";
+function myLikeKind() {
+  let k = "heart";
+  try { k = localStorage.getItem(LIKE_KEY) || "heart"; } catch (e) { /* 괜찮음 */ }
+  return LIKE_EMOJI[k] ? k : "heart";
+}
 const LIKE_EMOJI = Object.fromEntries(LIKE_KINDS);
-const LIKE_MAX_STICKERS = 40;   // 배경에 보이는 스티커 최대 개수 (숫자는 끝없이 올라감)
 let likeTarget = null;   // 지금 보고 있는 프로필 번호
 let likeDocs = [];       // [{ who, c: {heart: 3, ...}, at, nick }]
 let likePending = {};    // 아직 저장 안 한 내 공감 {heart: 5}
@@ -2397,6 +2418,7 @@ async function flushLikes() {
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") flushLikes(); });
 
 async function loadLikes(user, isMe) {
+  if ($("like-picker")) $("like-picker").classList.add("hidden");
   if (likePendingFor && likePendingFor !== user.phone) await flushLikes();
   const phone = user.phone;
   likeTarget = phone;
@@ -2420,38 +2442,6 @@ async function loadLikes(user, isMe) {
   }
 }
 
-// 같은 사람 배경엔 누가 봐도 같은 자리에 스티커가 붙도록 (번호로 정해지는 랜덤)
-function seeded(seed) {
-  let h = 2166136261;
-  for (const ch of String(seed)) h = Math.imul(h ^ ch.charCodeAt(0), 16777619);
-  return () => { h = Math.imul(h ^ (h >>> 15), 2246822507); h = Math.imul(h ^ (h >>> 13), 3266489909); h ^= h >>> 16; return (h >>> 0) / 4294967296; };
-}
-function renderLikeStickers(totals) {
-  const layer = $("pv-likestk");
-  const user = profileShown;
-  const total = sumCounts(totals);
-  if (!user || user.official || total === 0) { layer.replaceChildren(); return; }
-  const shown = Math.min(total, LIKE_MAX_STICKERS);
-  // 종류별로 비율대로 나누기 (있는 종류는 최소 1개)
-  const kinds = LIKE_KINDS.filter(([k]) => totals[k] > 0);
-  let alloc = kinds.map(([k, e]) => ({ e, n: Math.max(1, Math.round((shown * totals[k]) / total)) }));
-  while (alloc.reduce((a, b) => a + b.n, 0) > shown) { const big = alloc.reduce((a, b) => (b.n > a.n ? b : a)); big.n--; }
-  const list = [];
-  const most = Math.max(...alloc.map((a) => a.n));
-  for (let i = 0; i < most; i++) for (const a of alloc) if (i < a.n) list.push(a.e);
-  const rnd = seeded(user.phone);
-  layer.replaceChildren(
-    ...list.map((e, i) => {
-      const s = el("span", "", e);
-      s.style.left = 4 + rnd() * 84 + "%";
-      s.style.top = 6 + rnd() * 50 + "%";
-      s.style.fontSize = 24 + rnd() * 20 + "px";
-      s.style.transform = `rotate(${Math.round(rnd() * 50 - 25)}deg)`;
-      return s;
-    })
-  );
-}
-
 function renderLikes(isMe) {
   const user = profileShown;
   const official = !user || user.official;
@@ -2460,33 +2450,64 @@ function renderLikes(isMe) {
   const chip = $("pv-likes");
   chip.replaceChildren();
   if (total > 0 && !official) {
-    for (const [k, e] of LIKE_KINDS) if (totals[k]) chip.append(el("span", "", `${e} ${totals[k].toLocaleString()}`));
+    const top = LIKE_KINDS.filter(([k]) => totals[k]).sort((a, b) => totals[b[0]] - totals[a[0]]);
+    for (const [k, e] of top.slice(0, 4)) chip.append(el("span", "", `${e} ${totals[k].toLocaleString()}`));
+    if (top.length > 4) chip.append(el("span", "", `+${top.length - 4}`));
     if (isMe) chip.append(el("span", "", "›"));
   }
   chip.classList.toggle("hidden", official || total === 0);
-  renderLikeStickers(official ? {} : totals);
 
   const bar = $("pv-react");
   const canReact = !official && !isMe && user && !blocked.has(user.phone);
+  const mineBox = $("pv-mine");
+  // 내 프로필: 받은 공감 + 누가 얼마나 눌렀는지 보기
+  mineBox.classList.toggle("hidden", !(isMe && !official));
+  if (isMe && !official) {
+    mineBox.replaceChildren(el("span", "", total ? `받은 공감 ${total.toLocaleString()}번` : "아직 받은 공감이 없어요"));
+    if (total) mineBox.append(el("b", "", "누가 눌렀는지 보기 ›"));
+  }
   bar.classList.toggle("hidden", !canReact);
   if (!canReact) return;
-  if (bar.childElementCount !== LIKE_KINDS.length) {
-    bar.replaceChildren(
+  if (!$("like-main")) {
+    const main = el("button", "like-main");
+    main.id = "like-main";
+    main.type = "button";
+    main.append(el("span", "like-emo"), el("b"));
+    main.addEventListener("click", () => addLike(main.dataset.k));
+    const change = el("button", "like-change", "바꾸기 ▾");
+    change.id = "like-change";
+    change.type = "button";
+    change.addEventListener("click", () => $("like-picker").classList.toggle("hidden"));
+    const picker = el("div", "like-picker hidden");
+    picker.id = "like-picker";
+    picker.append(
       ...LIKE_KINDS.map(([k, e]) => {
-        const b = el("button");
+        const b = el("button", "", e);
         b.type = "button";
         b.dataset.k = k;
-        b.setAttribute("aria-label", "공감 " + e);
-        b.append(e, el("b"));
-        b.addEventListener("click", () => addLike(k));
+        b.addEventListener("click", () => {
+          try { localStorage.setItem(LIKE_KEY, k); } catch (err) { /* 괜찮음 */ }
+          picker.classList.add("hidden");
+          renderLikes(false);
+        });
         return b;
       })
     );
+    const mine = el("div", "like-mine");
+    mine.id = "like-mine";
+    bar.replaceChildren(main, change, mine, picker);
   }
-  for (const b of bar.children) {
-    const n = totals[b.dataset.k] || 0;
-    b.querySelector("b").textContent = n ? (n > 9999 ? Math.floor(n / 1000) + "k" : String(n)) : "";
-  }
+  const myDoc = likeDocs.find((x) => x.who === myPhone);
+  const myTotal = myDoc ? sumCounts(likeCountsOf(myDoc)) : 0;
+  $("like-mine").textContent = `내가 누른 횟수 ${myTotal.toLocaleString()}번`;
+  const k = myLikeKind();
+  const main = $("like-main");
+  main.dataset.k = k;
+  main.setAttribute("aria-label", "공감 " + LIKE_EMOJI[k]);
+  main.querySelector(".like-emo").textContent = LIKE_EMOJI[k];
+  const n = totals[k] || 0;
+  main.querySelector("b").textContent = n ? (n > 9999 ? Math.floor(n / 1000) + "k" : String(n)) : "";
+  for (const b of $("like-picker").children) b.classList.toggle("on", b.dataset.k === k);
 }
 
 function flyLike(e) {
@@ -2513,12 +2534,12 @@ function addLike(kind) {
   mine.at = Date.now();
   renderLikes(false);
   flyLike(LIKE_EMOJI[kind]);
-  const btn = $("pv-react").querySelector(`[data-k="${kind}"]`);
+  const btn = $("like-main");
   if (btn) { btn.classList.remove("pop"); void btn.offsetWidth; btn.classList.add("pop"); }
   if (!likeFlushTimer) likeFlushTimer = setTimeout(flushLikes, 1500);
 }
 
-$("pv-likes").addEventListener("click", () => {
+function openLikesList() {
   if (!profileIsMe || likeDocs.length === 0) return;
   const list = $("likes-list");
   const sorted = [...likeDocs].sort((a, b) => sumCounts(likeCountsOf(b)) - sumCounts(likeCountsOf(a)));
@@ -2527,13 +2548,17 @@ $("pv-likes").addEventListener("click", () => {
       const u = userInfo.has(x.who) ? userOf(x.who) : { phone: x.who, nickname: x.nick || formatPhone(x.who), photo: "" };
       const row = el("div", "pick-row");
       const c = likeCountsOf(x);
-      const detail = LIKE_KINDS.filter(([k]) => c[k]).map(([k, e]) => `${e}${Number(c[k]).toLocaleString()}`).join(" ");
-      row.append(makeAvatar(u), el("div", "name", u.nickname), el("span", "likes-e", detail));
+      const detail = LIKE_KINDS.filter(([k]) => c[k]).sort((a, b) => c[b[0]] - c[a[0]]).map(([k, e]) => `${e}${Number(c[k]).toLocaleString()}`).join(" ");
+      const name = el("div", "name");
+      name.append(u.nickname, el("div", "note", detail));
+      row.append(makeAvatar(u), name, el("span", "likes-total", `${sumCounts(c).toLocaleString()}번`));
       return row;
     })
   );
   openModal("likes-modal");
-});
+}
+$("pv-likes").addEventListener("click", openLikesList);
+$("pv-mine").addEventListener("click", openLikesList);
 
 /* ================= 온챗 공식 채팅 (010-onchat) ================= */
 const OC_ID = "onchat";
@@ -3100,7 +3125,8 @@ function acEls() {
     <div class="ac-head"><span>🖱️ 오토클리커</span><button class="ac-x" type="button" aria-label="닫기">✕</button></div>
     <button class="ac-btn" data-a="pick" type="button">🎯 누를 곳 정하기</button>
     <div class="ac-line"><span>간격</span><select data-a="gap">
-      <option value="50">0.05초</option><option value="100">0.1초</option><option value="200" selected>0.2초</option>
+      <option value="5">0.005초</option><option value="10">0.01초</option><option value="20">0.02초</option>
+      <option value="50" selected>0.05초</option><option value="100">0.1초</option><option value="200">0.2초</option>
       <option value="500">0.5초</option><option value="1000">1초</option><option value="3000">3초</option></select></div>
     <div class="ac-line"><span>횟수 (0=무한)</span><input data-a="max" type="number" min="0" max="100000" value="0" inputmode="numeric"></div>
     <button class="ac-btn go" data-a="run" type="button">▶ 시작</button>
@@ -3184,14 +3210,19 @@ function startAutoClicker() {
   if (!creatorMode) return;
   const panel = acEls();
   if (ac.x == null) { toast("🎯 누를 곳을 먼저 정해 주세요"); return acPick(); }
-  ac.gap = Number(panel.querySelector('[data-a="gap"]').value) || 200;
+  ac.gap = Number(panel.querySelector('[data-a="gap"]').value) || 50;
   ac.max = Math.max(0, Math.floor(Number(panel.querySelector('[data-a="max"]').value) || 0));
   ac.count = 0;
   panel.querySelector('[data-a="count"]').textContent = "0";
   const btn = panel.querySelector('[data-a="run"]');
   btn.textContent = "■ 멈추기";
   btn.className = "ac-btn stop";
-  ac.timer = setInterval(acClickOnce, ac.gap);
+  // 브라우저 타이머는 너무 짧으면 느려져서, 10ms마다 여러 번 눌러서 속도를 맞춤 (0.005초 = 10ms에 2번)
+  const tick = Math.max(ac.gap, 10);
+  const per = Math.max(1, Math.round(tick / ac.gap));
+  ac.timer = setInterval(() => {
+    for (let i = 0; i < per && ac.timer; i++) acClickOnce();
+  }, tick);
 }
 function stopAutoClicker(close) {
   if (ac.timer) clearInterval(ac.timer);
