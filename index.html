@@ -1075,6 +1075,74 @@ mark.hl { background: #FFE066; color: #222; border-radius: 3px; padding: 0 1px; 
 .hint { font-size: 11px; color: var(--text-sub); font-weight: 400; }
 #auth-submit { margin-top: 12px; }
 #forgot-btn, #gmail-toggle { margin: 6px auto 0; }
+/* 프로필 배경 공감 */
+.pv-float { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 3; }
+.pv-float span { position: absolute; bottom: 30%; font-size: 40px; animation: likefly 1.4s ease-out forwards; }
+@keyframes likefly { 0% { transform: translateY(0) scale(0.4); opacity: 0; } 15% { transform: translateY(-20px) scale(1.25); opacity: 1; } 100% { transform: translateY(-260px) scale(0.9); opacity: 0; } }
+.pv-likes { position: absolute; top: 14px; right: 14px; z-index: 2; display: flex; gap: 6px; align-items: center; padding: 7px 12px; border: none; border-radius: 18px; background: rgba(0,0,0,0.35); color: #fff; font-size: 14px; font-weight: 700; backdrop-filter: blur(6px); cursor: pointer; }
+.pv-react { display: flex; justify-content: center; gap: 8px; margin-top: 16px; }
+.pv-react button { position: relative; width: 48px; height: 48px; border: none; border-radius: 50%; background: rgba(0,0,0,0.3); font-size: 24px; cursor: pointer; backdrop-filter: blur(6px); transition: transform 0.15s, background 0.15s; }
+.pv-react button:active { transform: scale(0.85); }
+.pv-react button.pop { animation: likepop 0.18s ease-out; }
+@keyframes likepop { 50% { transform: scale(1.25); } }
+.pv-likestk { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.pv-likestk span { position: absolute; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.25)); }
+.pv-react button b { position: absolute; right: -6px; bottom: -4px; min-width: 18px; height: 18px; padding: 0 4px; border-radius: 9px; background: var(--primary); color: #fff; font-size: 11px; line-height: 18px; }
+.pv-react button b:empty { display: none; }
+.likes-e { font-size: 14px; white-space: nowrap; }
+/* 온챗 공식 채팅 */
+.oc-row .name { display: flex; align-items: center; gap: 4px; }
+.oc-check { display: inline-flex; width: 16px; height: 16px; border-radius: 50%; background: var(--primary); color: #fff; font-size: 10px; font-weight: 900; align-items: center; justify-content: center; flex-shrink: 0; }
+.oc-row .avatar, .oc-head-avatar { background-color: var(--primary); color: #fff; }
+.oc-head-avatar { width: 36px; height: 36px; border-radius: 13px; border: none; background-size: cover; background-position: center; font-size: 15px; font-weight: 800; cursor: pointer; flex-shrink: 0; }
+#oc-screen { position: absolute; inset: 0; z-index: 5; display: flex; flex-direction: column; background: var(--chat-bg); }
+#oc-list { flex: 1; overflow-y: auto; padding: 10px 12px 16px; }
+.oc-notice .bubble { background: var(--sheet); border: 1.5px solid var(--primary); }
+.oc-notice .tag { display: block; margin-bottom: 4px; color: var(--primary); font-size: 12px; font-weight: 800; }
+.oc-inbox-row { display: flex; align-items: center; gap: 12px; padding: 12px 6px; border-bottom: 1px solid var(--border); cursor: pointer; }
+.oc-inbox-row .info { flex: 1; min-width: 0; }
+.oc-inbox-row .name { font-weight: 700; font-size: 15px; }
+.oc-inbox-row .last { font-size: 13px; color: var(--text-sub); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.oc-inbox-row .badge { min-width: 20px; height: 20px; padding: 0 6px; border-radius: 10px; background: var(--unread); color: #fff; font-size: 12px; font-weight: 700; line-height: 20px; text-align: center; }
+.oc-inbox-row.notice-row .avatar { background: var(--primary); color: #fff; }
+.oc-empty { white-space: pre-line; margin: 40px 20px; text-align: center; color: var(--text-sub); font-size: 14px; line-height: 1.6; }
+.oc-seg { display: flex; gap: 6px; margin: 0 4px 14px; padding: 4px; border-radius: 14px; background: var(--input-bg); }
+.oc-seg button { flex: 1; padding: 10px; border: none; border-radius: 11px; background: none; color: var(--text-sub); font-size: 15px; font-weight: 700; cursor: pointer; }
+.oc-seg button.on { background: var(--sheet); color: var(--text); box-shadow: 0 1px 4px rgba(0,0,0,0.12); }
+.oc-help { margin: 0 6px 12px; color: var(--text-sub); font-size: 14px; }
+.oc-find { display: flex; gap: 8px; align-items: center; }
+.oc-find .input { flex: 1; }
+.oc-find .btn.sm { padding: 12px 16px; flex-shrink: 0; }
+#ocs-results { margin-top: 10px; }
+#ocs-results .pick-row { cursor: pointer; }
+.gift-preview { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 0 4px 6px; padding: 10px; border-radius: 16px; background: var(--input-bg); }
+.gift-preview img { width: 100%; aspect-ratio: 1; }
+#gift-results .pick-row .btn.sm { padding: 8px 12px; font-size: 13px; flex-shrink: 0; }
+.gift-got { color: var(--primary); font-weight: 800; font-size: 13px; flex-shrink: 0; }
+.oce-preview { position: relative; height: 150px; margin: 0 4px 10px; border-radius: 18px; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 14px; overflow: hidden; }
+.oce-preview .avatar { width: 72px; height: 72px; border-radius: 26px; font-size: 28px; background-color: var(--primary); color: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+.oce-btns { display: flex; justify-content: center; gap: 8px; margin-bottom: 6px; }
+.oce-bgs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.oce-bgs button { width: 54px; height: 54px; border-radius: 14px; border: 2px solid var(--border); cursor: pointer; font-size: 11px; color: var(--text); background-size: cover; }
+.oce-bgs button.on { border-color: var(--primary); box-shadow: 0 0 0 2px var(--primary); }
+/* 오토클리커 */
+#ac-panel { position: fixed; z-index: 100000; right: 12px; bottom: 96px; width: 210px; padding: 12px; border-radius: 18px; background: rgba(30,31,46,0.94); color: #fff; font-size: 13px; box-shadow: 0 8px 28px rgba(0,0,0,0.35); touch-action: none; user-select: none; -webkit-user-select: none; }
+#ac-panel .ac-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; font-weight: 800; cursor: move; }
+#ac-panel .ac-x { border: none; background: none; color: #fff; font-size: 18px; cursor: pointer; padding: 0 2px; }
+#ac-panel .ac-line { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin: 6px 0; }
+#ac-panel select, #ac-panel input { width: 92px; padding: 5px 6px; border: none; border-radius: 8px; background: rgba(255,255,255,0.14); color: #fff; font-size: 13px; }
+#ac-panel select option { color: #000; }
+#ac-panel .ac-btn { width: 100%; margin-top: 6px; padding: 9px; border: none; border-radius: 12px; background: rgba(255,255,255,0.16); color: #fff; font-size: 14px; font-weight: 700; cursor: pointer; }
+#ac-panel .ac-btn.go { background: var(--primary); }
+#ac-panel .ac-btn.stop { background: #e5484d; }
+#ac-panel .ac-count { margin-top: 8px; text-align: center; font-size: 12px; opacity: 0.8; }
+#ac-mark { position: fixed; z-index: 99999; width: 44px; height: 44px; margin: -22px 0 0 -22px; border: 3px solid #e5484d; border-radius: 50%; pointer-events: none; box-shadow: 0 0 0 2px #fff; }
+#ac-mark::after { content: ""; position: absolute; left: 50%; top: 50%; width: 6px; height: 6px; margin: -3px 0 0 -3px; border-radius: 50%; background: #e5484d; }
+#ac-mark.hit { animation: achit 0.18s ease-out; }
+@keyframes achit { 50% { transform: scale(0.7); } }
+#ac-pick { position: fixed; inset: 0; z-index: 99998; background: rgba(229,72,77,0.08); cursor: crosshair; }
+#ac-pick p { position: absolute; top: 40%; left: 0; right: 0; margin: 0 auto; width: max-content; padding: 10px 16px; border-radius: 14px; background: rgba(0,0,0,0.75); color: #fff; font-size: 15px; font-weight: 700; pointer-events: none; }
+.setting-sub.warn { color: #e5484d; font-weight: 700; }
 .pw-desc { margin: 0 4px 12px; padding: 12px 14px; border-radius: 14px; background: color-mix(in srgb, var(--primary) 12%, transparent); color: var(--text); font-size: 14px; line-height: 1.5; }
 .pw-msg { min-height: 18px; margin: 4px 2px 0; color: #e5484d; font-size: 13px; }
 #pw-forgot { display: block; margin: 10px auto 4px; }
@@ -1229,6 +1297,7 @@ mark.hl { background: #FFE066; color: #222; border-radius: 3px; padding: 0 1px; 
           </button>
         </header>
         <div class="search-box"><input id="room-search" class="search-input" type="search" placeholder="채팅방 이름, 메시지 검색" autocomplete="off"></div>
+        <div id="oc-row" class="room-row oc-row hidden"></div>
         <div id="room-list"></div>
       </div>
 
@@ -1245,6 +1314,9 @@ mark.hl { background: #FFE066; color: #222; border-radius: 3px; padding: 0 1px; 
         <button id="push-row" class="setting-row">
           <span>앱 꺼져도 알림 받기<small id="push-sub" class="setting-sub"></small></span>
           <span id="push-switch" class="switch"></span>
+        </button>
+        <button id="push-test-row" class="setting-row hidden">
+          <span>🔔 알림 테스트<small class="setting-sub">이 폰에 알림이 뜨는지 바로 확인해요</small></span> <span class="setting-value">›</span>
         </button>
         <button id="sound-row" class="setting-row">
           알림 소리 <span id="sound-switch" class="switch"></span>
@@ -1269,6 +1341,18 @@ mark.hl { background: #FFE066; color: #222; border-radius: 3px; padding: 0 1px; 
         <button id="lock-time-row" class="setting-row hidden">
           <span>잠그는 시간<small class="setting-sub">앱을 나갔다가 다시 올 때</small></span> <span id="lock-time" class="setting-value">바로 ›</span>
         </button>
+        <div id="creator-section" class="hidden">
+          <div class="section-title">제작자 전용</div>
+          <button id="ac-row" class="setting-row">
+            <span>🖱️ 오토클리커<small class="setting-sub">정한 곳을 자동으로 계속 눌러요 (테스트용)</small></span> <span class="setting-value">›</span>
+          </button>
+          <button id="gift-row" class="setting-row">
+            <span>🎁 이모티콘 선물하기<small class="setting-sub">⚾ 볼리 (야구) 이모티콘을 한 명씩 선물해요</small></span> <span class="setting-value">›</span>
+          </button>
+          <button id="oc-edit-row" class="setting-row">
+            <span>온챗 공식 프로필 편집<small class="setting-sub">010-onchat 이름 · 사진 · 배경</small></span> <span class="setting-value">›</span>
+          </button>
+        </div>
         <div class="section-title">계정</div>
         <button id="pw-row" class="setting-row">
           <span><span id="pw-row-title">비밀번호 변경</span><small class="setting-sub" id="pw-row-sub">로그인할 때 쓰는 비밀번호</small></span> <span class="setting-value">›</span>
@@ -1353,6 +1437,7 @@ mark.hl { background: #FFE066; color: #222; border-radius: 3px; padding: 0 1px; 
           <button class="emo-tab" data-pack="mochi" type="button">모찌</button>
           <button class="emo-tab" data-pack="soda" type="button">소다</button>
           <button class="emo-tab" data-pack="mungge" type="button">뭉게</button>
+          <button id="emo-tab-yagu" class="emo-tab hidden" data-pack="yagu" type="button">⚾ 볼리</button>
           <button class="emo-tab" data-pack="emoji" type="button">😀 이모지</button>
         </div>
         <div id="emo-grid" class="emo-grid"></div>
@@ -1382,6 +1467,9 @@ mark.hl { background: #FFE066; color: #222; border-radius: 3px; padding: 0 1px; 
         <div id="pv-bg" class="pv-bg"></div>
         <div class="pv-shade"></div>
         <div id="pv-stickers" class="sticker-layer"></div>
+        <div id="pv-likestk" class="pv-likestk"></div>
+        <div id="pv-float" class="pv-float"></div>
+        <button id="pv-likes" class="pv-likes hidden" type="button"></button>
         <button class="icon-btn pv-close" data-close aria-label="닫기">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
         </button>
@@ -1396,6 +1484,7 @@ mark.hl { background: #FFE066; color: #222; border-radius: 3px; padding: 0 1px; 
           <div id="pf-real" class="real-name hidden"></div>
           <div id="pf-status" class="status"></div>
           <div id="pf-phone" class="phone"></div>
+          <div id="pv-react" class="pv-react hidden"></div>
         </div>
         <div id="pf-actions" class="pv-actions"></div>
       </div>
@@ -1431,6 +1520,107 @@ mark.hl { background: #FFE066; color: #222; border-radius: 3px; padding: 0 1px; 
           </button>
           <input id="edit-bg-input" type="file" accept="image/*" hidden>
           <button id="edit-save" class="btn" type="submit">저장</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- ========== 온챗 공식 채팅 (010-onchat) ========== -->
+    <section id="oc-screen" class="hidden">
+      <header class="chat-head">
+        <button id="oc-back" class="icon-btn" aria-label="뒤로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <button id="oc-head-avatar" class="oc-head-avatar" type="button" aria-label="온챗 프로필"></button>
+        <div class="chat-titles"><h3 id="oc-title">온챗</h3><div id="oc-sub" class="chat-sub"></div></div>
+      </header>
+      <div id="oc-list"></div>
+      <form id="oc-form" class="chat-input">
+        <textarea id="oc-text" rows="1" maxlength="2000" placeholder="온챗에 물어보기"></textarea>
+        <button id="oc-send" class="send-btn" type="submit" aria-label="전송">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+        </button>
+      </form>
+    </section>
+
+    <!-- ========== 온챗팀으로 보내기 (제작자) ========== -->
+    <div id="oc-send-modal" class="overlay hidden">
+      <div class="sheet scroll">
+        <div class="sheet-head">
+          <h3>누구에게 보낼까요?</h3>
+          <button class="icon-btn" data-close aria-label="닫기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+        </div>
+        <div class="oc-seg">
+          <button id="ocs-all" type="button" class="on">📢 모두에게</button>
+          <button id="ocs-one" type="button">👤 한 명에게만</button>
+        </div>
+        <div id="ocs-all-box">
+          <p class="oc-help">공지로 보내져요. 모든 사람의 온챗 채팅에 보여요.</p>
+          <button id="ocs-go-notice" class="btn" type="button">공지 쓰기</button>
+        </div>
+        <form id="ocs-one-box" class="form hidden">
+          <label class="field-label" for="ocs-nick">받는 사람 닉네임</label>
+          <div class="oc-find">
+            <input id="ocs-nick" class="input" type="text" maxlength="12" placeholder="프로필 닉네임 입력" autocomplete="off">
+            <button id="ocs-find" class="btn sm" type="submit">찾기</button>
+          </div>
+          <div id="ocs-results" class="pick-list"></div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ========== 이모티콘 선물하기 (제작자) ========== -->
+    <div id="gift-modal" class="overlay hidden">
+      <div class="sheet scroll">
+        <div class="sheet-head">
+          <h3>🎁 이모티콘 선물하기</h3>
+          <button class="icon-btn" data-close aria-label="닫기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+        </div>
+        <div id="gift-preview" class="gift-preview"></div>
+        <p class="oc-help">선물받은 사람만 채팅에서 ⚾ 볼리 이모티콘을 쓸 수 있어요. 보낸 이모티콘은 누구나 볼 수 있어요.</p>
+        <form id="gift-form" class="form">
+          <label class="field-label" for="gift-nick">받는 사람 닉네임</label>
+          <div class="oc-find">
+            <input id="gift-nick" class="input" type="text" maxlength="12" placeholder="프로필 닉네임 입력" autocomplete="off">
+            <button class="btn sm" type="submit">찾기</button>
+          </div>
+          <div id="gift-results" class="pick-list"></div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ========== 내 프로필 공감한 사람 ========== -->
+    <div id="likes-modal" class="overlay hidden">
+      <div class="sheet tall">
+        <div class="sheet-head">
+          <h3>배경 공감</h3>
+          <button class="icon-btn" data-close aria-label="닫기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+        </div>
+        <div id="likes-list" class="pick-list"></div>
+      </div>
+    </div>
+
+    <!-- ========== 온챗 공식 프로필 편집 (제작자) ========== -->
+    <div id="oc-edit-modal" class="overlay hidden">
+      <div class="sheet scroll">
+        <div class="sheet-head">
+          <h3>온챗 공식 프로필</h3>
+          <button class="icon-btn" data-close aria-label="닫기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+        </div>
+        <div id="oce-preview" class="oce-preview">
+          <div id="oce-avatar" class="avatar"></div>
+        </div>
+        <div class="oce-btns">
+          <button id="oce-photo-btn" class="btn sm ghost" type="button">사진 바꾸기</button>
+          <button id="oce-photo-reset" class="btn sm ghost" type="button">기본 사진</button>
+        </div>
+        <input id="oce-photo-input" type="file" accept="image/*" hidden>
+        <input id="oce-bg-input" type="file" accept="image/*" hidden>
+        <form id="oce-form" class="form">
+          <label class="field-label" for="oce-name">이름</label>
+          <input id="oce-name" class="input" type="text" maxlength="12" required>
+          <label class="field-label" for="oce-status">상태메시지</label>
+          <input id="oce-status" class="input" type="text" maxlength="40">
+          <label class="field-label">배경</label>
+          <div id="oce-bgs" class="oce-bgs"></div>
+          <button id="oce-save" class="btn" type="submit">저장</button>
         </form>
       </div>
     </div>
@@ -1696,7 +1886,7 @@ const firebaseConfig = {
 };
 
 // 👉 Cloudflare 알림 서버 주소 (예: "https://onchat-push.아이디.workers.dev"). 비어 있으면 앱 꺼진 알림은 꺼짐
-const APP_VERSION = "2026.11.15c"; // 설정 맨 아래에 보임 (새 버전 받았는지 확인용)
+const APP_VERSION = "2026.11.17c"; // 설정 맨 아래에 보임 (새 버전 받았는지 확인용)
 setTimeout(() => { const v = document.getElementById("app-version"); if (v) v.textContent = "OnChat 버전 " + APP_VERSION; }, 0);
 const PUSH_URL = "https://onchat.joshlee151001.workers.dev".replace(/\/$/, "");
 
@@ -1792,6 +1982,14 @@ function isValidPhone(phone) {
 }
 
 // 요소 만들기 (innerHTML 대신 써서 닉네임에 이상한 코드가 들어와도 안전)
+// 폰(손가락 터치 화면)인지: 폰에선 Enter가 줄바꿈
+function phoneKeyboard() {
+  try {
+    if (matchMedia("(hover: none) and (pointer: coarse)").matches) return true;
+  } catch (e) { /* 옛 브라우저 */ }
+  return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+}
+
 function el(tag, className, text) {
   const node = document.createElement(tag);
   if (className) node.className = className;
@@ -2135,6 +2333,881 @@ function nudgeGmailPassword() {
     openPwModal();
   }, 1500);
 }
+
+
+/* ================= 제작자 ================= */
+// 제작자 번호는 코드에 직접 쓰지 않고 SHA-256 값만 저장
+const CREATOR_HASH = "36fb1385853887a7d2228a43a76194404e95794100bd21a8744623a034ac7702";
+let creatorMode = false;
+async function sha256Hex(text) {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+  return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+async function checkCreator(phone) {
+  let ok = false;
+  try { ok = (await sha256Hex(phone)) === CREATOR_HASH; } catch (e) { ok = false; }
+  if (phone !== myPhone) return;
+  creatorMode = ok;
+  $("creator-section").classList.toggle("hidden", !ok);
+  if (ok) startCreatorInbox();
+  renderOcRow();
+  renderGiftTabs();
+}
+
+/* ================= 프로필 배경 공감 (스티커처럼 계속 쌓임) ================= */
+// 누를 때마다 +1 → 친구 배경에 이모지 스티커가 쌓임 (무한)
+// 많이 눌러도 저장은 잠깐 모았다가 한 번에 (Firestore 무료 쓰기 횟수 아끼기)
+const LIKE_KINDS = [["heart", "❤️"], ["like", "👍"], ["haha", "😆"], ["wow", "😮"], ["sad", "😢"]];
+const LIKE_EMOJI = Object.fromEntries(LIKE_KINDS);
+const LIKE_MAX_STICKERS = 40;   // 배경에 보이는 스티커 최대 개수 (숫자는 끝없이 올라감)
+let likeTarget = null;   // 지금 보고 있는 프로필 번호
+let likeDocs = [];       // [{ who, c: {heart: 3, ...}, at, nick }]
+let likePending = {};    // 아직 저장 안 한 내 공감 {heart: 5}
+let likePendingFor = null;
+let likeFlushTimer = null;
+let lastFly = 0;
+
+function likeCountsOf(x) {
+  if (x.c && typeof x.c === "object") return x.c;
+  return x.e && LIKE_EMOJI[x.e] ? { [x.e]: 1 } : {}; // 예전 방식(한 개만) 호환
+}
+function likeTotals() {
+  const t = {};
+  for (const x of likeDocs) for (const [k, n] of Object.entries(likeCountsOf(x))) if (LIKE_EMOJI[k]) t[k] = (t[k] || 0) + (Number(n) || 0);
+  return t;
+}
+function sumCounts(c) { return Object.values(c).reduce((a, b) => a + (Number(b) || 0), 0); }
+
+async function flushLikes() {
+  clearTimeout(likeFlushTimer);
+  likeFlushTimer = null;
+  const phone = likePendingFor;
+  const add = likePending;
+  likePending = {};
+  if (!phone || !myPhone || !Object.keys(add).length) return;
+  const c = {};
+  for (const [k, n] of Object.entries(add)) c[k] = increment(n);
+  try {
+    await setDoc(doc(db, "users", phone, "likes", myPhone), { c, at: Date.now(), nick: ((me && me.nickname) || "").slice(0, 12) }, { merge: true });
+  } catch (err) {
+    console.warn(err);
+    toast("공감을 저장하지 못했어요");
+  }
+}
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") flushLikes(); });
+
+async function loadLikes(user, isMe) {
+  if (likePendingFor && likePendingFor !== user.phone) await flushLikes();
+  const phone = user.phone;
+  likeTarget = phone;
+  likeDocs = [];
+  renderLikes(isMe);
+  if (!phone || user.official) return;
+  try {
+    const snap = await getDocs(collection(db, "users", phone, "likes"));
+    if (likeTarget !== phone) return;
+    likeDocs = snap.docs.map((d) => ({ who: d.id, ...d.data() }));
+    // 아직 저장 안 된 내 공감도 더해서 보여 줌
+    if (likePendingFor === phone && Object.keys(likePending).length) {
+      let mine = likeDocs.find((x) => x.who === myPhone);
+      if (!mine) { mine = { who: myPhone, c: {} }; likeDocs.push(mine); }
+      mine.c = { ...likeCountsOf(mine) };
+      for (const [k, n] of Object.entries(likePending)) mine.c[k] = (mine.c[k] || 0) + n;
+    }
+    renderLikes(isMe);
+  } catch (err) {
+    console.warn(err);
+  }
+}
+
+// 같은 사람 배경엔 누가 봐도 같은 자리에 스티커가 붙도록 (번호로 정해지는 랜덤)
+function seeded(seed) {
+  let h = 2166136261;
+  for (const ch of String(seed)) h = Math.imul(h ^ ch.charCodeAt(0), 16777619);
+  return () => { h = Math.imul(h ^ (h >>> 15), 2246822507); h = Math.imul(h ^ (h >>> 13), 3266489909); h ^= h >>> 16; return (h >>> 0) / 4294967296; };
+}
+function renderLikeStickers(totals) {
+  const layer = $("pv-likestk");
+  const user = profileShown;
+  const total = sumCounts(totals);
+  if (!user || user.official || total === 0) { layer.replaceChildren(); return; }
+  const shown = Math.min(total, LIKE_MAX_STICKERS);
+  // 종류별로 비율대로 나누기 (있는 종류는 최소 1개)
+  const kinds = LIKE_KINDS.filter(([k]) => totals[k] > 0);
+  let alloc = kinds.map(([k, e]) => ({ e, n: Math.max(1, Math.round((shown * totals[k]) / total)) }));
+  while (alloc.reduce((a, b) => a + b.n, 0) > shown) { const big = alloc.reduce((a, b) => (b.n > a.n ? b : a)); big.n--; }
+  const list = [];
+  const most = Math.max(...alloc.map((a) => a.n));
+  for (let i = 0; i < most; i++) for (const a of alloc) if (i < a.n) list.push(a.e);
+  const rnd = seeded(user.phone);
+  layer.replaceChildren(
+    ...list.map((e, i) => {
+      const s = el("span", "", e);
+      s.style.left = 4 + rnd() * 84 + "%";
+      s.style.top = 6 + rnd() * 50 + "%";
+      s.style.fontSize = 24 + rnd() * 20 + "px";
+      s.style.transform = `rotate(${Math.round(rnd() * 50 - 25)}deg)`;
+      return s;
+    })
+  );
+}
+
+function renderLikes(isMe) {
+  const user = profileShown;
+  const official = !user || user.official;
+  const totals = likeTotals();
+  const total = sumCounts(totals);
+  const chip = $("pv-likes");
+  chip.replaceChildren();
+  if (total > 0 && !official) {
+    for (const [k, e] of LIKE_KINDS) if (totals[k]) chip.append(el("span", "", `${e} ${totals[k].toLocaleString()}`));
+    if (isMe) chip.append(el("span", "", "›"));
+  }
+  chip.classList.toggle("hidden", official || total === 0);
+  renderLikeStickers(official ? {} : totals);
+
+  const bar = $("pv-react");
+  const canReact = !official && !isMe && user && !blocked.has(user.phone);
+  bar.classList.toggle("hidden", !canReact);
+  if (!canReact) return;
+  if (bar.childElementCount !== LIKE_KINDS.length) {
+    bar.replaceChildren(
+      ...LIKE_KINDS.map(([k, e]) => {
+        const b = el("button");
+        b.type = "button";
+        b.dataset.k = k;
+        b.setAttribute("aria-label", "공감 " + e);
+        b.append(e, el("b"));
+        b.addEventListener("click", () => addLike(k));
+        return b;
+      })
+    );
+  }
+  for (const b of bar.children) {
+    const n = totals[b.dataset.k] || 0;
+    b.querySelector("b").textContent = n ? (n > 9999 ? Math.floor(n / 1000) + "k" : String(n)) : "";
+  }
+}
+
+function flyLike(e) {
+  const now = Date.now();
+  if (now - lastFly < 90) return; // 너무 빨리 누르면 날아가는 건 조금만
+  lastFly = now;
+  const layer = $("pv-float");
+  const s = el("span", "", e);
+  s.style.left = 15 + Math.random() * 70 + "%";
+  s.style.fontSize = 30 + Math.random() * 20 + "px";
+  layer.append(s);
+  setTimeout(() => s.remove(), 1500);
+}
+
+function addLike(kind) {
+  const user = profileShown;
+  if (!user || user.official || !myPhone || user.phone === myPhone || !LIKE_EMOJI[kind]) return;
+  if (likePendingFor !== user.phone) { flushLikes(); likePendingFor = user.phone; }
+  likePending[kind] = (likePending[kind] || 0) + 1;
+  let mine = likeDocs.find((x) => x.who === myPhone);
+  if (!mine) { mine = { who: myPhone, c: {}, nick: (me && me.nickname) || "" }; likeDocs.push(mine); }
+  mine.c = { ...likeCountsOf(mine) };
+  mine.c[kind] = (mine.c[kind] || 0) + 1;
+  mine.at = Date.now();
+  renderLikes(false);
+  flyLike(LIKE_EMOJI[kind]);
+  const btn = $("pv-react").querySelector(`[data-k="${kind}"]`);
+  if (btn) { btn.classList.remove("pop"); void btn.offsetWidth; btn.classList.add("pop"); }
+  if (!likeFlushTimer) likeFlushTimer = setTimeout(flushLikes, 1500);
+}
+
+$("pv-likes").addEventListener("click", () => {
+  if (!profileIsMe || likeDocs.length === 0) return;
+  const list = $("likes-list");
+  const sorted = [...likeDocs].sort((a, b) => sumCounts(likeCountsOf(b)) - sumCounts(likeCountsOf(a)));
+  list.replaceChildren(
+    ...sorted.map((x) => {
+      const u = userInfo.has(x.who) ? userOf(x.who) : { phone: x.who, nickname: x.nick || formatPhone(x.who), photo: "" };
+      const row = el("div", "pick-row");
+      const c = likeCountsOf(x);
+      const detail = LIKE_KINDS.filter(([k]) => c[k]).map(([k, e]) => `${e}${Number(c[k]).toLocaleString()}`).join(" ");
+      row.append(makeAvatar(u), el("div", "name", u.nickname), el("span", "likes-e", detail));
+      return row;
+    })
+  );
+  openModal("likes-modal");
+});
+
+/* ================= 온챗 공식 채팅 (010-onchat) ================= */
+const OC_ID = "onchat";
+const OC_DEFAULT = { nickname: "온챗", statusMessage: "온챗 공식 채팅이에요 💬", photo: "", bg: "preset:logo" };
+let ocProfile = { ...OC_DEFAULT };
+let ocNotices = [];        // 공지 [{id, text, at}]
+let ocMeta = null;         // support/{내번호} (안 읽은 답장 수 등)
+let ocMsgs = [];           // 지금 열린 대화
+let ocInbox = [];          // 제작자: 문의 목록
+let ocMode = null;         // null(닫힘) | "user" | "inbox" | "thread" | "notice"
+let ocThread = null;       // 제작자가 보고 있는 사람 번호
+let ocStopMsgs = null;
+let ocStopInbox = null;
+
+function ocUser() {
+  return { ...OC_DEFAULT, ...ocProfile, phone: OC_ID, official: true };
+}
+function ocSeenKey() { return "onchat-oc-seen-" + myPhone; }
+function ocSeenAt() { try { return Number(localStorage.getItem(ocSeenKey()) || 0); } catch (e) { return 0; } }
+function ocNewNotices() {
+  const seen = ocSeenAt();
+  return ocNotices.filter((n) => n.at > seen).length;
+}
+function ocUnread() {
+  if (creatorMode) return ocInbox.reduce((s, t) => s + (t.creatorUnread || 0), 0);
+  return ocNewNotices() + ((ocMeta && ocMeta.userUnread) || 0);
+}
+
+function startOfficial(phone) {
+  const stops = [];
+  stops.push(onSnapshot(doc(db, "official", OC_ID), (snap) => {
+    ocProfile = snap.exists() ? { ...OC_DEFAULT, ...snap.data() } : { ...OC_DEFAULT };
+    renderOcRow();
+    renderOcHead();
+  }, (err) => console.warn(err)));
+  stops.push(onSnapshot(query(collection(db, "notices"), orderBy("at"), limitToLast(30)), (snap) => {
+    const before = ocNotices.length ? ocNotices[ocNotices.length - 1].at : 0;
+    ocNotices = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    const last = ocNotices[ocNotices.length - 1];
+    if (before && last && last.at > before && ocMode !== "user" && ocMode !== "notice") toast("📢 온챗 공지: " + String(last.text || "").slice(0, 30));
+    if (ocMode === "user" || ocMode === "notice") { markOcSeen(); renderOcList(); }
+    renderOcRow();
+  }, (err) => console.warn(err)));
+  let metaFirst = true;
+  stops.push(onSnapshot(doc(db, "support", phone), (snap) => {
+    const prev = metaFirst ? Infinity : (ocMeta && ocMeta.userUnread) || 0;
+    metaFirst = false;
+    ocMeta = snap.exists() ? snap.data() : null;
+    const now = (ocMeta && ocMeta.userUnread) || 0;
+    if (now > prev && ocMode !== "user" && ocMeta.lastFrom === OC_ID) toast("💬 온챗: " + String(ocMeta.lastText || "").slice(0, 30));
+    if (ocMode === "user" && now > 0) clearOcUnread("userUnread", phone);
+    renderOcRow();
+  }, (err) => console.warn(err)));
+  checkCreator(phone);
+  return () => {
+    stops.forEach((f) => f());
+    if (ocStopInbox) ocStopInbox();
+    ocStopInbox = null;
+    closeOc();
+    creatorMode = false;
+    ocInbox = [];
+    ocNotices = [];
+    ocMeta = null;
+    $("creator-section").classList.add("hidden");
+    stopAutoClicker(true);
+  };
+}
+
+function startCreatorInbox() {
+  if (ocStopInbox) return;
+  let first = true;
+  ocStopInbox = onSnapshot(query(collection(db, "support"), orderBy("lastAt"), limitToLast(100)), (snap) => {
+    const prev = first ? Infinity : ocInbox.reduce((s, t) => s + (t.creatorUnread || 0), 0);
+    first = false;
+    const fresh = snap.docs.map((d) => ({ phone: d.id, ...d.data() })).reverse();
+    const temp = ocMode === "thread" && !fresh.some((t) => t.phone === ocThread) ? ocInbox.filter((t) => t.phone === ocThread) : [];
+    ocInbox = [...temp, ...fresh];
+    const now = ocInbox.reduce((s, t) => s + (t.creatorUnread || 0), 0);
+    if (now > prev && ocMode !== "inbox" && ocMode !== "thread") toast("📮 온챗에 새 문의가 왔어요");
+    // 보고 있는 대화에 새 문의가 오면 바로 읽음
+    if (ocMode === "thread") {
+      const open = ocInbox.find((t) => t.phone === ocThread);
+      if (open && open.creatorUnread > 0) { open.creatorUnread = 0; clearOcUnread("creatorUnread", ocThread); }
+    }
+    if (ocMode === "inbox") renderOcList();
+    renderOcRow();
+  }, (err) => console.warn(err));
+}
+
+function renderOcRow() {
+  const row = $("oc-row");
+  if (!myPhone) { row.classList.add("hidden"); return; }
+  const q = ($("room-search").value || "").trim().toLowerCase();
+  const u = ocUser();
+  row.classList.toggle("hidden", !!q && !(u.nickname + " 온챗 onchat").toLowerCase().includes(q));
+  let lastText = u.statusMessage || "";
+  let lastAt = 0;
+  if (creatorMode) {
+    const t = ocInbox[0];
+    if (t) { lastText = `${t.nickname || formatPhone(t.phone)}: ${t.lastText || ""}`; lastAt = t.lastAt || 0; }
+    else lastText = "아직 문의가 없어요";
+  } else {
+    const n = ocNotices[ocNotices.length - 1];
+    if (n) { lastText = "📢 " + n.text; lastAt = n.at; }
+    if (ocMeta && ocMeta.lastAt > lastAt) { lastText = ocMeta.lastText || ""; lastAt = ocMeta.lastAt; }
+  }
+  const info = el("div", "info");
+  const name = el("div", "name");
+  name.append(u.nickname, el("span", "oc-check", "✓"));
+  info.append(name, el("div", "last", String(lastText).replace(/\s+/g, " ")));
+  const side = el("div", "side");
+  side.append(el("div", "time", lastAt ? formatListTime(lastAt) : ""));
+  const unread = ocUnread();
+  if (unread > 0) side.append(el("div", "badge", unread > 99 ? "99+" : String(unread)));
+  const av = makeAvatar(u);
+  av.addEventListener("click", (e) => { e.stopPropagation(); openProfile(ocUser(), false); });
+  row.replaceChildren(av, info, side);
+  row.onclick = () => openOc();
+}
+$("room-search").addEventListener("input", renderOcRow);
+
+function renderOcHead() {
+  const u = ocUser();
+  paintAvatar($("oc-head-avatar"), u);
+  if (!ocMode) return;
+  let title = u.nickname, sub = "010-onchat · 공식 채팅";
+  if (ocMode === "inbox") sub = "제작자 모드 · 문의함";
+  if (ocMode === "notice") { title = "📢 공지 보내기"; sub = "모든 사람에게 보여요"; }
+  if (ocMode === "thread") {
+    const t = ocInbox.find((x) => x.phone === ocThread);
+    title = (t && t.nickname) || formatPhone(ocThread);
+    sub = formatPhone(ocThread) + " · 온챗으로 답장해요";
+  }
+  $("oc-title").textContent = title;
+  $("oc-sub").textContent = sub;
+  $("oc-form").classList.toggle("hidden", ocMode === "inbox");
+  $("oc-text").placeholder = ocMode === "notice" ? "공지 내용 쓰기" : ocMode === "thread" ? "온챗으로 답장하기" : "온챗에 물어보기";
+}
+
+function markOcSeen() {
+  const last = ocNotices[ocNotices.length - 1];
+  if (!last) return;
+  try { localStorage.setItem(ocSeenKey(), String(Math.max(ocSeenAt(), last.at))); } catch (e) { /* 괜찮음 */ }
+}
+function clearOcUnread(field, phone) {
+  setDoc(doc(db, "support", phone), { [field]: 0 }, { merge: true }).catch((e) => console.warn(e));
+}
+
+function openOc() {
+  if (creatorMode) setOcMode("inbox");
+  else setOcMode("user");
+}
+function setOcMode(mode, phone) {
+  if (ocStopMsgs) { ocStopMsgs(); ocStopMsgs = null; }
+  ocMode = mode;
+  ocThread = phone || null;
+  ocMsgs = [];
+  $("oc-text").value = ""; // 다른 사람/공지로 잘못 보내지 않게 쓰던 글 비우기
+  $("oc-text").style.height = "";
+  $("oc-screen").classList.remove("hidden");
+  renderOcHead();
+  renderOcList();
+  const who = mode === "user" ? myPhone : mode === "thread" ? phone : null;
+  if (mode === "user" || mode === "notice") markOcSeen();
+  if (who) {
+    ocStopMsgs = onSnapshot(query(collection(db, "support", who, "messages"), orderBy("at"), limitToLast(200)), (snap) => {
+      ocMsgs = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      renderOcList(true);
+    }, (err) => console.warn(err));
+    if (mode === "user" && ocMeta && ocMeta.userUnread) clearOcUnread("userUnread", myPhone);
+    if (mode === "thread") {
+      const t = ocInbox.find((x) => x.phone === phone);
+      if (t && t.creatorUnread) clearOcUnread("creatorUnread", phone);
+    }
+  }
+  renderOcRow();
+  if (mode !== "inbox") setTimeout(() => { const l = $("oc-list"); l.scrollTop = l.scrollHeight; }, 50);
+}
+function closeOc() {
+  if (ocStopMsgs) { ocStopMsgs(); ocStopMsgs = null; }
+  ocMode = null;
+  ocThread = null;
+  ocMsgs = [];
+  $("oc-screen").classList.add("hidden");
+  $("oc-form").reset();
+  renderOcRow();
+}
+$("oc-back").addEventListener("click", () => {
+  ocInbox = ocInbox.filter((t) => t.lastAt); // 보내지 않고 나온 새 대화는 목록에서 빼기
+  if (creatorMode && (ocMode === "thread" || ocMode === "notice")) setOcMode("inbox");
+  else closeOc();
+});
+$("oc-head-avatar").addEventListener("click", () => openProfile(ocUser(), false));
+
+function ocBubble(m, mine, opts = {}) {
+  const row = el("div", "msg first " + (mine ? "mine" : "other") + (opts.notice ? " oc-notice" : ""));
+  const body = el("div", "body");
+  if (!mine) {
+    const av = opts.avatarUser ? makeAvatar(opts.avatarUser) : makeAvatar(ocUser());
+    row.append(av);
+    body.append(el("div", "sender", opts.sender || ocUser().nickname));
+  }
+  const line = el("div", "line");
+  const b = el("div", "bubble");
+  if (opts.notice) b.append(el("span", "tag", "📢 공지"));
+  b.append(String(m.text || ""));
+  const meta = el("div", "meta");
+  meta.append(el("span", "", formatTime(m.at)));
+  line.append(b, meta);
+  body.append(line);
+  row.append(body);
+  if (opts.onLong) {
+    let t = null;
+    b.addEventListener("contextmenu", (e) => { e.preventDefault(); opts.onLong(); });
+    b.addEventListener("touchstart", () => { t = setTimeout(opts.onLong, 550); }, { passive: true });
+    b.addEventListener("touchend", () => clearTimeout(t));
+    b.addEventListener("touchmove", () => clearTimeout(t), { passive: true });
+  }
+  return row;
+}
+
+function renderOcList(keepBottom) {
+  const list = $("oc-list");
+  if (!ocMode) return;
+  const atBottom = list.scrollHeight - list.scrollTop - list.clientHeight < 80;
+  const nodes = [];
+  if (ocMode === "inbox") {
+    const nr = el("div", "oc-inbox-row notice-row");
+    const nav = el("div", "avatar", "✏️");
+    const ni = el("div", "info");
+    ni.append(el("div", "name", "메시지 보내기"), el("div", "last", "모두에게(공지) 또는 한 명에게만"));
+    nr.append(nav, ni);
+    nr.addEventListener("click", openOcSend);
+    nodes.push(nr, el("div", "section-title", "받은 문의"));
+    if (ocInbox.length === 0) nodes.push(el("p", "oc-empty", "아직 온 문의가 없어요."));
+    for (const t of ocInbox) {
+      const r = el("div", "oc-inbox-row");
+      const u = userInfo.has(t.phone) ? userOf(t.phone) : { phone: t.phone, nickname: t.nickname || formatPhone(t.phone), photo: "" };
+      const info = el("div", "info");
+      info.append(el("div", "name", t.nickname || u.nickname), el("div", "last", (t.lastFrom === OC_ID ? "나: " : "") + (t.lastText || "")));
+      const side = el("div", "side");
+      side.append(el("div", "time", t.lastAt ? formatListTime(t.lastAt) : ""));
+      if (t.creatorUnread > 0) side.append(el("div", "badge", String(t.creatorUnread)));
+      r.append(makeAvatar(u), info, side);
+      r.addEventListener("click", () => setOcMode("thread", t.phone));
+      nodes.push(r);
+    }
+    list.replaceChildren(...nodes);
+    return;
+  }
+  if (ocMode === "notice") {
+    if (ocNotices.length === 0) nodes.push(el("p", "oc-empty", "아직 보낸 공지가 없어요.\n아래에 쓰면 모든 사람의 온챗 채팅에 보여요."));
+    for (const n of ocNotices) nodes.push(ocBubble(n, true, { onLong: () => deleteNotice(n) }));
+  } else if (ocMode === "user") {
+    const items = [
+      ...ocNotices.map((n) => ({ ...n, _notice: true })),
+      ...ocMsgs,
+    ].sort((a, b) => (a.at || 0) - (b.at || 0));
+    if (items.length === 0) nodes.push(el("p", "oc-empty", "안녕하세요! 온챗 공식 채팅이에요 👋\n궁금한 점이나 바라는 기능을 보내 주세요."));
+    for (const m of items) {
+      if (m._notice) nodes.push(ocBubble(m, false, { notice: true }));
+      else nodes.push(ocBubble(m, m.from !== OC_ID));
+    }
+  } else if (ocMode === "thread") {
+    const t = ocInbox.find((x) => x.phone === ocThread);
+    const u = userInfo.has(ocThread) ? userOf(ocThread) : { phone: ocThread, nickname: (t && t.nickname) || formatPhone(ocThread), photo: "" };
+    if (ocMsgs.length === 0) nodes.push(el("p", "oc-empty", `${u.nickname}님에게만 보이는 메시지를 보내요.\n아래에 쓰면 온챗 이름으로 보내져요.`));
+    for (const m of ocMsgs) {
+      if (m.from === OC_ID) nodes.push(ocBubble(m, true));
+      else nodes.push(ocBubble(m, false, { avatarUser: u, sender: u.nickname }));
+    }
+  }
+  list.replaceChildren(...nodes);
+  if (keepBottom || atBottom) list.scrollTop = list.scrollHeight;
+}
+
+async function deleteNotice(n) {
+  if (!creatorMode || !confirm("이 공지를 지울까요?")) return;
+  try { await deleteDoc(doc(db, "notices", n.id)); toast("공지를 지웠어요"); } catch (err) { console.warn(err); toast("지우지 못했어요"); }
+}
+
+$("oc-text").addEventListener("input", (e) => {
+  const t = e.target;
+  t.style.height = "";
+  t.style.height = Math.min(t.scrollHeight, 110) + "px";
+});
+$("oc-text").addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && !e.shiftKey && !e.isComposing && e.keyCode !== 229 && !phoneKeyboard()) {
+    e.preventDefault();
+    $("oc-form").requestSubmit();
+  }
+});
+$("oc-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const text = $("oc-text").value.trim().slice(0, 2000);
+  if (!text || !myPhone || !ocMode) return;
+  $("oc-text").value = "";
+  $("oc-text").style.height = "";
+  const at = Date.now();
+  try {
+    if (ocMode === "notice") {
+      if (!creatorMode) return;
+      await setDoc(doc(collection(db, "notices")), { text, at });
+    } else if (ocMode === "user") {
+      const batch = writeBatch(db);
+      batch.set(doc(collection(db, "support", myPhone, "messages")), { from: myPhone, text, at });
+      batch.set(doc(db, "support", myPhone), {
+        phone: myPhone, nickname: ((me && me.nickname) || "").slice(0, 12),
+        lastText: text.slice(0, 100), lastAt: at, lastFrom: myPhone, creatorUnread: increment(1),
+      }, { merge: true });
+      await batch.commit();
+    } else if (ocMode === "thread" && creatorMode) {
+      const batch = writeBatch(db);
+      batch.set(doc(collection(db, "support", ocThread, "messages")), { from: OC_ID, text, at });
+      const t = ocInbox.find((x) => x.phone === ocThread);
+      const extra = { phone: ocThread };
+      if (t && t.nickname) extra.nickname = String(t.nickname).slice(0, 12);
+      batch.set(doc(db, "support", ocThread), {
+        ...extra, lastText: text.slice(0, 100), lastAt: at, lastFrom: OC_ID, userUnread: increment(1), creatorUnread: 0,
+      }, { merge: true });
+      await batch.commit();
+    }
+  } catch (err) {
+    console.warn(err);
+    $("oc-text").value = text;
+    toast(navigator.onLine === false ? "📶 인터넷이 없어서 못 보냈어요" : "보내지 못했어요");
+  }
+});
+
+
+/* ---------- 온챗팀으로 보내기: 모두에게 / 한 명에게만 (제작자) ---------- */
+function setOcsTab(one) {
+  $("ocs-all").classList.toggle("on", !one);
+  $("ocs-one").classList.toggle("on", one);
+  $("ocs-all-box").classList.toggle("hidden", one);
+  $("ocs-one-box").classList.toggle("hidden", !one);
+  if (one) setTimeout(() => $("ocs-nick").focus(), 50);
+}
+function openOcSend() {
+  if (!creatorMode) return;
+  $("ocs-nick").value = "";
+  $("ocs-results").replaceChildren();
+  setOcsTab(false);
+  openModal("oc-send-modal");
+}
+$("ocs-all").addEventListener("click", () => setOcsTab(false));
+$("ocs-one").addEventListener("click", () => setOcsTab(true));
+$("ocs-go-notice").addEventListener("click", () => { closeModal("oc-send-modal"); setOcMode("notice"); });
+$("ocs-one-box").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const nick = $("ocs-nick").value.trim();
+  const box = $("ocs-results");
+  if (!nick) return $("ocs-nick").focus();
+  box.replaceChildren(el("p", "oc-help", "찾는 중..."));
+  try {
+    const snap = await getDocs(query(collection(db, "users"), where("nickname", "==", nick), limit(20)));
+    const found = snap.docs.map((d) => ({ phone: d.id, ...d.data() })).filter((u) => u.uid);
+    if (found.length === 0) {
+      box.replaceChildren(el("p", "oc-help", `'${nick}' 닉네임을 쓰는 사람이 없어요. (띄어쓰기·대소문자까지 똑같이)`));
+      return;
+    }
+    box.replaceChildren(
+      ...found.map((u) => {
+        const row = el("div", "pick-row");
+        const name = el("div", "name");
+        name.append(u.nickname, el("div", "note", formatPhone(u.phone)));
+        row.append(makeAvatar(u), name, el("span", "setting-value", "›"));
+        row.addEventListener("click", async () => {
+          closeModal("oc-send-modal");
+          // 처음 보내는 사람이면 목록에 이름이 보이도록 기본 정보만 만들어 둠
+          if (!ocInbox.some((t) => t.phone === u.phone)) {
+            ocInbox = [{ phone: u.phone, nickname: u.nickname }, ...ocInbox];
+          }
+          setOcMode("thread", u.phone);
+        });
+        return row;
+      })
+    );
+  } catch (err) {
+    console.warn(err);
+    box.replaceChildren(el("p", "oc-help", "찾지 못했어요. Firestore 규칙을 확인해 주세요."));
+  }
+});
+
+
+/* ---------- 선물 이모티콘 ---------- */
+// gifts/{번호} = { packs: { yagu: true } } — 제작자만 씀
+let giftPacks = {};
+function ownsPack(id) {
+  return !!(creatorMode || giftPacks[id]);
+}
+function renderGiftTabs() {
+  for (const [id, pack] of Object.entries(EMOTICONS)) {
+    if (!pack.gift) continue;
+    const tab = $("emo-tab-" + id);
+    if (tab) tab.classList.toggle("hidden", !ownsPack(id));
+  }
+  if (!$("emo-panel").classList.contains("hidden")) renderEmoGrid();
+}
+function startGifts(phone) {
+  let first = true;
+  const stop = onSnapshot(doc(db, "gifts", phone), (snap) => {
+    const next = (snap.exists() && snap.data().packs) || {};
+    if (!first) {
+      for (const id of Object.keys(next)) {
+        if (next[id] && !giftPacks[id] && EMOTICONS[id]) toast(`🎁 ${EMOTICONS[id].name} 이모티콘을 선물받았어요!`);
+      }
+    }
+    first = false;
+    giftPacks = next;
+    renderGiftTabs();
+  }, (err) => console.warn(err));
+  return () => { stop(); giftPacks = {}; renderGiftTabs(); };
+}
+
+function openGift() {
+  if (!creatorMode) return;
+  const prev = $("gift-preview");
+  if (!prev.childElementCount) prev.replaceChildren(...Object.keys(EMOTICONS.yagu.items).slice(0, 8).map((k) => emoticonImg("yagu/" + k)));
+  $("gift-nick").value = "";
+  $("gift-results").replaceChildren();
+  openModal("gift-modal");
+  setTimeout(() => $("gift-nick").focus(), 80);
+}
+$("gift-row").addEventListener("click", openGift);
+
+async function setGift(u, on, row) {
+  try {
+    const at = Date.now();
+    const batch = writeBatch(db);
+    batch.set(doc(db, "gifts", u.phone), { packs: { yagu: on }, at }, { merge: true });
+    if (on) {
+      const text = `🎁 ${u.nickname}님에게 ⚾ 볼리 이모티콘을 선물했어요! 채팅에서 이모티콘 버튼을 눌러 보세요.`;
+      batch.set(doc(collection(db, "support", u.phone, "messages")), { from: OC_ID, text, at });
+      batch.set(doc(db, "support", u.phone), {
+        phone: u.phone, nickname: String(u.nickname || "").slice(0, 12),
+        lastText: text.slice(0, 100), lastAt: at, lastFrom: OC_ID, userUnread: increment(1),
+      }, { merge: true });
+    }
+    await batch.commit();
+    toast(on ? `🎁 ${u.nickname}님에게 선물했어요` : "선물을 취소했어요");
+    renderGiftRow(row, u, on);
+  } catch (err) {
+    console.warn(err);
+    toast("선물하지 못했어요 (Firestore 규칙 확인)");
+  }
+}
+function renderGiftRow(row, u, has) {
+  const name = el("div", "name");
+  name.append(u.nickname, el("div", "note", formatPhone(u.phone)));
+  const side = [];
+  if (u.phone === myPhone) side.push(el("span", "gift-got", "제작자 (이미 있음)"));
+  else if (has) {
+    side.push(el("span", "gift-got", "받음 ✓"));
+    const undo = el("button", "btn sm ghost", "취소");
+    undo.type = "button";
+    undo.addEventListener("click", () => { if (confirm(`${u.nickname}님의 선물을 취소할까요?`)) setGift(u, false, row); });
+    side.push(undo);
+  } else {
+    const give = el("button", "btn sm", "🎁 선물하기");
+    give.type = "button";
+    give.addEventListener("click", () => setGift(u, true, row));
+    side.push(give);
+  }
+  row.replaceChildren(makeAvatar(u), name, ...side);
+}
+$("gift-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const nick = $("gift-nick").value.trim();
+  const box = $("gift-results");
+  if (!nick) return $("gift-nick").focus();
+  box.replaceChildren(el("p", "oc-help", "찾는 중..."));
+  try {
+    const snap = await getDocs(query(collection(db, "users"), where("nickname", "==", nick), limit(20)));
+    const found = snap.docs.map((d) => ({ phone: d.id, ...d.data() })).filter((u) => u.uid);
+    if (!found.length) {
+      box.replaceChildren(el("p", "oc-help", `'${nick}' 닉네임을 쓰는 사람이 없어요. (띄어쓰기까지 똑같이)`));
+      return;
+    }
+    const rows = await Promise.all(found.map(async (u) => {
+      let has = false;
+      try {
+        const g = await getDoc(doc(db, "gifts", u.phone));
+        has = !!(g.exists() && g.data().packs && g.data().packs.yagu);
+      } catch (err) { console.warn(err); }
+      const row = el("div", "pick-row");
+      renderGiftRow(row, u, has);
+      return row;
+    }));
+    box.replaceChildren(...rows);
+  } catch (err) {
+    console.warn(err);
+    box.replaceChildren(el("p", "oc-help", "찾지 못했어요. Firestore 규칙을 확인해 주세요."));
+  }
+});
+
+/* ---------- 온챗 공식 프로필 편집 (제작자) ---------- */
+let oceDraft = null;
+function renderOce() {
+  const u = { ...oceDraft, phone: OC_ID };
+  paintAvatar($("oce-avatar"), u);
+  paintBg($("oce-preview"), u.bg);
+  const box = $("oce-bgs");
+  const opts = [["preset:logo", BG_PRESETS.logo]].concat(Object.entries(BG_PRESETS).filter(([k]) => k !== "logo").map(([k, v]) => ["preset:" + k, v]));
+  const btns = opts.map(([id, p]) => {
+    const b = el("button", oceDraft.bg === id ? "on" : "");
+    b.type = "button";
+    b.title = p.name;
+    b.style.background = p.css;
+    b.addEventListener("click", () => { oceDraft.bg = id; renderOce(); });
+    return b;
+  });
+  const up = el("button", safeImage(oceDraft.bg) ? "on" : "", "📷 사진");
+  up.type = "button";
+  if (safeImage(oceDraft.bg)) up.style.background = bgCss(oceDraft.bg);
+  up.addEventListener("click", () => $("oce-bg-input").click());
+  box.replaceChildren(...btns, up);
+}
+function openOcEdit() {
+  if (!creatorMode) return;
+  oceDraft = { ...ocUser() };
+  $("oce-name").value = oceDraft.nickname || "";
+  $("oce-status").value = oceDraft.statusMessage || "";
+  renderOce();
+  openModal("oc-edit-modal");
+}
+$("oc-edit-row").addEventListener("click", openOcEdit);
+$("oce-name").addEventListener("input", () => { oceDraft.nickname = $("oce-name").value; renderOce(); });
+$("oce-photo-btn").addEventListener("click", () => $("oce-photo-input").click());
+$("oce-photo-reset").addEventListener("click", () => { oceDraft.photo = ""; renderOce(); });
+$("oce-photo-input").addEventListener("change", async (e) => {
+  const f = e.target.files[0]; e.target.value = "";
+  if (!f) return;
+  try { oceDraft.photo = await compressImage(f, { maxSide: 400, quality: 0.8, maxBytes: 150000 }); renderOce(); } catch (err) { toast(err.message || "사진을 못 불러왔어요"); }
+});
+$("oce-bg-input").addEventListener("change", async (e) => {
+  const f = e.target.files[0]; e.target.value = "";
+  if (!f) return;
+  try { oceDraft.bg = await compressImage(f, { maxSide: 1080, quality: 0.75, maxBytes: 350000 }); renderOce(); } catch (err) { toast(err.message || "사진을 못 불러왔어요"); }
+});
+$("oce-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const nickname = $("oce-name").value.trim().slice(0, 12);
+  if (!nickname) return toast("이름을 입력해 주세요");
+  const data = { nickname, statusMessage: $("oce-status").value.trim().slice(0, 40), photo: oceDraft.photo || "", bg: oceDraft.bg || "" };
+  try {
+    await setDoc(doc(db, "official", OC_ID), data);
+    closeModal("oc-edit-modal");
+    toast("온챗 프로필을 저장했어요");
+  } catch (err) {
+    console.warn(err);
+    toast("저장하지 못했어요 (Firestore 규칙 확인)");
+  }
+});
+
+/* ================= 오토클리커 (제작자 전용, 테스트용) ================= */
+let ac = { x: null, y: null, timer: null, count: 0, max: 0, gap: 200 };
+function acEls() {
+  let panel = $("ac-panel");
+  if (panel) return panel;
+  panel = el("div");
+  panel.id = "ac-panel";
+  panel.innerHTML = `
+    <div class="ac-head"><span>🖱️ 오토클리커</span><button class="ac-x" type="button" aria-label="닫기">✕</button></div>
+    <button class="ac-btn" data-a="pick" type="button">🎯 누를 곳 정하기</button>
+    <div class="ac-line"><span>간격</span><select data-a="gap">
+      <option value="50">0.05초</option><option value="100">0.1초</option><option value="200" selected>0.2초</option>
+      <option value="500">0.5초</option><option value="1000">1초</option><option value="3000">3초</option></select></div>
+    <div class="ac-line"><span>횟수 (0=무한)</span><input data-a="max" type="number" min="0" max="100000" value="0" inputmode="numeric"></div>
+    <button class="ac-btn go" data-a="run" type="button">▶ 시작</button>
+    <div class="ac-count">누른 횟수: <b data-a="count">0</b></div>`;
+  document.body.append(panel);
+  const mark = el("div");
+  mark.id = "ac-mark";
+  mark.style.display = "none";
+  document.body.append(mark);
+  panel.querySelector(".ac-x").addEventListener("click", () => stopAutoClicker(true));
+  panel.querySelector('[data-a="pick"]').addEventListener("click", acPick);
+  panel.querySelector('[data-a="run"]').addEventListener("click", () => (ac.timer ? stopAutoClicker(false) : startAutoClicker()));
+  // 패널 끌어서 옮기기
+  const head = panel.querySelector(".ac-head");
+  let drag = null;
+  head.addEventListener("pointerdown", (e) => {
+    if (e.target.closest(".ac-x")) return;
+    const r = panel.getBoundingClientRect();
+    drag = { dx: e.clientX - r.left, dy: e.clientY - r.top };
+    head.setPointerCapture(e.pointerId);
+  });
+  head.addEventListener("pointermove", (e) => {
+    if (!drag) return;
+    panel.style.left = Math.max(0, Math.min(innerWidth - panel.offsetWidth, e.clientX - drag.dx)) + "px";
+    panel.style.top = Math.max(0, Math.min(innerHeight - panel.offsetHeight, e.clientY - drag.dy)) + "px";
+    panel.style.right = "auto";
+    panel.style.bottom = "auto";
+  });
+  head.addEventListener("pointerup", () => { drag = null; });
+  return panel;
+}
+function openAutoClicker() {
+  if (!creatorMode) return;
+  acEls();
+  $("ac-panel").style.display = "";
+  toast("🎯 누를 곳을 먼저 정해 주세요");
+}
+$("ac-row").addEventListener("click", openAutoClicker);
+
+function acPick() {
+  if (ac.timer) stopAutoClicker(false);
+  const cover = el("div");
+  cover.id = "ac-pick";
+  cover.append(el("p", "", "누를 곳을 탭하세요"));
+  cover.addEventListener("click", (e) => {
+    ac.x = e.clientX;
+    ac.y = e.clientY;
+    cover.remove();
+    const mark = $("ac-mark");
+    mark.style.left = ac.x + "px";
+    mark.style.top = ac.y + "px";
+    mark.style.display = "";
+  });
+  document.body.append(cover);
+}
+
+function acClickOnce() {
+  const panel = $("ac-panel");
+  const mark = $("ac-mark");
+  panel.style.visibility = "hidden";
+  const target = document.elementFromPoint(ac.x, ac.y);
+  panel.style.visibility = "";
+  if (target && !target.closest("#ac-panel")) {
+    const o = { bubbles: true, cancelable: true, clientX: ac.x, clientY: ac.y, view: window };
+    try {
+      target.dispatchEvent(new PointerEvent("pointerdown", { ...o, pointerId: 99, isPrimary: true }));
+      target.dispatchEvent(new MouseEvent("mousedown", o));
+      target.dispatchEvent(new PointerEvent("pointerup", { ...o, pointerId: 99, isPrimary: true }));
+      target.dispatchEvent(new MouseEvent("mouseup", o));
+    } catch (e) { /* 일부 브라우저 */ }
+    target.dispatchEvent(new MouseEvent("click", o));
+  }
+  ac.count++;
+  panel.querySelector('[data-a="count"]').textContent = ac.count;
+  mark.classList.remove("hit");
+  void mark.offsetWidth;
+  mark.classList.add("hit");
+  if (ac.max > 0 && ac.count >= ac.max) stopAutoClicker(false);
+}
+function startAutoClicker() {
+  if (!creatorMode) return;
+  const panel = acEls();
+  if (ac.x == null) { toast("🎯 누를 곳을 먼저 정해 주세요"); return acPick(); }
+  ac.gap = Number(panel.querySelector('[data-a="gap"]').value) || 200;
+  ac.max = Math.max(0, Math.floor(Number(panel.querySelector('[data-a="max"]').value) || 0));
+  ac.count = 0;
+  panel.querySelector('[data-a="count"]').textContent = "0";
+  const btn = panel.querySelector('[data-a="run"]');
+  btn.textContent = "■ 멈추기";
+  btn.className = "ac-btn stop";
+  ac.timer = setInterval(acClickOnce, ac.gap);
+}
+function stopAutoClicker(close) {
+  if (ac.timer) clearInterval(ac.timer);
+  ac.timer = null;
+  const panel = $("ac-panel");
+  if (!panel) return;
+  const btn = panel.querySelector('[data-a="run"]');
+  btn.textContent = "▶ 시작";
+  btn.className = "ac-btn go";
+  if (close) {
+    panel.style.display = "none";
+    $("ac-mark").style.display = "none";
+    ac.x = ac.y = null;
+  }
+}
+window.__onchatAc = { get state() { return { ...ac, running: !!ac.timer }; } };
 
 /* ================= 하단 탭 ================= */
 document.querySelectorAll(".tabbar button").forEach((btn) => {
@@ -2796,10 +3869,9 @@ function enterMain(phone) {
     (err) => console.error(err)
   );
 
-  stopListeners = [stopMe, stopFriends, stopRooms, stopBlocked, listenIncomingCalls(phone)];
+  stopListeners = [stopMe, stopFriends, stopRooms, stopBlocked, listenIncomingCalls(phone), startOfficial(phone), startGifts(phone)];
   startPresence();
-  if (pushOn()) subscribePush(false).catch((e) => console.warn(e));
-  renderPushSettings();
+  checkPushHealth();
 
   // 알림을 눌러서 열린 경우 그 방으로
   if (pendingOpenRoom) {
@@ -3038,8 +4110,12 @@ function renderPushSettings() {
   if (!PUSH_URL) sub = "알림 서버를 아직 연결하지 않았어요";
   else if (!pushSupported()) sub = isIOS() ? "홈 화면에 추가한 온챗 아이콘으로 열어야 쓸 수 있어요" : "이 브라우저는 지원하지 않아요";
   else if (Notification.permission === "denied") sub = "알림이 차단돼 있어요 (브라우저/폰 설정에서 허용)";
+  else if (pushOn() && pushBroken) sub = "⚠️ 알림이 끊겼어요. 껐다가 다시 켜 주세요";
   else sub = pushOn() ? "앱을 꺼도 새 메시지를 알려드려요" : "켜면 앱을 꺼도 카톡처럼 알림이 와요";
   $("push-sub").textContent = sub;
+  $("push-sub").classList.toggle("warn", !!(pushOn() && pushBroken));
+  const test = $("push-test-row");
+  if (test) test.classList.toggle("hidden", !pushOn());
 }
 
 function b64urlToBytes(str) {
@@ -3079,8 +4155,50 @@ async function subscribePush(askPermission) {
     }
   }
   if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: key });
+  // 같은 기기 주소를 3일 안에 이미 등록했으면 서버에 또 안 씀
+  // (앱 열 때마다 등록하면 알림 서버의 무료 저장 횟수(하루 1000번)를 다 써서 알림이 멈출 수 있음)
+  const mark = "onchat-push-sync:" + myPhone;
+  let last = null;
+  try { last = JSON.parse(localStorage.getItem(mark) || "null"); } catch (e) { last = null; }
+  if (!askPermission && last && last.ep === sub.endpoint && Date.now() - last.at < 3 * 86400000) return true;
   const res = await pushApi("/subscribe", { subscription: sub.toJSON() });
-  return !!(res && res.ok);
+  const ok = !!(res && res.ok);
+  if (ok) try { localStorage.setItem(mark, JSON.stringify({ ep: sub.endpoint, at: Date.now() })); } catch (e) { /* 괜찮음 */ }
+  return ok;
+}
+let pushBroken = false;
+$("push-test-row").addEventListener("click", async () => {
+  try {
+    if (Notification.permission !== "granted") {
+      toast("알림 허용이 꺼져 있어요. 폰 설정 → 알림 → OnChat에서 허용해 주세요");
+      return;
+    }
+    const reg = await navigator.serviceWorker.ready;
+    await reg.showNotification("OnChat 알림 테스트", { body: "이게 보이면 이 폰은 알림을 받을 수 있어요 👍", tag: "onchat-test-" + Date.now(), icon: "icon-192.png" });
+    toast("알림을 보냈어요. 위에서 내려와야 해요");
+    checkPushHealth();
+  } catch (err) {
+    console.warn(err);
+    toast("알림을 띄우지 못했어요");
+  }
+});
+// 앱을 열 때: 알림을 켜 뒀는데 폰에서 알림이 끊겼으면 알려 줌
+async function checkPushHealth() {
+  if (!pushOn() || !PUSH_URL || !pushSupported()) { pushBroken = false; renderPushSettings(); return; }
+  let ok = false;
+  try { ok = await subscribePush(false); } catch (e) { console.warn(e); ok = false; }
+  pushBroken = !ok;
+  renderPushSettings();
+  if (pushBroken) {
+    const key = "onchat-push-warn";
+    const today = new Date().toDateString();
+    let shown = "";
+    try { shown = localStorage.getItem(key) || ""; } catch (e) { /* 괜찮음 */ }
+    if (shown !== today) {
+      try { localStorage.setItem(key, today); } catch (e) { /* 괜찮음 */ }
+      setTimeout(() => toast("🔕 앱 꺼진 알림이 끊겼어요. 설정 → 알림에서 다시 켜 주세요"), 2500);
+    }
+  }
 }
 
 async function unsubscribePush() {
@@ -3110,6 +4228,7 @@ $("push-row").addEventListener("click", async () => {
       writePref("onchat-push", false);
       toast("앱 꺼진 알림을 껐어요");
     } else if (await subscribePush(true)) {
+      pushBroken = false;
       writePref("onchat-push", true);
       toast("이제 앱을 꺼도 알림이 와요 🔔");
     } else {
@@ -3130,7 +4249,7 @@ function requestPush(roomId, room, kind) {
   if (!PUSH_URL) return;
   const skip = kind === "call" ? [] : ((room && room.members) || []).filter((p) => {
     const pr = p !== myPhone && presence.get(p);
-    return pr && pr.online && pr.watching;
+    return pr && pr.online && (pr.conns || []).some(isWatchingValue);
   });
   pushApi("/notify", { roomId, skip, kind: kind || "", appUrl: location.origin + location.pathname }).catch(() => {});
 }
@@ -3409,12 +4528,22 @@ function openProfile(user, isMe) {
   paintAvatar($("pf-avatar"), user);
   $("pf-name").textContent = user.nickname;
   $("pf-status").textContent = user.statusMessage || "";
-  $("pf-phone").textContent = formatPhone(user.phone);
+  $("pf-phone").textContent = user.official ? "010-onchat · 공식" : formatPhone(user.phone);
+  loadLikes(user, isMe);
 
   const actions = $("pf-actions");
   actions.replaceChildren();
 
-  if (isMe) {
+  if (user.official) {
+    const chat = el("button", "btn", creatorMode ? "문의함" : "1:1 채팅");
+    chat.addEventListener("click", () => { closeModal("profile-modal"); openOc(); });
+    actions.append(chat);
+    if (creatorMode) {
+      const edit = el("button", "btn ghost", "프로필 편집");
+      edit.addEventListener("click", () => { closeModal("profile-modal"); openOcEdit(); });
+      actions.append(edit);
+    }
+  } else if (isMe) {
     const edit = el("button", "btn ghost", "프로필 편집");
     edit.addEventListener("click", () => {
       closeModal("profile-modal");
@@ -4154,6 +5283,7 @@ function myJoinOf(room) {
 }
 
 function openRoom(id) {
+  if (ocMode) closeOc();
   closeRoom();
   const mySession = session;
   roomMessages = [];
@@ -4772,6 +5902,25 @@ function makeFailedRow(f) {
 /* ================= 이모티콘 ================= */
 // 온챗 프렌즈 이모티콘 (그림은 코드 안에 들어 있음 → 메시지에는 "oni/hi" 같은 이름만 저장)
 const EMOTICONS = {
+  // 선물 전용 (제작자가 선물한 사람만 씀, 제작자는 바로 씀)
+  yagu: {
+    name: "⚾ 볼리",
+    gift: true,
+    items: {
+    hi: { name: "안녕!", svg: "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><radialGradient id=\"bb\" cx=\".38\" cy=\".32\" r=\".8\"><stop offset=\"0\" stop-color=\"#FFFFFF\"/><stop offset=\".7\" stop-color=\"#F6F2EA\"/><stop offset=\"1\" stop-color=\"#E4DDD0\"/></radialGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(-4) translate(-100 -100)\"><path transform=\"translate(176 28) scale(1)\" d=\"M0 -12l3.5 8.5 8.5 3.5-8.5 3.5L0 12l-3.5-8.5L-12 0l8.5-3.5z\" fill=\"#FFD84D\"/><path transform=\"translate(24 50) scale(0.7)\" d=\"M0 -12l3.5 8.5 8.5 3.5-8.5 3.5L0 12l-3.5-8.5L-12 0l8.5-3.5z\" fill=\"#FFD84D\"/><ellipse cx=\"100\" cy=\"176\" rx=\"44\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><rect x=\"80\" y=\"136\" width=\"16\" height=\"30\" rx=\"8\" fill=\"#F7F4EF\" stroke=\"#3A2E2A\" stroke-width=\"3.5\"/><rect x=\"104\" y=\"136\" width=\"16\" height=\"30\" rx=\"8\" fill=\"#F7F4EF\" stroke=\"#3A2E2A\" stroke-width=\"3.5\"/><path d=\"M78 164h20v6q0 4-4 4H78q-4 0-4-4q0-6 4-6zM102 164h20q4 0 4 6q0 4-4 4h-16q-4 0-4-4z\" fill=\"#1E7F78\" stroke=\"#3A2E2A\" stroke-width=\"3\"/><circle cx=\"100\" cy=\"90\" r=\"56\" fill=\"url(#bb)\" stroke=\"#3A2E2A\" stroke-width=\"4\"/><path d=\"M58 52Q78 90 58 128\" stroke=\"#E8403A\" stroke-width=\"3.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M142 52Q122 90 142 128\" stroke=\"#E8403A\" stroke-width=\"3.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M56.6 57.6l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M60.5 69.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M63.0 88.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M60.5 107.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M56.6 118.4l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M133.4 57.6l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M129.5 69.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M127.0 88.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M129.5 107.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M133.4 118.4l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><ellipse cx=\"80\" cy=\"58\" rx=\"14\" ry=\"7\" transform=\"rotate(-25 80 58)\" fill=\"#fff\" opacity=\".85\"/><path d=\"M50 66Q52 30 100 28Q148 30 150 66Q100 54 50 66z\" fill=\"#2FA39B\" stroke=\"#3A2E2A\" stroke-width=\"4\" stroke-linejoin=\"round\"/><path d=\"M136 62q26-2 40 10q-20 8-44 0z\" fill=\"#1E7F78\" stroke=\"#3A2E2A\" stroke-width=\"3.5\" stroke-linejoin=\"round\"/><circle cx=\"100\" cy=\"29\" r=\"5\" fill=\"#1E7F78\" stroke=\"#3A2E2A\" stroke-width=\"2.5\"/><path transform=\"translate(100 46) scale(0.75)\" d=\"M0 -12l3.5 8.5 8.5 3.5-8.5 3.5L0 12l-3.5-8.5L-12 0l8.5-3.5z\" fill=\"#FFF3B0\"/><ellipse cx=\"74\" cy=\"102\" rx=\"7.5\" ry=\"4.5\" fill=\"#FF7A7A\" opacity=\".45\"/><ellipse cx=\"126\" cy=\"102\" rx=\"7.5\" ry=\"4.5\" fill=\"#FF7A7A\" opacity=\".45\"/><ellipse cx=\"82\" cy=\"88\" rx=\"7\" ry=\"8.5\" fill=\"#2B1E16\"/><circle cx=\"84.5\" cy=\"84.5\" r=\"2.8\" fill=\"#fff\"/><ellipse cx=\"118\" cy=\"88\" rx=\"7\" ry=\"8.5\" fill=\"#2B1E16\"/><circle cx=\"120.5\" cy=\"84.5\" r=\"2.8\" fill=\"#fff\"/><path d=\"M86 102q14 22 28 0z\" fill=\"#2B1E16\" stroke=\"#2B1E16\" stroke-width=\"3\" stroke-linejoin=\"round\"/><path d=\"M93 113q7 6 14 0q-7-5-14 0z\" fill=\"#FF7B7B\"/><ellipse cx=\"42\" cy=\"108\" rx=\"10\" ry=\"14\" transform=\"rotate(25 42 108)\" fill=\"#F7F4EF\" stroke=\"#3A2E2A\" stroke-width=\"3.5\"/><ellipse cx=\"166\" cy=\"58\" rx=\"10\" ry=\"14\" transform=\"rotate(-160 166 58)\" fill=\"#F7F4EF\" stroke=\"#3A2E2A\" stroke-width=\"3.5\"/></g><rect x=\"60.5\" y=\"166\" width=\"79.0\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#3A2E2A\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#3A2E2A\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">안녕!</text></svg>" },
+    homerun: { name: "홈런!", svg: "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><radialGradient id=\"bb\" cx=\".38\" cy=\".32\" r=\".8\"><stop offset=\"0\" stop-color=\"#FFFFFF\"/><stop offset=\".7\" stop-color=\"#F6F2EA\"/><stop offset=\"1\" stop-color=\"#E4DDD0\"/></radialGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(6) translate(-100 -100)\"><path d=\"M150 40q22 14 26 40M160 30q28 18 32 52\" stroke=\"#9AA5B1\" stroke-width=\"4\" fill=\"none\" stroke-linecap=\"round\"/><path transform=\"translate(30 40) scale(1)\" d=\"M0 -12l3.5 8.5 8.5 3.5-8.5 3.5L0 12l-3.5-8.5L-12 0l8.5-3.5z\" fill=\"#FFD84D\"/><path transform=\"translate(176 120) scale(0.8)\" d=\"M0 -12l3.5 8.5 8.5 3.5-8.5 3.5L0 12l-3.5-8.5L-12 0l8.5-3.5z\" fill=\"#FFD84D\"/><circle cx=\"30\" cy=\"22\" r=\"8\" fill=\"#fff\" stroke=\"#3A2E2A\" stroke-width=\"2.5\"/><path d=\"M25.6 16.0q3.6 6.0 0 12.0M34.4 16.0q-3.6 6.0 0 12.0\" stroke=\"#E8403A\" stroke-width=\"1.8\" fill=\"none\"/><ellipse cx=\"100\" cy=\"176\" rx=\"44\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><rect x=\"80\" y=\"136\" width=\"16\" height=\"30\" rx=\"8\" fill=\"#F7F4EF\" stroke=\"#3A2E2A\" stroke-width=\"3.5\"/><rect x=\"104\" y=\"136\" width=\"16\" height=\"30\" rx=\"8\" fill=\"#F7F4EF\" stroke=\"#3A2E2A\" stroke-width=\"3.5\"/><path d=\"M78 164h20v6q0 4-4 4H78q-4 0-4-4q0-6 4-6zM102 164h20q4 0 4 6q0 4-4 4h-16q-4 0-4-4z\" fill=\"#1E7F78\" stroke=\"#3A2E2A\" stroke-width=\"3\"/><circle cx=\"100\" cy=\"90\" r=\"56\" fill=\"url(#bb)\" stroke=\"#3A2E2A\" stroke-width=\"4\"/><path d=\"M58 52Q78 90 58 128\" stroke=\"#E8403A\" stroke-width=\"3.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M142 52Q122 90 142 128\" stroke=\"#E8403A\" stroke-width=\"3.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M56.6 57.6l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M60.5 69.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M63.0 88.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M60.5 107.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M56.6 118.4l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M133.4 57.6l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M129.5 69.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M127.0 88.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M129.5 107.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M133.4 118.4l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><ellipse cx=\"80\" cy=\"58\" rx=\"14\" ry=\"7\" transform=\"rotate(-25 80 58)\" fill=\"#fff\" opacity=\".85\"/><ellipse cx=\"74\" cy=\"102\" rx=\"7.5\" ry=\"4.5\" fill=\"#FF7A7A\" opacity=\".45\"/><ellipse cx=\"126\" cy=\"102\" rx=\"7.5\" ry=\"4.5\" fill=\"#FF7A7A\" opacity=\".45\"/><path d=\"M73 91q9-11 18 0M109 91q9-11 18 0\" stroke=\"#2B1E16\" stroke-width=\"4.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M86 102q14 22 28 0z\" fill=\"#2B1E16\" stroke=\"#2B1E16\" stroke-width=\"3\" stroke-linejoin=\"round\"/><path d=\"M93 113q7 6 14 0q-7-5-14 0z\" fill=\"#FF7B7B\"/><ellipse cx=\"150\" cy=\"64\" rx=\"10\" ry=\"14\" transform=\"rotate(-120 150 64)\" fill=\"#F7F4EF\" stroke=\"#3A2E2A\" stroke-width=\"3.5\"/><ellipse cx=\"160\" cy=\"80\" rx=\"10\" ry=\"14\" transform=\"rotate(-100 160 80)\" fill=\"#F7F4EF\" stroke=\"#3A2E2A\" stroke-width=\"3.5\"/><g transform=\"translate(150 70) rotate(-60)\"><path d=\"M0 -5h50q22 0 30 2q8 3 0 6q-8 2-30 2H0q-5 0-5-5t5-5z\" fill=\"#E0A86A\" stroke=\"#6B4423\" stroke-width=\"3.5\" stroke-linejoin=\"round\"/><rect x=\"-6\" y=\"-6\" width=\"20\" height=\"12\" rx=\"5\" fill=\"#5B5B66\" stroke=\"#2E2E36\" stroke-width=\"2.5\"/></g></g><rect x=\"60.5\" y=\"166\" width=\"79.0\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#3A2E2A\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#3A2E2A\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">홈런!</text></svg>" },
+    hit: { name: "안타!", svg: "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><radialGradient id=\"bb\" cx=\".38\" cy=\".32\" r=\".8\"><stop offset=\"0\" stop-color=\"#FFFFFF\"/><stop offset=\".7\" stop-color=\"#F6F2EA\"/><stop offset=\"1\" stop-color=\"#E4DDD0\"/></radialGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(0) translate(-100 -100)\"><path d=\"M170 64l18-10M172 78l20-2\" stroke=\"#9AA5B1\" stroke-width=\"4\" stroke-linecap=\"round\"/><circle cx=\"184\" cy=\"40\" r=\"9\" fill=\"#fff\" stroke=\"#3A2E2A\" stroke-width=\"2.5\"/><path d=\"M179.05 33.25q4.05 6.75 0 13.5M188.95 33.25q-4.05 6.75 0 13.5\" stroke=\"#E8403A\" stroke-width=\"1.8\" fill=\"none\"/><ellipse cx=\"100\" cy=\"176\" rx=\"44\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><rect x=\"80\" y=\"136\" width=\"16\" height=\"30\" rx=\"8\" fill=\"#F7F4EF\" stroke=\"#3A2E2A\" stroke-width=\"3.5\"/><rect x=\"104\" y=\"136\" width=\"16\" height=\"30\" rx=\"8\" fill=\"#F7F4EF\" stroke=\"#3A2E2A\" stroke-width=\"3.5\"/><path d=\"M78 164h20v6q0 4-4 4H78q-4 0-4-4q0-6 4-6zM102 164h20q4 0 4 6q0 4-4 4h-16q-4 0-4-4z\" fill=\"#1E7F78\" stroke=\"#3A2E2A\" stroke-width=\"3\"/><circle cx=\"100\" cy=\"90\" r=\"56\" fill=\"url(#bb)\" stroke=\"#3A2E2A\" stroke-width=\"4\"/><path d=\"M58 52Q78 90 58 128\" stroke=\"#E8403A\" stroke-width=\"3.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M142 52Q122 90 142 128\" stroke=\"#E8403A\" stroke-width=\"3.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M56.6 57.6l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M60.5 69.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M63.0 88.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M60.5 107.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M56.6 118.4l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M133.4 57.6l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M129.5 69.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M127.0 88.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M129.5 107.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M133.4 118.4l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><ellipse cx=\"80\" cy=\"58\" rx=\"14\" ry=\"7\" transform=\"rotate(-25 80 58)\" fill=\"#fff\" opacity=\".85\"/><path d=\"M50 66Q52 30 100 28Q148 30 150 66Q100 54 50 66z\" fill=\"#2FA39B\" stroke=\"#3A2E2A\" stroke-width=\"4\" stroke-linejoin=\"round\"/><path d=\"M136 62q26-2 40 10q-20 8-44 0z\" fill=\"#1E7F78\" stroke=\"#3A2E2A\" stroke-width=\"3.5\" stroke-linejoin=\"round\"/><circle cx=\"100\" cy=\"29\" r=\"5\" fill=\"#1E7F78\" stroke=\"#3A2E2A\" stroke-width=\"2.5\"/><path transform=\"translate(100 46) scale(0.75)\" d=\"M0 -12l3.5 8.5 8.5 3.5-8.5 3.5L0 12l-3.5-8.5L-12 0l8.5-3.5z\" fill=\"#FFF3B0\"/><ellipse cx=\"74\" cy=\"102\" rx=\"7.5\" ry=\"4.5\" fill=\"#FF7A7A\" opacity=\".45\"/><ellipse cx=\"126\" cy=\"102\" rx=\"7.5\" ry=\"4.5\" fill=\"#FF7A7A\" opacity=\".45\"/><path d=\"M70 76l20 7M130 76l-20 7\" stroke=\"#2B1E16\" stroke-width=\"5\" stroke-linecap=\"round\"/><ellipse cx=\"82\" cy=\"91\" rx=\"7\" ry=\"8\" fill=\"#2B1E16\"/><circle cx=\"84.5\" cy=\"88\" r=\"2.6\" fill=\"#fff\"/><ellipse cx=\"118\" cy=\"91\" rx=\"7\" ry=\"8\" fill=\"#2B1E16\"/><circle cx=\"120.5\" cy=\"88\" r=\"2.6\" fill=\"#fff\"/><rect x=\"86\" y=\"102\" width=\"28\" height=\"12\" rx=\"5\" fill=\"#fff\" stroke=\"#2B1E16\" stroke-width=\"3.5\"/><path d=\"M95 102v12M105 102v12\" stroke=\"#2B1E16\" stroke-width=\"2.5\"/><ellipse cx=\"150\" cy=\"92\" rx=\"10\" ry=\"14\" transform=\"rotate(-80 150 92)\" fill=\"#F7F4EF\" stroke=\"#3A2E2A\" stroke-width=\"3.5\"/><ellipse cx=\"156\" cy=\"104\" rx=\"10\" ry=\"14\" transform=\"rotate(-70 156 104)\" fill=\"#F7F4EF\" stroke=\"#3A2E2A\" stroke-width=\"3.5\"/><g transform=\"translate(144 100) rotate(-35)\"><path d=\"M0 -5h50q22 0 30 2q8 3 0 6q-8 2-30 2H0q-5 0-5-5t5-5z\" fill=\"#E0A86A\" stroke=\"#6B4423\" stroke-width=\"3.5\" stroke-linejoin=\"round\"/><rect x=\"-6\" y=\"-6\" width=\"20\" height=\"12\" rx=\"5\" fill=\"#5B5B66\" stroke=\"#2E2E36\" stroke-width=\"2.5\"/></g></g><rect x=\"60.5\" y=\"166\" width=\"79.0\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#3A2E2A\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#3A2E2A\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">안타!</text></svg>" },
+    safe: { name: "세이프!", svg: "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><radialGradient id=\"bb\" cx=\".38\" cy=\".32\" r=\".8\"><stop offset=\"0\" stop-color=\"#FFFFFF\"/><stop offset=\".7\" stop-color=\"#F6F2EA\"/><stop offset=\"1\" stop-color=\"#E4DDD0\"/></radialGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(-14) translate(-100 -100)\"><ellipse cx=\"40\" cy=\"160\" rx=\"22\" ry=\"12\" fill=\"#D9CBB3\" opacity=\".8\"/><ellipse cx=\"22\" cy=\"146\" rx=\"14\" ry=\"9\" fill=\"#E6DAC6\" opacity=\".8\"/><ellipse cx=\"60\" cy=\"150\" rx=\"12\" ry=\"8\" fill=\"#E6DAC6\" opacity=\".8\"/><ellipse cx=\"100\" cy=\"176\" rx=\"44\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><rect x=\"80\" y=\"136\" width=\"16\" height=\"30\" rx=\"8\" fill=\"#F7F4EF\" stroke=\"#3A2E2A\" stroke-width=\"3.5\"/><rect x=\"104\" y=\"136\" width=\"16\" height=\"30\" rx=\"8\" fill=\"#F7F4EF\" stroke=\"#3A2E2A\" stroke-width=\"3.5\"/><path d=\"M78 164h20v6q0 4-4 4H78q-4 0-4-4q0-6 4-6zM102 164h20q4 0 4 6q0 4-4 4h-16q-4 0-4-4z\" fill=\"#1E7F78\" stroke=\"#3A2E2A\" stroke-width=\"3\"/><circle cx=\"100\" cy=\"90\" r=\"56\" fill=\"url(#bb)\" stroke=\"#3A2E2A\" stroke-width=\"4\"/><path d=\"M58 52Q78 90 58 128\" stroke=\"#E8403A\" stroke-width=\"3.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M142 52Q122 90 142 128\" stroke=\"#E8403A\" stroke-width=\"3.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M56.6 57.6l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M60.5 69.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M63.0 88.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M60.5 107.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M56.6 118.4l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M133.4 57.6l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M129.5 69.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M127.0 88.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M129.5 107.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M133.4 118.4l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><ellipse cx=\"80\" cy=\"58\" rx=\"14\" ry=\"7\" transform=\"rotate(-25 80 58)\" fill=\"#fff\" opacity=\".85\"/><path d=\"M50 66Q52 30 100 28Q148 30 150 66Q100 54 50 66z\" fill=\"#2FA39B\" stroke=\"#3A2E2A\" stroke-width=\"4\" stroke-linejoin=\"round\"/><path d=\"M136 62q26-2 40 10q-20 8-44 0z\" fill=\"#1E7F78\" stroke=\"#3A2E2A\" stroke-width=\"3.5\" stroke-linejoin=\"round\"/><circle cx=\"100\" cy=\"29\" r=\"5\" fill=\"#1E7F78\" stroke=\"#3A2E2A\" stroke-width=\"2.5\"/><path transform=\"translate(100 46) scale(0.75)\" d=\"M0 -12l3.5 8.5 8.5 3.5-8.5 3.5L0 12l-3.5-8.5L-12 0l8.5-3.5z\" fill=\"#FFF3B0\"/><ellipse cx=\"74\" cy=\"102\" rx=\"7.5\" ry=\"4.5\" fill=\"#FF7A7A\" opacity=\".45\"/><ellipse cx=\"126\" cy=\"102\" rx=\"7.5\" ry=\"4.5\" fill=\"#FF7A7A\" opacity=\".45\"/><path d=\"M70 76l20 7M130 76l-20 7\" stroke=\"#2B1E16\" stroke-width=\"5\" stroke-linecap=\"round\"/><ellipse cx=\"82\" cy=\"91\" rx=\"7\" ry=\"8\" fill=\"#2B1E16\"/><circle cx=\"84.5\" cy=\"88\" r=\"2.6\" fill=\"#fff\"/><ellipse cx=\"118\" cy=\"91\" rx=\"7\" ry=\"8\" fill=\"#2B1E16\"/><circle cx=\"120.5\" cy=\"88\" r=\"2.6\" fill=\"#fff\"/><path d=\"M86 102q14 22 28 0z\" fill=\"#2B1E16\" stroke=\"#2B1E16\" stroke-width=\"3\" stroke-linejoin=\"round\"/><path d=\"M93 113q7 6 14 0q-7-5-14 0z\" fill=\"#FF7B7B\"/><ellipse cx=\"36\" cy=\"92\" rx=\"10\" ry=\"14\" transform=\"rotate(90 36 92)\" fill=\"#F7F4EF\" stroke=\"#3A2E2A\" stroke-width=\"3.5\"/><ellipse cx=\"164\" cy=\"92\" rx=\"10\" ry=\"14\" transform=\"rotate(-90 164 92)\" fill=\"#F7F4EF\" stroke=\"#3A2E2A\" stroke-width=\"3.5\"/></g><rect x=\"51.0\" y=\"166\" width=\"98.0\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#3A2E2A\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#3A2E2A\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">세이프!</text></svg>" },
+    out: { name: "아웃!", svg: "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><radialGradient id=\"bb\" cx=\".38\" cy=\".32\" r=\".8\"><stop offset=\"0\" stop-color=\"#FFFFFF\"/><stop offset=\".7\" stop-color=\"#F6F2EA\"/><stop offset=\"1\" stop-color=\"#E4DDD0\"/></radialGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(0) translate(-100 -100)\"><path d=\"M160 26l20 20M180 26l-20 20\" stroke=\"#E8403A\" stroke-width=\"6\" stroke-linecap=\"round\"/><path d=\"M150 46q8 12 4 18q-8 2-8-8z\" fill=\"#7CC8FF\" stroke=\"#3B8FD1\" stroke-width=\"2\"/><ellipse cx=\"100\" cy=\"176\" rx=\"44\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><rect x=\"80\" y=\"136\" width=\"16\" height=\"30\" rx=\"8\" fill=\"#F7F4EF\" stroke=\"#3A2E2A\" stroke-width=\"3.5\"/><rect x=\"104\" y=\"136\" width=\"16\" height=\"30\" rx=\"8\" fill=\"#F7F4EF\" stroke=\"#3A2E2A\" stroke-width=\"3.5\"/><path d=\"M78 164h20v6q0 4-4 4H78q-4 0-4-4q0-6 4-6zM102 164h20q4 0 4 6q0 4-4 4h-16q-4 0-4-4z\" fill=\"#1E7F78\" stroke=\"#3A2E2A\" stroke-width=\"3\"/><circle cx=\"100\" cy=\"90\" r=\"56\" fill=\"url(#bb)\" stroke=\"#3A2E2A\" stroke-width=\"4\"/><path d=\"M58 52Q78 90 58 128\" stroke=\"#E8403A\" stroke-width=\"3.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M142 52Q122 90 142 128\" stroke=\"#E8403A\" stroke-width=\"3.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M56.6 57.6l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M60.5 69.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M63.0 88.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M60.5 107.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M56.6 118.4l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M133.4 57.6l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M129.5 69.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M127.0 88.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M129.5 107.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M133.4 118.4l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><ellipse cx=\"80\" cy=\"58\" rx=\"14\" ry=\"7\" transform=\"rotate(-25 80 58)\" fill=\"#fff\" opacity=\".85\"/><ellipse cx=\"74\" cy=\"102\" rx=\"7.5\" ry=\"4.5\" fill=\"#FF7A7A\" opacity=\".45\"/><ellipse cx=\"126\" cy=\"102\" rx=\"7.5\" ry=\"4.5\" fill=\"#FF7A7A\" opacity=\".45\"/><path d=\"M76 82l12 12M88 82l-12 12M112 82l12 12M124 82l-12 12\" stroke=\"#2B1E16\" stroke-width=\"4.5\" stroke-linecap=\"round\"/><path d=\"M88 114q12-12 24 0\" stroke=\"#2B1E16\" stroke-width=\"4\" fill=\"none\" stroke-linecap=\"round\"/><ellipse cx=\"84\" cy=\"128\" rx=\"10\" ry=\"14\" transform=\"rotate(40 84 128)\" fill=\"#F7F4EF\" stroke=\"#3A2E2A\" stroke-width=\"3.5\"/><ellipse cx=\"116\" cy=\"128\" rx=\"10\" ry=\"14\" transform=\"rotate(-40 116 128)\" fill=\"#F7F4EF\" stroke=\"#3A2E2A\" stroke-width=\"3.5\"/></g><rect x=\"60.5\" y=\"166\" width=\"79.0\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#3A2E2A\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#3A2E2A\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">아웃!</text></svg>" },
+    strike: { name: "삼진ㅠ", svg: "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><radialGradient id=\"bb\" cx=\".38\" cy=\".32\" r=\".8\"><stop offset=\"0\" stop-color=\"#FFFFFF\"/><stop offset=\".7\" stop-color=\"#F6F2EA\"/><stop offset=\"1\" stop-color=\"#E4DDD0\"/></radialGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(8) translate(-100 -100)\"><path d=\"M60 26q10-8 20 0t20 0 20 0 20 0\" stroke=\"#B197FC\" stroke-width=\"4\" fill=\"none\" stroke-linecap=\"round\"/><path transform=\"translate(40 40) scale(0.6)\" d=\"M0 -12l3.5 8.5 8.5 3.5-8.5 3.5L0 12l-3.5-8.5L-12 0l8.5-3.5z\" fill=\"#B197FC\"/><ellipse cx=\"100\" cy=\"176\" rx=\"44\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><rect x=\"80\" y=\"136\" width=\"16\" height=\"30\" rx=\"8\" fill=\"#F7F4EF\" stroke=\"#3A2E2A\" stroke-width=\"3.5\"/><rect x=\"104\" y=\"136\" width=\"16\" height=\"30\" rx=\"8\" fill=\"#F7F4EF\" stroke=\"#3A2E2A\" stroke-width=\"3.5\"/><path d=\"M78 164h20v6q0 4-4 4H78q-4 0-4-4q0-6 4-6zM102 164h20q4 0 4 6q0 4-4 4h-16q-4 0-4-4z\" fill=\"#1E7F78\" stroke=\"#3A2E2A\" stroke-width=\"3\"/><circle cx=\"100\" cy=\"90\" r=\"56\" fill=\"url(#bb)\" stroke=\"#3A2E2A\" stroke-width=\"4\"/><path d=\"M58 52Q78 90 58 128\" stroke=\"#E8403A\" stroke-width=\"3.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M142 52Q122 90 142 128\" stroke=\"#E8403A\" stroke-width=\"3.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M56.6 57.6l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M60.5 69.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M63.0 88.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M60.5 107.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M56.6 118.4l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M133.4 57.6l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M129.5 69.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M127.0 88.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M129.5 107.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M133.4 118.4l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><ellipse cx=\"80\" cy=\"58\" rx=\"14\" ry=\"7\" transform=\"rotate(-25 80 58)\" fill=\"#fff\" opacity=\".85\"/><ellipse cx=\"74\" cy=\"102\" rx=\"7.5\" ry=\"4.5\" fill=\"#FF7A7A\" opacity=\".45\"/><ellipse cx=\"126\" cy=\"102\" rx=\"7.5\" ry=\"4.5\" fill=\"#FF7A7A\" opacity=\".45\"/><path d=\"M82 88m-9 0a9 9 0 1 0 9-9a6 6 0 1 0 6 6a3 3 0 1 0-3 3\" stroke=\"#2B1E16\" stroke-width=\"3\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M118 88m-9 0a9 9 0 1 0 9-9a6 6 0 1 0 6 6a3 3 0 1 0-3 3\" stroke=\"#2B1E16\" stroke-width=\"3\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M86 110q3.5-5 7 0t7 0 7 0 7 0\" stroke=\"#2B1E16\" stroke-width=\"3.5\" fill=\"none\" stroke-linecap=\"round\"/><ellipse cx=\"44\" cy=\"116\" rx=\"10\" ry=\"14\" transform=\"rotate(25 44 116)\" fill=\"#F7F4EF\" stroke=\"#3A2E2A\" stroke-width=\"3.5\"/><ellipse cx=\"156\" cy=\"116\" rx=\"10\" ry=\"14\" transform=\"rotate(-25 156 116)\" fill=\"#F7F4EF\" stroke=\"#3A2E2A\" stroke-width=\"3.5\"/></g><rect x=\"60.5\" y=\"166\" width=\"79.0\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#3A2E2A\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#3A2E2A\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">삼진ㅠ</text></svg>" },
+    win: { name: "이겼다!", svg: "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><radialGradient id=\"bb\" cx=\".38\" cy=\".32\" r=\".8\"><stop offset=\"0\" stop-color=\"#FFFFFF\"/><stop offset=\".7\" stop-color=\"#F6F2EA\"/><stop offset=\"1\" stop-color=\"#E4DDD0\"/></radialGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(0) translate(-100 -100)\"><rect x=\"30\" y=\"30\" width=\"8\" height=\"12\" rx=\"2\" fill=\"#FF6B6B\" transform=\"rotate(20 30 30)\"/><rect x=\"52\" y=\"14\" width=\"8\" height=\"12\" rx=\"2\" fill=\"#FFD84D\" transform=\"rotate(-30 52 14)\"/><rect x=\"150\" y=\"18\" width=\"8\" height=\"12\" rx=\"2\" fill=\"#4DABF7\" transform=\"rotate(35 150 18)\"/><rect x=\"172\" y=\"40\" width=\"8\" height=\"12\" rx=\"2\" fill=\"#69DB7C\" transform=\"rotate(-15 172 40)\"/><rect x=\"20\" y=\"70\" width=\"8\" height=\"12\" rx=\"2\" fill=\"#B197FC\" transform=\"rotate(40 20 70)\"/><rect x=\"180\" y=\"80\" width=\"8\" height=\"12\" rx=\"2\" fill=\"#FF922B\" transform=\"rotate(-35 180 80)\"/><ellipse cx=\"100\" cy=\"176\" rx=\"44\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><rect x=\"80\" y=\"136\" width=\"16\" height=\"30\" rx=\"8\" fill=\"#F7F4EF\" stroke=\"#3A2E2A\" stroke-width=\"3.5\"/><rect x=\"104\" y=\"136\" width=\"16\" height=\"30\" rx=\"8\" fill=\"#F7F4EF\" stroke=\"#3A2E2A\" stroke-width=\"3.5\"/><path d=\"M78 164h20v6q0 4-4 4H78q-4 0-4-4q0-6 4-6zM102 164h20q4 0 4 6q0 4-4 4h-16q-4 0-4-4z\" fill=\"#1E7F78\" stroke=\"#3A2E2A\" stroke-width=\"3\"/><circle cx=\"100\" cy=\"90\" r=\"56\" fill=\"url(#bb)\" stroke=\"#3A2E2A\" stroke-width=\"4\"/><path d=\"M58 52Q78 90 58 128\" stroke=\"#E8403A\" stroke-width=\"3.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M142 52Q122 90 142 128\" stroke=\"#E8403A\" stroke-width=\"3.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M56.6 57.6l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M60.5 69.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M63.0 88.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M60.5 107.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M56.6 118.4l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M133.4 57.6l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M129.5 69.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M127.0 88.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M129.5 107.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M133.4 118.4l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><ellipse cx=\"80\" cy=\"58\" rx=\"14\" ry=\"7\" transform=\"rotate(-25 80 58)\" fill=\"#fff\" opacity=\".85\"/><path d=\"M50 66Q52 30 100 28Q148 30 150 66Q100 54 50 66z\" fill=\"#2FA39B\" stroke=\"#3A2E2A\" stroke-width=\"4\" stroke-linejoin=\"round\"/><path d=\"M136 62q26-2 40 10q-20 8-44 0z\" fill=\"#1E7F78\" stroke=\"#3A2E2A\" stroke-width=\"3.5\" stroke-linejoin=\"round\"/><circle cx=\"100\" cy=\"29\" r=\"5\" fill=\"#1E7F78\" stroke=\"#3A2E2A\" stroke-width=\"2.5\"/><path transform=\"translate(100 46) scale(0.75)\" d=\"M0 -12l3.5 8.5 8.5 3.5-8.5 3.5L0 12l-3.5-8.5L-12 0l8.5-3.5z\" fill=\"#FFF3B0\"/><ellipse cx=\"74\" cy=\"102\" rx=\"7.5\" ry=\"4.5\" fill=\"#FF7A7A\" opacity=\".45\"/><ellipse cx=\"126\" cy=\"102\" rx=\"7.5\" ry=\"4.5\" fill=\"#FF7A7A\" opacity=\".45\"/><path d=\"M73 91q9-11 18 0M109 91q9-11 18 0\" stroke=\"#2B1E16\" stroke-width=\"4.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M86 102q14 22 28 0z\" fill=\"#2B1E16\" stroke=\"#2B1E16\" stroke-width=\"3\" stroke-linejoin=\"round\"/><path d=\"M93 113q7 6 14 0q-7-5-14 0z\" fill=\"#FF7B7B\"/><ellipse cx=\"40\" cy=\"52\" rx=\"10\" ry=\"14\" transform=\"rotate(160 40 52)\" fill=\"#F7F4EF\" stroke=\"#3A2E2A\" stroke-width=\"3.5\"/><ellipse cx=\"160\" cy=\"52\" rx=\"10\" ry=\"14\" transform=\"rotate(-160 160 52)\" fill=\"#F7F4EF\" stroke=\"#3A2E2A\" stroke-width=\"3.5\"/></g><rect x=\"51.0\" y=\"166\" width=\"98.0\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#3A2E2A\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#3A2E2A\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">이겼다!</text></svg>" },
+    lose: { name: "졌다ㅠㅠ", svg: "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><radialGradient id=\"bb\" cx=\".38\" cy=\".32\" r=\".8\"><stop offset=\"0\" stop-color=\"#FFFFFF\"/><stop offset=\".7\" stop-color=\"#F6F2EA\"/><stop offset=\"1\" stop-color=\"#E4DDD0\"/></radialGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(0) translate(-100 -100)\"><ellipse cx=\"100\" cy=\"182\" rx=\"56\" ry=\"7\" fill=\"#7CC8FF\" opacity=\".5\"/><ellipse cx=\"100\" cy=\"176\" rx=\"44\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><rect x=\"80\" y=\"136\" width=\"16\" height=\"30\" rx=\"8\" fill=\"#F7F4EF\" stroke=\"#3A2E2A\" stroke-width=\"3.5\"/><rect x=\"104\" y=\"136\" width=\"16\" height=\"30\" rx=\"8\" fill=\"#F7F4EF\" stroke=\"#3A2E2A\" stroke-width=\"3.5\"/><path d=\"M78 164h20v6q0 4-4 4H78q-4 0-4-4q0-6 4-6zM102 164h20q4 0 4 6q0 4-4 4h-16q-4 0-4-4z\" fill=\"#1E7F78\" stroke=\"#3A2E2A\" stroke-width=\"3\"/><circle cx=\"100\" cy=\"90\" r=\"56\" fill=\"url(#bb)\" stroke=\"#3A2E2A\" stroke-width=\"4\"/><path d=\"M58 52Q78 90 58 128\" stroke=\"#E8403A\" stroke-width=\"3.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M142 52Q122 90 142 128\" stroke=\"#E8403A\" stroke-width=\"3.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M56.6 57.6l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M60.5 69.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M63.0 88.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M60.5 107.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M56.6 118.4l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M133.4 57.6l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M129.5 69.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M127.0 88.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M129.5 107.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M133.4 118.4l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><ellipse cx=\"80\" cy=\"58\" rx=\"14\" ry=\"7\" transform=\"rotate(-25 80 58)\" fill=\"#fff\" opacity=\".85\"/><ellipse cx=\"74\" cy=\"102\" rx=\"7.5\" ry=\"4.5\" fill=\"#FF7A7A\" opacity=\".45\"/><ellipse cx=\"126\" cy=\"102\" rx=\"7.5\" ry=\"4.5\" fill=\"#FF7A7A\" opacity=\".45\"/><path d=\"M73 86q9 8 18 0M109 86q9 8 18 0\" stroke=\"#2B1E16\" stroke-width=\"4.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M84 104q16 26 32 0z\" fill=\"#2B1E16\" stroke=\"#2B1E16\" stroke-width=\"3\" stroke-linejoin=\"round\"/><ellipse cx=\"88\" cy=\"138\" rx=\"10\" ry=\"14\" transform=\"rotate(40 88 138)\" fill=\"#F7F4EF\" stroke=\"#3A2E2A\" stroke-width=\"3.5\"/><ellipse cx=\"112\" cy=\"138\" rx=\"10\" ry=\"14\" transform=\"rotate(-40 112 138)\" fill=\"#F7F4EF\" stroke=\"#3A2E2A\" stroke-width=\"3.5\"/><path d=\"M76 94q-3 22 3 36\" stroke=\"#5AB8FF\" stroke-width=\"6\" fill=\"none\" stroke-linecap=\"round\" opacity=\".9\"/><path d=\"M124 94q3 22-3 36\" stroke=\"#5AB8FF\" stroke-width=\"6\" fill=\"none\" stroke-linecap=\"round\" opacity=\".9\"/></g><rect x=\"51.0\" y=\"166\" width=\"98.0\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#3A2E2A\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#3A2E2A\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">졌다ㅠㅠ</text></svg>" },
+    cheer: { name: "응원해!", svg: "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><radialGradient id=\"bb\" cx=\".38\" cy=\".32\" r=\".8\"><stop offset=\"0\" stop-color=\"#FFFFFF\"/><stop offset=\".7\" stop-color=\"#F6F2EA\"/><stop offset=\"1\" stop-color=\"#E4DDD0\"/></radialGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(-6) translate(-100 -100)\"><g transform=\"rotate(-18 156 70)\"><rect x=\"148\" y=\"20\" width=\"18\" height=\"86\" rx=\"9\" fill=\"#FFD84D\" stroke=\"#B8860B\" stroke-width=\"3.5\"/><path d=\"M152 34h10M152 50h10M152 66h10\" stroke=\"#fff\" stroke-width=\"3\" stroke-linecap=\"round\" opacity=\".8\"/></g><path d=\"M24 40l10 8M18 64l14 2\" stroke=\"#FFB000\" stroke-width=\"4\" stroke-linecap=\"round\"/><ellipse cx=\"100\" cy=\"176\" rx=\"44\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><rect x=\"80\" y=\"136\" width=\"16\" height=\"30\" rx=\"8\" fill=\"#F7F4EF\" stroke=\"#3A2E2A\" stroke-width=\"3.5\"/><rect x=\"104\" y=\"136\" width=\"16\" height=\"30\" rx=\"8\" fill=\"#F7F4EF\" stroke=\"#3A2E2A\" stroke-width=\"3.5\"/><path d=\"M78 164h20v6q0 4-4 4H78q-4 0-4-4q0-6 4-6zM102 164h20q4 0 4 6q0 4-4 4h-16q-4 0-4-4z\" fill=\"#1E7F78\" stroke=\"#3A2E2A\" stroke-width=\"3\"/><circle cx=\"100\" cy=\"90\" r=\"56\" fill=\"url(#bb)\" stroke=\"#3A2E2A\" stroke-width=\"4\"/><path d=\"M58 52Q78 90 58 128\" stroke=\"#E8403A\" stroke-width=\"3.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M142 52Q122 90 142 128\" stroke=\"#E8403A\" stroke-width=\"3.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M56.6 57.6l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M60.5 69.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M63.0 88.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M60.5 107.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M56.6 118.4l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M133.4 57.6l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M129.5 69.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M127.0 88.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M129.5 107.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M133.4 118.4l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><ellipse cx=\"80\" cy=\"58\" rx=\"14\" ry=\"7\" transform=\"rotate(-25 80 58)\" fill=\"#fff\" opacity=\".85\"/><path d=\"M50 66Q52 30 100 28Q148 30 150 66Q100 54 50 66z\" fill=\"#2FA39B\" stroke=\"#3A2E2A\" stroke-width=\"4\" stroke-linejoin=\"round\"/><path d=\"M136 62q26-2 40 10q-20 8-44 0z\" fill=\"#1E7F78\" stroke=\"#3A2E2A\" stroke-width=\"3.5\" stroke-linejoin=\"round\"/><circle cx=\"100\" cy=\"29\" r=\"5\" fill=\"#1E7F78\" stroke=\"#3A2E2A\" stroke-width=\"2.5\"/><path transform=\"translate(100 46) scale(0.75)\" d=\"M0 -12l3.5 8.5 8.5 3.5-8.5 3.5L0 12l-3.5-8.5L-12 0l8.5-3.5z\" fill=\"#FFF3B0\"/><ellipse cx=\"74\" cy=\"102\" rx=\"7.5\" ry=\"4.5\" fill=\"#FF7A7A\" opacity=\".45\"/><ellipse cx=\"126\" cy=\"102\" rx=\"7.5\" ry=\"4.5\" fill=\"#FF7A7A\" opacity=\".45\"/><path transform=\"translate(82 88) scale(0.9)\" d=\"M0 -12l3.5 8.5 8.5 3.5-8.5 3.5L0 12l-3.5-8.5L-12 0l8.5-3.5z\" fill=\"#2B1E16\"/><path transform=\"translate(118 88) scale(0.9)\" d=\"M0 -12l3.5 8.5 8.5 3.5-8.5 3.5L0 12l-3.5-8.5L-12 0l8.5-3.5z\" fill=\"#2B1E16\"/><path d=\"M86 102q14 22 28 0z\" fill=\"#2B1E16\" stroke=\"#2B1E16\" stroke-width=\"3\" stroke-linejoin=\"round\"/><path d=\"M93 113q7 6 14 0q-7-5-14 0z\" fill=\"#FF7B7B\"/><ellipse cx=\"40\" cy=\"108\" rx=\"10\" ry=\"14\" transform=\"rotate(25 40 108)\" fill=\"#F7F4EF\" stroke=\"#3A2E2A\" stroke-width=\"3.5\"/><ellipse cx=\"152\" cy=\"76\" rx=\"10\" ry=\"14\" transform=\"rotate(-150 152 76)\" fill=\"#F7F4EF\" stroke=\"#3A2E2A\" stroke-width=\"3.5\"/></g><rect x=\"51.0\" y=\"166\" width=\"98.0\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#3A2E2A\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#3A2E2A\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">응원해!</text></svg>" },
+    go: { name: "직관 가자!", svg: "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><radialGradient id=\"bb\" cx=\".38\" cy=\".32\" r=\".8\"><stop offset=\"0\" stop-color=\"#FFFFFF\"/><stop offset=\".7\" stop-color=\"#F6F2EA\"/><stop offset=\"1\" stop-color=\"#E4DDD0\"/></radialGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(0) translate(-100 -100)\"><path d=\"M170 40c-6-6-16 0-10 8l10 10 10-10c6-8-4-14-10-8z\" fill=\"#FF4D6D\"/><ellipse cx=\"100\" cy=\"176\" rx=\"44\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><rect x=\"80\" y=\"136\" width=\"16\" height=\"30\" rx=\"8\" fill=\"#F7F4EF\" stroke=\"#3A2E2A\" stroke-width=\"3.5\"/><rect x=\"104\" y=\"136\" width=\"16\" height=\"30\" rx=\"8\" fill=\"#F7F4EF\" stroke=\"#3A2E2A\" stroke-width=\"3.5\"/><path d=\"M78 164h20v6q0 4-4 4H78q-4 0-4-4q0-6 4-6zM102 164h20q4 0 4 6q0 4-4 4h-16q-4 0-4-4z\" fill=\"#1E7F78\" stroke=\"#3A2E2A\" stroke-width=\"3\"/><circle cx=\"100\" cy=\"90\" r=\"56\" fill=\"url(#bb)\" stroke=\"#3A2E2A\" stroke-width=\"4\"/><path d=\"M58 52Q78 90 58 128\" stroke=\"#E8403A\" stroke-width=\"3.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M142 52Q122 90 142 128\" stroke=\"#E8403A\" stroke-width=\"3.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M56.6 57.6l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M60.5 69.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M63.0 88.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M60.5 107.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M56.6 118.4l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M133.4 57.6l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M129.5 69.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M127.0 88.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M129.5 107.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M133.4 118.4l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><ellipse cx=\"80\" cy=\"58\" rx=\"14\" ry=\"7\" transform=\"rotate(-25 80 58)\" fill=\"#fff\" opacity=\".85\"/><path d=\"M50 66Q52 30 100 28Q148 30 150 66Q100 54 50 66z\" fill=\"#2FA39B\" stroke=\"#3A2E2A\" stroke-width=\"4\" stroke-linejoin=\"round\"/><path d=\"M136 62q26-2 40 10q-20 8-44 0z\" fill=\"#1E7F78\" stroke=\"#3A2E2A\" stroke-width=\"3.5\" stroke-linejoin=\"round\"/><circle cx=\"100\" cy=\"29\" r=\"5\" fill=\"#1E7F78\" stroke=\"#3A2E2A\" stroke-width=\"2.5\"/><path transform=\"translate(100 46) scale(0.75)\" d=\"M0 -12l3.5 8.5 8.5 3.5-8.5 3.5L0 12l-3.5-8.5L-12 0l8.5-3.5z\" fill=\"#FFF3B0\"/><ellipse cx=\"74\" cy=\"102\" rx=\"7.5\" ry=\"4.5\" fill=\"#FF7A7A\" opacity=\".45\"/><ellipse cx=\"126\" cy=\"102\" rx=\"7.5\" ry=\"4.5\" fill=\"#FF7A7A\" opacity=\".45\"/><ellipse cx=\"82\" cy=\"88\" rx=\"7\" ry=\"8.5\" fill=\"#2B1E16\"/><circle cx=\"84.5\" cy=\"84.5\" r=\"2.8\" fill=\"#fff\"/><path d=\"M109 90q9-10 18 0\" stroke=\"#2B1E16\" stroke-width=\"4.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M90 104q10 10 20 0\" stroke=\"#2B1E16\" stroke-width=\"4\" fill=\"none\" stroke-linecap=\"round\"/><ellipse cx=\"44\" cy=\"108\" rx=\"10\" ry=\"14\" transform=\"rotate(25 44 108)\" fill=\"#F7F4EF\" stroke=\"#3A2E2A\" stroke-width=\"3.5\"/><ellipse cx=\"140\" cy=\"118\" rx=\"10\" ry=\"14\" transform=\"rotate(-60 140 118)\" fill=\"#F7F4EF\" stroke=\"#3A2E2A\" stroke-width=\"3.5\"/><g transform=\"rotate(-12 150 120)\"><path d=\"M120 104h56v12a6 6 0 0 0 0 12v12h-56v-12a6 6 0 0 0 0-12z\" fill=\"#FFE8A3\" stroke=\"#B8860B\" stroke-width=\"3\"/><path d=\"M158 104v36\" stroke=\"#B8860B\" stroke-width=\"2\" stroke-dasharray=\"4 3\"/><text x=\"138\" y=\"127\" text-anchor=\"middle\" font-size=\"11\" font-weight=\"900\" fill=\"#8A5A00\" font-family=\"sans-serif\">입장권</text></g></g><rect x=\"37.7\" y=\"166\" width=\"124.6\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#3A2E2A\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#3A2E2A\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">직관 가자!</text></svg>" },
+    comeback: { name: "역전!", svg: "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><radialGradient id=\"bb\" cx=\".38\" cy=\".32\" r=\".8\"><stop offset=\"0\" stop-color=\"#FFFFFF\"/><stop offset=\".7\" stop-color=\"#F6F2EA\"/><stop offset=\"1\" stop-color=\"#E4DDD0\"/></radialGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(0) translate(-100 -100)\"><path d=\"M28 150q-14-22 4-40q-2 14 8 18q4-14 14-20q-4 22 6 30q4 10-4 16q-14 6-28-4z\" fill=\"#FF6B3D\" opacity=\".9\"/><path d=\"M38 150q-6-12 4-20q0 8 6 10q4 8-2 12q-4 2-8-2z\" fill=\"#FFD84D\"/><path d=\"M168 150q14-22-4-40q2 14-8 18q-4-14-14-20q4 22-6 30q-4 10 4 16q14 6 28-4z\" fill=\"#FF6B3D\" opacity=\".9\"/><path transform=\"translate(170 24) scale(0.8)\" d=\"M0 -12l3.5 8.5 8.5 3.5-8.5 3.5L0 12l-3.5-8.5L-12 0l8.5-3.5z\" fill=\"#FFD84D\"/><ellipse cx=\"100\" cy=\"176\" rx=\"44\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><rect x=\"80\" y=\"136\" width=\"16\" height=\"30\" rx=\"8\" fill=\"#F7F4EF\" stroke=\"#3A2E2A\" stroke-width=\"3.5\"/><rect x=\"104\" y=\"136\" width=\"16\" height=\"30\" rx=\"8\" fill=\"#F7F4EF\" stroke=\"#3A2E2A\" stroke-width=\"3.5\"/><path d=\"M78 164h20v6q0 4-4 4H78q-4 0-4-4q0-6 4-6zM102 164h20q4 0 4 6q0 4-4 4h-16q-4 0-4-4z\" fill=\"#1E7F78\" stroke=\"#3A2E2A\" stroke-width=\"3\"/><circle cx=\"100\" cy=\"90\" r=\"56\" fill=\"url(#bb)\" stroke=\"#3A2E2A\" stroke-width=\"4\"/><path d=\"M58 52Q78 90 58 128\" stroke=\"#E8403A\" stroke-width=\"3.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M142 52Q122 90 142 128\" stroke=\"#E8403A\" stroke-width=\"3.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M56.6 57.6l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M60.5 69.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M63.0 88.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M60.5 107.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M56.6 118.4l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M133.4 57.6l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M129.5 69.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M127.0 88.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M129.5 107.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M133.4 118.4l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><ellipse cx=\"80\" cy=\"58\" rx=\"14\" ry=\"7\" transform=\"rotate(-25 80 58)\" fill=\"#fff\" opacity=\".85\"/><ellipse cx=\"74\" cy=\"102\" rx=\"7.5\" ry=\"4.5\" fill=\"#FF7A7A\" opacity=\".45\"/><ellipse cx=\"126\" cy=\"102\" rx=\"7.5\" ry=\"4.5\" fill=\"#FF7A7A\" opacity=\".45\"/><path d=\"M70 76l20 7M130 76l-20 7\" stroke=\"#2B1E16\" stroke-width=\"5\" stroke-linecap=\"round\"/><ellipse cx=\"82\" cy=\"91\" rx=\"7\" ry=\"8\" fill=\"#2B1E16\"/><circle cx=\"84.5\" cy=\"88\" r=\"2.6\" fill=\"#fff\"/><ellipse cx=\"118\" cy=\"91\" rx=\"7\" ry=\"8\" fill=\"#2B1E16\"/><circle cx=\"120.5\" cy=\"88\" r=\"2.6\" fill=\"#fff\"/><rect x=\"86\" y=\"102\" width=\"28\" height=\"12\" rx=\"5\" fill=\"#fff\" stroke=\"#2B1E16\" stroke-width=\"3.5\"/><path d=\"M95 102v12M105 102v12\" stroke=\"#2B1E16\" stroke-width=\"2.5\"/><ellipse cx=\"40\" cy=\"108\" rx=\"10\" ry=\"14\" transform=\"rotate(25 40 108)\" fill=\"#F7F4EF\" stroke=\"#3A2E2A\" stroke-width=\"3.5\"/><ellipse cx=\"166\" cy=\"62\" rx=\"10\" ry=\"14\" transform=\"rotate(-170 166 62)\" fill=\"#F7F4EF\" stroke=\"#3A2E2A\" stroke-width=\"3.5\"/></g><rect x=\"60.5\" y=\"166\" width=\"79.0\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#3A2E2A\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#3A2E2A\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">역전!</text></svg>" },
+    fight: { name: "화이팅!", svg: "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\"><defs><radialGradient id=\"bb\" cx=\".38\" cy=\".32\" r=\".8\"><stop offset=\"0\" stop-color=\"#FFFFFF\"/><stop offset=\".7\" stop-color=\"#F6F2EA\"/><stop offset=\"1\" stop-color=\"#E4DDD0\"/></radialGradient></defs><g transform=\"translate(100 96) scale(0.8) rotate(0) translate(-100 -100)\"><path d=\"M150 20l6 14M166 26l-2 14M180 40l-12 6\" stroke=\"#FF922B\" stroke-width=\"4\" stroke-linecap=\"round\"/><ellipse cx=\"100\" cy=\"176\" rx=\"44\" ry=\"7\" fill=\"#000\" opacity=\".1\"/><rect x=\"80\" y=\"136\" width=\"16\" height=\"30\" rx=\"8\" fill=\"#F7F4EF\" stroke=\"#3A2E2A\" stroke-width=\"3.5\"/><rect x=\"104\" y=\"136\" width=\"16\" height=\"30\" rx=\"8\" fill=\"#F7F4EF\" stroke=\"#3A2E2A\" stroke-width=\"3.5\"/><path d=\"M78 164h20v6q0 4-4 4H78q-4 0-4-4q0-6 4-6zM102 164h20q4 0 4 6q0 4-4 4h-16q-4 0-4-4z\" fill=\"#1E7F78\" stroke=\"#3A2E2A\" stroke-width=\"3\"/><circle cx=\"100\" cy=\"90\" r=\"56\" fill=\"url(#bb)\" stroke=\"#3A2E2A\" stroke-width=\"4\"/><path d=\"M58 52Q78 90 58 128\" stroke=\"#E8403A\" stroke-width=\"3.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M142 52Q122 90 142 128\" stroke=\"#E8403A\" stroke-width=\"3.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M56.6 57.6l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M60.5 69.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M63.0 88.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M60.5 107.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M56.6 118.4l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M133.4 57.6l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M129.5 69.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M127.0 88.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M129.5 107.0l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><path d=\"M133.4 118.4l10 4\" stroke=\"#E8403A\" stroke-width=\"2.6\" stroke-linecap=\"round\"/><ellipse cx=\"80\" cy=\"58\" rx=\"14\" ry=\"7\" transform=\"rotate(-25 80 58)\" fill=\"#fff\" opacity=\".85\"/><path d=\"M50 66Q52 30 100 28Q148 30 150 66Q100 54 50 66z\" fill=\"#2FA39B\" stroke=\"#3A2E2A\" stroke-width=\"4\" stroke-linejoin=\"round\"/><path d=\"M136 62q26-2 40 10q-20 8-44 0z\" fill=\"#1E7F78\" stroke=\"#3A2E2A\" stroke-width=\"3.5\" stroke-linejoin=\"round\"/><circle cx=\"100\" cy=\"29\" r=\"5\" fill=\"#1E7F78\" stroke=\"#3A2E2A\" stroke-width=\"2.5\"/><path transform=\"translate(100 46) scale(0.75)\" d=\"M0 -12l3.5 8.5 8.5 3.5-8.5 3.5L0 12l-3.5-8.5L-12 0l8.5-3.5z\" fill=\"#FFF3B0\"/><ellipse cx=\"74\" cy=\"102\" rx=\"7.5\" ry=\"4.5\" fill=\"#FF7A7A\" opacity=\".45\"/><ellipse cx=\"126\" cy=\"102\" rx=\"7.5\" ry=\"4.5\" fill=\"#FF7A7A\" opacity=\".45\"/><path d=\"M70 76l20 7M130 76l-20 7\" stroke=\"#2B1E16\" stroke-width=\"5\" stroke-linecap=\"round\"/><ellipse cx=\"82\" cy=\"91\" rx=\"7\" ry=\"8\" fill=\"#2B1E16\"/><circle cx=\"84.5\" cy=\"88\" r=\"2.6\" fill=\"#fff\"/><ellipse cx=\"118\" cy=\"91\" rx=\"7\" ry=\"8\" fill=\"#2B1E16\"/><circle cx=\"120.5\" cy=\"88\" r=\"2.6\" fill=\"#fff\"/><path d=\"M86 102q14 22 28 0z\" fill=\"#2B1E16\" stroke=\"#2B1E16\" stroke-width=\"3\" stroke-linejoin=\"round\"/><path d=\"M93 113q7 6 14 0q-7-5-14 0z\" fill=\"#FF7B7B\"/><ellipse cx=\"42\" cy=\"110\" rx=\"10\" ry=\"14\" transform=\"rotate(25 42 110)\" fill=\"#F7F4EF\" stroke=\"#3A2E2A\" stroke-width=\"3.5\"/><ellipse cx=\"164\" cy=\"60\" rx=\"10\" ry=\"14\" transform=\"rotate(-165 164 60)\" fill=\"#F7F4EF\" stroke=\"#3A2E2A\" stroke-width=\"3.5\"/></g><rect x=\"51.0\" y=\"166\" width=\"98.0\" height=\"30\" rx=\"15\" fill=\"#fff\" stroke=\"#3A2E2A\" stroke-width=\"3\"/><text x=\"100\" y=\"187\" text-anchor=\"middle\" font-size=\"18\" font-weight=\"800\" fill=\"#3A2E2A\" font-family=\"Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif\">화이팅!</text></svg>" }
+    },
+  },
   oni: {
     name: "온이",
     items: {
@@ -4841,6 +5990,8 @@ function renderEmoGrid() {
     );
     return;
   }
+  if (EMOTICONS[emoPack] && EMOTICONS[emoPack].gift && !ownsPack(emoPack)) emoPack = "oni";
+  document.querySelectorAll(".emo-tabs .emo-tab").forEach((t) => t.classList.toggle("on", t.dataset.pack === emoPack));
   const pack = EMOTICONS[emoPack];
   grid.replaceChildren(
     ...Object.entries(pack.items).map(([key, item]) => {
@@ -5308,10 +6459,11 @@ chatText.addEventListener("input", () => {
   else clearTyping();
 });
 
-// Enter = 보내기, Shift+Enter = 줄바꿈
+// 컴퓨터: Enter = 보내기, Shift+Enter = 줄바꿈
+// 폰: Enter = 줄바꿈 (보내기는 ➤ 버튼) — 카톡처럼
 // isComposing: 한글 조합 중 Enter는 무시 (안 그러면 마지막 글자가 한 번 더 보내짐)
 chatText.addEventListener("keydown", (e) => {
-  if (e.key === "Enter" && !e.shiftKey && !e.isComposing && e.keyCode !== 229) {
+  if (e.key === "Enter" && !e.shiftKey && !e.isComposing && e.keyCode !== 229 && !phoneKeyboard()) {
     e.preventDefault();
     sendText();
   }
@@ -5624,11 +6776,24 @@ let presenceStops = [];
 
 // 접속 정보는 계정 ID(uid)로 저장 (Realtime Database 규칙이 전화번호를 모르기 때문)
 let myConnRef = null;
-// 앱을 보는지/내렸는지 바뀔 때마다 알려 줌
-document.addEventListener("visibilitychange", () => {
+let serverOffset = 0;      // 내 폰 시계와 서버 시계 차이
+const WATCH_FRESH = 75000; // "보는 중" 표시가 이 시간 안에 새로 찍혀야 진짜 보는 중
+// 값: 보는 중이면 서버 시간(30초마다 새로 찍음), 내렸으면 0
+// 예전엔 1로 저장했는데, 아이폰은 앱을 내리면 바로 재워서 0으로 못 바꾸고 1이 남음
+// → 서버가 "보고 있네" 하고 알림을 안 보내던 문제가 있었음
+function presenceValue() {
+  return document.visibilityState === "visible" ? rtdbNow() : 0;
+}
+function setPresenceValue() {
   // 연결을 끊었다가 다시 켜는 중이면 새 접속 정보가 따로 만들어짐 (예전 것에 쓰면 안 지워진 채 남음)
-  if (myConnRef && !rtdbOff) dbSet(myConnRef, document.visibilityState === "visible" ? 1 : 0).catch(() => {});
-});
+  if (myConnRef && !rtdbOff) dbSet(myConnRef, presenceValue()).catch(() => {});
+}
+document.addEventListener("visibilitychange", setPresenceValue);
+window.addEventListener("pagehide", () => { if (myConnRef && !rtdbOff) dbSet(myConnRef, 0).catch(() => {}); });
+function isWatchingValue(c) {
+  if (c === 1) return true; // 아직 업데이트 안 한 친구 폰 (예전 방식)
+  return typeof c === "number" && c > 1 && Date.now() + serverOffset - c < WATCH_FRESH;
+}
 
 function startPresence() {
   const uid = auth.currentUser && auth.currentUser.uid;
@@ -5642,14 +6807,18 @@ function startPresence() {
       await onDisconnect(myConn).remove();
       await onDisconnect(lastSeenRef).set(rtdbNow());
       // 값: 1 = 앱을 보고 있음, 0 = 켜져만 있음 (보고 있으면 서버 알림을 안 받음)
-      await dbSet(myConn, document.visibilityState === "visible" ? 1 : 0);
+      await dbSet(myConn, presenceValue());
       myConnRef = myConn;
     } catch (e) {
       console.warn("접속 표시를 저장하지 못했어요 (Realtime Database 규칙 확인)", e);
     }
   });
+  const stopOffset = onValue(dbRef(rtdb, ".info/serverTimeOffset"), (s) => { serverOffset = Number(s.val()) || 0; });
+  const beat = setInterval(() => { if (document.visibilityState === "visible") setPresenceValue(); }, 30000);
   presenceStops.push(() => {
     stop();
+    stopOffset();
+    clearInterval(beat);
     myConnRef = null;
     if (myConn) {
       dbRemove(myConn).catch(() => {});
@@ -5677,7 +6846,7 @@ function watchPresence(phone) {
       const conns = v.conns ? Object.values(v.conns) : [];
       presence.set(phone, {
         online: conns.length > 0,
-        watching: conns.some((c) => c === 1), // 앱 화면을 보고 있는 기기가 있음
+        conns, // 보는 중인지는 쓸 때 시간으로 다시 확인 (isWatchingValue)
         lastSeen: v.lastSeen || 0,
       });
       onPresenceChange(phone);
@@ -6402,6 +7571,7 @@ function cleanupSession() {
 }
 
 $("logout-btn").addEventListener("click", async () => {
+  await flushLikes().catch(() => {});
   try { localStorage.removeItem("onchat-lock"); updateLockRows(); } catch (e) { /* 괜찮음 */ }
   try { if ("clearAppBadge" in navigator) navigator.clearAppBadge(); } catch (e) { /* 괜찮음 */ }
   lastBadge = -1;
