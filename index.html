@@ -1129,6 +1129,7 @@ mark.hl { background: #FFE066; color: #222; border-radius: 3px; padding: 0 1px; 
 .gift-preview img { width: 100%; aspect-ratio: 1; }
 #gift-results .pick-row .btn.sm { padding: 8px 12px; font-size: 13px; flex-shrink: 0; }
 .gift-got { color: var(--primary); font-weight: 800; font-size: 13px; flex-shrink: 0; }
+.btn.yt-btn { background: #FF0033; color: #fff; }
 .oce-preview { position: relative; height: 150px; margin: 0 4px 10px; border-radius: 18px; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 14px; overflow: hidden; }
 .oce-preview .avatar { width: 72px; height: 72px; border-radius: 26px; font-size: 28px; background-color: var(--primary); color: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
 .oce-btns { display: flex; justify-content: center; gap: 8px; margin-bottom: 6px; }
@@ -1363,6 +1364,10 @@ mark.hl { background: #FFE066; color: #222; border-radius: 3px; padding: 0 1px; 
             <span>온챗 공식 프로필 편집<small class="setting-sub">010-onchat 이름 · 사진 · 배경</small></span> <span class="setting-value">›</span>
           </button>
         </div>
+        <div class="section-title">온챗</div>
+        <button id="yt-row" class="setting-row">
+          <span>▶️ 온챗팀 유튜브<small class="setting-sub">@On-CHAT · 새 기능 소식을 영상으로 봐요</small></span> <span class="setting-value">›</span>
+        </button>
         <div class="section-title">계정</div>
         <button id="pw-row" class="setting-row">
           <span><span id="pw-row-title">비밀번호 변경</span><small class="setting-sub" id="pw-row-sub">로그인할 때 쓰는 비밀번호</small></span> <span class="setting-value">›</span>
@@ -1628,6 +1633,8 @@ mark.hl { background: #FFE066; color: #222; border-radius: 3px; padding: 0 1px; 
           <input id="oce-name" class="input" type="text" maxlength="12" required>
           <label class="field-label" for="oce-status">상태메시지</label>
           <input id="oce-status" class="input" type="text" maxlength="40">
+          <label class="field-label" for="oce-yt">유튜브 주소</label>
+          <input id="oce-yt" class="input" type="url" maxlength="100" placeholder="https://www.youtube.com/@On-CHAT">
           <label class="field-label">배경</label>
           <div id="oce-bgs" class="oce-bgs"></div>
           <button id="oce-save" class="btn" type="submit">저장</button>
@@ -1896,7 +1903,7 @@ const firebaseConfig = {
 };
 
 // 👉 Cloudflare 알림 서버 주소 (예: "https://onchat-push.아이디.workers.dev"). 비어 있으면 앱 꺼진 알림은 꺼짐
-const APP_VERSION = "2026.11.17e"; // 설정 맨 아래에 보임 (새 버전 받았는지 확인용)
+const APP_VERSION = "2026.11.20a"; // 설정 맨 아래에 보임 (새 버전 받았는지 확인용)
 setTimeout(() => { const v = document.getElementById("app-version"); if (v) v.textContent = "OnChat 버전 " + APP_VERSION; }, 0);
 const PUSH_URL = "https://onchat.joshlee151001.workers.dev".replace(/\/$/, "");
 
@@ -2562,7 +2569,16 @@ $("pv-mine").addEventListener("click", openLikesList);
 
 /* ================= 온챗 공식 채팅 (010-onchat) ================= */
 const OC_ID = "onchat";
-const OC_DEFAULT = { nickname: "온챗", statusMessage: "온챗 공식 채팅이에요 💬", photo: "", bg: "preset:logo" };
+const OC_DEFAULT = { nickname: "온챗", statusMessage: "온챗 공식 채팅이에요 💬", photo: "", bg: "preset:logo", youtube: "https://www.youtube.com/@On-CHAT" };
+// 유튜브 주소만 허용 (이상한 링크 막기)
+function safeYoutube(url) {
+  const u = String(url || "").trim();
+  return /^https:\/\/(www\.|m\.)?youtube\.com\/[^\s"'<>]+$|^https:\/\/youtu\.be\/[^\s"'<>]+$/.test(u) ? u : "";
+}
+function openYoutube() {
+  const url = safeYoutube(ocUser().youtube) || OC_DEFAULT.youtube;
+  window.open(url, "_blank", "noopener");
+}
 let ocProfile = { ...OC_DEFAULT };
 let ocNotices = [];        // 공지 [{id, text, at}]
 let ocMeta = null;         // support/{내번호} (안 읽은 답장 수 등)
@@ -3082,10 +3098,12 @@ function openOcEdit() {
   oceDraft = { ...ocUser() };
   $("oce-name").value = oceDraft.nickname || "";
   $("oce-status").value = oceDraft.statusMessage || "";
+  $("oce-yt").value = oceDraft.youtube || "";
   renderOce();
   openModal("oc-edit-modal");
 }
 $("oc-edit-row").addEventListener("click", openOcEdit);
+$("yt-row").addEventListener("click", openYoutube);
 $("oce-name").addEventListener("input", () => { oceDraft.nickname = $("oce-name").value; renderOce(); });
 $("oce-photo-btn").addEventListener("click", () => $("oce-photo-input").click());
 $("oce-photo-reset").addEventListener("click", () => { oceDraft.photo = ""; renderOce(); });
@@ -3103,7 +3121,10 @@ $("oce-form").addEventListener("submit", async (e) => {
   e.preventDefault();
   const nickname = $("oce-name").value.trim().slice(0, 12);
   if (!nickname) return toast("이름을 입력해 주세요");
-  const data = { nickname, statusMessage: $("oce-status").value.trim().slice(0, 40), photo: oceDraft.photo || "", bg: oceDraft.bg || "" };
+  const ytRaw = $("oce-yt").value.trim();
+  const youtube = safeYoutube(ytRaw);
+  if (ytRaw && !youtube) return toast("유튜브 주소(https://www.youtube.com/...)만 넣을 수 있어요");
+  const data = { nickname, statusMessage: $("oce-status").value.trim().slice(0, 40), photo: oceDraft.photo || "", bg: oceDraft.bg || "", youtube };
   try {
     await setDoc(doc(db, "official", OC_ID), data);
     closeModal("oc-edit-modal");
@@ -4569,6 +4590,11 @@ function openProfile(user, isMe) {
     const chat = el("button", "btn", creatorMode ? "문의함" : "1:1 채팅");
     chat.addEventListener("click", () => { closeModal("profile-modal"); openOc(); });
     actions.append(chat);
+    if (safeYoutube(user.youtube)) {
+      const yt = el("button", "btn yt-btn", "▶ 유튜브");
+      yt.addEventListener("click", openYoutube);
+      actions.append(yt);
+    }
     if (creatorMode) {
       const edit = el("button", "btn ghost", "프로필 편집");
       edit.addEventListener("click", () => { closeModal("profile-modal"); openOcEdit(); });
