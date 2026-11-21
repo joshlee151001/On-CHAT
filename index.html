@@ -1154,6 +1154,14 @@ mark.hl { background: #FFE066; color: #222; border-radius: 3px; padding: 0 1px; 
 #ac-pick { position: fixed; inset: 0; z-index: 99998; background: rgba(229,72,77,0.08); cursor: crosshair; }
 #ac-pick p { position: absolute; top: 40%; left: 0; right: 0; margin: 0 auto; width: max-content; padding: 10px 16px; border-radius: 14px; background: rgba(0,0,0,0.75); color: #fff; font-size: 15px; font-weight: 700; pointer-events: none; }
 .setting-sub.warn { color: #e5484d; font-weight: 700; }
+.members-search { margin: 0 4px 10px; }
+#members-list .pick-row { cursor: pointer; }
+.member-date { font-size: 12px; color: var(--text-sub); white-space: nowrap; flex-shrink: 0; }
+.del-warn { margin: 0 4px 14px; padding: 14px 16px; border-radius: 14px; background: color-mix(in srgb, #e5484d 12%, transparent); font-size: 14px; line-height: 1.6; }
+.del-warn b { color: #e5484d; }
+.del-warn ul { margin: 6px 0 0; padding-left: 18px; }
+.del-check { display: flex; align-items: center; gap: 8px; margin: 10px 2px 0; font-size: 14px; }
+.btn.danger { background: #e5484d; color: #fff; }
 .pw-desc { margin: 0 4px 12px; padding: 12px 14px; border-radius: 14px; background: color-mix(in srgb, var(--primary) 12%, transparent); color: var(--text); font-size: 14px; line-height: 1.5; }
 .pw-msg { min-height: 18px; margin: 4px 2px 0; color: #e5484d; font-size: 13px; }
 #pw-forgot { display: block; margin: 10px auto 4px; }
@@ -1357,6 +1365,9 @@ mark.hl { background: #FFE066; color: #222; border-radius: 3px; padding: 0 1px; 
           <button id="ac-row" class="setting-row">
             <span>🖱️ 오토클리커<small class="setting-sub">정한 곳을 자동으로 계속 눌러요 (테스트용)</small></span> <span class="setting-value">›</span>
           </button>
+          <button id="members-row" class="setting-row">
+            <span>👥 가입자 목록<small class="setting-sub">누가 온챗에 가입했는지 봐요</small></span> <span class="setting-value">›</span>
+          </button>
           <button id="gift-row" class="setting-row">
             <span>🎁 이모티콘 선물하기<small class="setting-sub">⚾ 볼리 (야구) 이모티콘을 한 명씩 선물해요</small></span> <span class="setting-value">›</span>
           </button>
@@ -1373,6 +1384,7 @@ mark.hl { background: #FFE066; color: #222; border-radius: 3px; padding: 0 1px; 
           <span><span id="pw-row-title">비밀번호 변경</span><small class="setting-sub" id="pw-row-sub">로그인할 때 쓰는 비밀번호</small></span> <span class="setting-value">›</span>
         </button>
         <button id="logout-btn" class="setting-row danger">로그아웃</button>
+        <button id="delete-acc-btn" class="setting-row danger">회원 탈퇴 (프로필 삭제)</button>
         <p id="app-version" class="app-version"></p>
       </div>
 
@@ -1597,6 +1609,43 @@ mark.hl { background: #FFE066; color: #222; border-radius: 3px; padding: 0 1px; 
             <button class="btn sm" type="submit">찾기</button>
           </div>
           <div id="gift-results" class="pick-list"></div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ========== 가입자 목록 (제작자) ========== -->
+    <div id="members-modal" class="overlay hidden">
+      <div class="sheet tall">
+        <div class="sheet-head">
+          <h3 id="members-title">가입자 목록</h3>
+          <button class="icon-btn" data-close aria-label="닫기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+        </div>
+        <input id="members-search" class="input members-search" type="search" placeholder="닉네임 또는 번호로 찾기" autocomplete="off">
+        <div id="members-list" class="pick-list"></div>
+      </div>
+    </div>
+
+    <!-- ========== 회원 탈퇴 ========== -->
+    <div id="delete-acc-modal" class="overlay hidden">
+      <div class="sheet scroll">
+        <div class="sheet-head">
+          <h3>회원 탈퇴</h3>
+          <button class="icon-btn" data-close aria-label="닫기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+        </div>
+        <div class="del-warn">
+          <b>⚠️ 탈퇴하면 되돌릴 수 없어요</b>
+          <ul>
+            <li>내 프로필, 친구 목록, 받은 공감이 지워져요</li>
+            <li>모든 채팅방에서 나가요 (방에 "OO님이 탈퇴했습니다"가 남아요)</li>
+            <li>같은 번호로 나중에 다시 가입할 수 있어요</li>
+          </ul>
+        </div>
+        <form id="delete-acc-form" class="form">
+          <label class="field-label" for="del-pw">비밀번호 확인</label>
+          <input id="del-pw" class="input" type="password" autocomplete="current-password" required>
+          <label class="del-check"><input id="del-agree" type="checkbox"> 위 내용을 확인했어요</label>
+          <p id="del-msg" class="pw-msg"></p>
+          <button id="del-go" class="btn danger" type="submit">탈퇴하기</button>
         </form>
       </div>
     </div>
@@ -1903,7 +1952,7 @@ const firebaseConfig = {
 };
 
 // 👉 Cloudflare 알림 서버 주소 (예: "https://onchat-push.아이디.workers.dev"). 비어 있으면 앱 꺼진 알림은 꺼짐
-const APP_VERSION = "2026.11.20a"; // 설정 맨 아래에 보임 (새 버전 받았는지 확인용)
+const APP_VERSION = "2026.11.21a"; // 설정 맨 아래에 보임 (새 버전 받았는지 확인용)
 setTimeout(() => { const v = document.getElementById("app-version"); if (v) v.textContent = "OnChat 버전 " + APP_VERSION; }, 0);
 const PUSH_URL = "https://onchat.joshlee151001.workers.dev".replace(/\/$/, "");
 
@@ -3068,6 +3117,119 @@ $("gift-form").addEventListener("submit", async (e) => {
   } catch (err) {
     console.warn(err);
     box.replaceChildren(el("p", "oc-help", "찾지 못했어요. Firestore 규칙을 확인해 주세요."));
+  }
+});
+
+
+/* ---------- 가입자 목록 (제작자) ---------- */
+let membersAll = [];
+function tsMillis(t) {
+  if (!t) return 0;
+  if (typeof t === "number") return t;
+  if (typeof t.toMillis === "function") return t.toMillis();
+  if (t.seconds) return t.seconds * 1000;
+  return 0;
+}
+function renderMembers() {
+  const q = ($("members-search").value || "").trim().toLowerCase().replace(/-/g, "");
+  const list = q ? membersAll.filter((u) => (u.nickname || "").toLowerCase().includes(q) || u.phone.includes(q)) : membersAll;
+  $("members-title").textContent = `가입자 목록 (${membersAll.length.toLocaleString()}명)`;
+  if (!list.length) {
+    $("members-list").replaceChildren(el("p", "oc-help", q ? "찾는 사람이 없어요." : "아직 가입한 사람이 없어요."));
+    return;
+  }
+  $("members-list").replaceChildren(
+    ...list.map((u) => {
+      const row = el("div", "pick-row");
+      const name = el("div", "name");
+      name.append((u.nickname || "(이름 없음)") + (u.phone === myPhone ? " (나)" : ""), el("div", "note", formatPhone(u.phone)));
+      const t = tsMillis(u.createdAt);
+      row.append(makeAvatar(u), name, el("span", "member-date", t ? new Date(t).toLocaleDateString("ko-KR", { year: "2-digit", month: "numeric", day: "numeric" }) + " 가입" : ""));
+      row.addEventListener("click", () => { closeModal("members-modal"); openProfile(u, u.phone === myPhone); });
+      return row;
+    })
+  );
+}
+async function openMembers() {
+  if (!creatorMode) return;
+  $("members-search").value = "";
+  $("members-list").replaceChildren(el("p", "oc-help", "불러오는 중..."));
+  openModal("members-modal");
+  try {
+    const snap = await getDocs(query(collection(db, "users"), limit(2000)));
+    membersAll = snap.docs.map((d) => ({ phone: d.id, ...d.data() })).filter((u) => u.uid)
+      .sort((a, b) => tsMillis(b.createdAt) - tsMillis(a.createdAt));
+    renderMembers();
+  } catch (err) {
+    console.warn(err);
+    $("members-list").replaceChildren(el("p", "oc-help", "불러오지 못했어요. Firestore 규칙을 확인해 주세요."));
+  }
+}
+$("members-row").addEventListener("click", openMembers);
+$("members-search").addEventListener("input", renderMembers);
+
+/* ---------- 회원 탈퇴 ---------- */
+$("delete-acc-btn").addEventListener("click", () => {
+  $("delete-acc-form").reset();
+  $("del-msg").textContent = "";
+  openModal("delete-acc-modal");
+});
+$("delete-acc-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const user = auth.currentUser;
+  const phone = myPhone;
+  const msg = $("del-msg");
+  if (!user || !phone) return;
+  if (!$("del-agree").checked) { msg.textContent = "'위 내용을 확인했어요'를 체크해 주세요."; return; }
+  if (!confirm("정말 탈퇴할까요? 되돌릴 수 없어요.")) return;
+  const btn = $("del-go");
+  btn.disabled = true;
+  btn.textContent = "탈퇴하는 중...";
+  msg.textContent = "";
+  try {
+    // 1) 본인 확인
+    await reauthenticateWithCredential(user, EmailAuthProvider.credential(user.email, $("del-pw").value));
+    // 2) 모든 채팅방에서 나가기
+    const name = nameOf(phone);
+    const now = Date.now();
+    for (const room of rooms.slice()) {
+      try {
+        const batch = writeBatch(db);
+        const text = `${name}님이 탈퇴했습니다.`;
+        batch.update(doc(db, "rooms", room.id), { members: arrayRemove(phone), lastMessage: text, lastAt: now, lastSender: phone });
+        addSystemMessage(batch, room.id, text, now);
+        await batch.commit();
+      } catch (err) { console.warn("방 나가기 실패", room.id, err); }
+    }
+    // 3) 친구 / 차단 / 받은 공감 지우기
+    for (const sub of ["friends", "blocked", "likes"]) {
+      try {
+        const snap = await getDocs(collection(db, "users", phone, sub));
+        for (const d of snap.docs) await deleteDoc(d.ref).catch(() => {});
+      } catch (err) { console.warn(sub, err); }
+    }
+    // 4) 프로필 + 계정 연결 지우기
+    const batch = writeBatch(db);
+    batch.delete(doc(db, "users", phone));
+    batch.delete(doc(db, "accounts", user.uid));
+    await batch.commit();
+    // 5) 알림 끄기, 이 기기 기록 지우기
+    if (pushOn()) { await unsubscribePush().catch(() => {}); writePref("onchat-push", false); }
+    try {
+      for (const k of Object.keys(localStorage)) if (k.includes(phone) || k === "onchat-lock") localStorage.removeItem(k);
+    } catch (err) { /* 괜찮음 */ }
+    // 6) 로그인 계정 삭제
+    await deleteUser(user);
+    closeModal("delete-acc-modal");
+    cleanupSession();
+    showWelcome();
+    alert("탈퇴했어요. 그동안 온챗을 써 줘서 고마워요 🙏");
+  } catch (err) {
+    console.warn(err);
+    msg.textContent = pwError(err).replace("바꾸지 못했어요", "탈퇴하지 못했어요");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "탈퇴하기";
   }
 });
 
